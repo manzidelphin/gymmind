@@ -1,0 +1,209 @@
+.page {
+  min-height: 100svh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+  box-sizing: border-box;
+}
+
+/* Logo */
+.logo    { text-align: center; margin-bottom: 32px; }
+.logoText { font-size: 26px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; }
+.logoSub  { font-size: 13px; color: #64748b; margin-top: 2px; }
+
+/* Step dots */
+.stepIndicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 28px; }
+.dot     { width: 8px;  height: 8px; border-radius: 999px; background: #e2e8f0; transition: all 0.25s; }
+.dotActive { width: 24px; height: 8px; border-radius: 999px; background: #2563eb; transition: all 0.25s; }
+.dotDone { width: 8px;  height: 8px; border-radius: 999px; background: #22c55e; transition: all 0.25s; }
+
+/* Labels */
+.label {
+  display: block; font-size: 13px; font-weight: 600; color: #475569;
+  margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.labelSpaced { margin-top: 20px; }
+.labelOptional { color: #94a3b8; font-weight: 400; text-transform: none; }
+
+/* Inputs */
+.input {
+  width: 100%; padding: 16px 18px; font-size: 22px; font-weight: 600;
+  border: 2px solid #e2e8f0; border-radius: 12px; background: #f8fafc;
+  color: #0f172a; letter-spacing: 1px; box-sizing: border-box; font-family: inherit;
+}
+.input:focus { border-color: #2563eb; outline: none; }
+
+.select {
+  width: 100%; padding: 14px 18px; font-size: 16px; font-weight: 500;
+  border: 2px solid #e2e8f0; border-radius: 12px; background: #f8fafc;
+  color: #0f172a; margin-top: 8px; cursor: pointer; box-sizing: border-box;
+  font-family: inherit;
+}
+
+/* Buttons */
+.btn {
+  width: 100%; padding: 16px; font-size: 17px; font-weight: 700;
+  border-radius: 12px; background: #2563eb; color: #fff;
+  margin-top: 16px; border: none; cursor: pointer; font-family: inherit;
+}
+.btnDisabled { background: #94a3b8; cursor: not-allowed; }
+
+.backBtn {
+  width: 100%; padding: 12px; font-size: 14px; font-weight: 600;
+  border-radius: 12px; background: transparent; color: #94a3b8;
+  margin-top: 10px; border: 2px solid #f1f5f9; cursor: pointer; font-family: inherit;
+}
+
+/* OTP grid */
+.otpGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.otpCell {
+  width: 100%; aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 700;
+  border: 2px solid #e2e8f0; border-radius: 10px;
+  background: #f8fafc; color: #0f172a;
+  caret-color: transparent; outline: none; font-family: inherit;
+  box-sizing: border-box;
+}
+.otpCell:focus   { border-color: #2563eb; }
+.otpCellFilled   { border-color: #2563eb; background: #eff6ff; }
+
+/* Step heading (institutional / individual flows) */
+.stepHeading {
+  font-size: 18px; font-weight: 700; color: #0f172a;
+  margin-bottom: 16px; text-align: center;
+}
+
+/* Institution list */
+.instList {
+  list-style: none; margin: 0 0 4px; padding: 0;
+  border: 2px solid #e2e8f0; border-radius: 12px; overflow: hidden;
+}
+.instItem {
+  width: 100%; display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; background: #fff; border: none; cursor: pointer;
+  font-family: inherit; color: #0f172a; text-align: left;
+  border-bottom: 1px solid #f1f5f9; transition: background 0.12s;
+}
+.instItem:last-child { border-bottom: none; }
+.instItem:hover { background: #f8fafc; }
+.instAvatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #0F6E56; color: #fff;
+  font-size: 15px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.instName { font-size: 16px; font-weight: 600; flex: 1; }
+
+/* Member search input (institutional step 2) */
+.memberSearchInput {
+  width: 100%; padding: 16px 18px; font-size: 18px; font-weight: 500;
+  border: 2px solid #e2e8f0; border-radius: 12px; background: #f8fafc;
+  color: #0f172a; box-sizing: border-box; font-family: inherit;
+  min-height: 56px; margin-bottom: 8px;
+}
+.memberSearchInput:focus { border-color: #0F6E56; outline: none; background: #fff; }
+
+/* Search results */
+.resultList {
+  list-style: none; margin: 12px 0 0; padding: 0;
+  border: 2px solid #e2e8f0; border-radius: 12px; overflow: hidden;
+}
+.resultItem {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; background: #fff; border: none; cursor: pointer;
+  font-family: inherit; font-size: 16px; color: #0f172a; text-align: left;
+  border-bottom: 1px solid #f1f5f9; transition: background 0.12s;
+}
+.resultItem:last-child { border-bottom: none; }
+.resultItem:hover { background: #f8fafc; }
+.resultName { font-weight: 600; }
+.resultArrow { color: #94a3b8; font-size: 18px; flex-shrink: 0; }
+.resultInfo { display: flex; flex-direction: column; gap: 2px; text-align: left; }
+.resultMeta { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; color: #64748b; font-weight: 400; }
+.resultInst { color: #2563eb; font-weight: 600; }
+
+.notFound {
+  margin-top: 14px; padding: 14px 18px; background: #fef9ec;
+  border: 1px solid #fcd34d; border-radius: 10px;
+  font-size: 14px; color: #78350f; line-height: 1.5;
+}
+
+.newMemberBtn {
+  display: inline-block; margin-top: 10px; padding: 10px 18px;
+  font-size: 14px; font-weight: 700; color: #fff;
+  background: #2563eb; border: none; border-radius: 8px;
+  cursor: pointer; font-family: inherit;
+}
+
+/* Selected member indicator */
+.selectedCard {
+  display: flex; flex-direction: column; background: #eff6ff;
+  border: 2px solid #bfdbfe; border-radius: 12px; padding: 14px 18px;
+  margin-bottom: 20px;
+}
+.selectedLabel { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #3b82f6; }
+.selectedName  { font-size: 20px; font-weight: 700; color: #1e40af; margin-top: 2px; }
+
+/* Dev badge / error / hint */
+.devBadge {
+  background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px;
+  padding: 8px 12px; font-size: 13px; color: #92400e;
+  margin-top: 10px; text-align: center; font-family: monospace;
+}
+.error {
+  background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px;
+  padding: 11px 14px; font-size: 14px; color: #dc2626;
+  margin-top: 12px; text-align: center;
+}
+.hint { font-size: 13px; color: #94a3b8; text-align: center; margin-top: 10px; }
+
+/* Success screen */
+.successBox   { text-align: center; }
+.successIcon  { font-size: 56px; margin-bottom: 12px; line-height: 1; }
+.successTitle { font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+.successSub   { font-size: 14px; color: #64748b; margin-bottom: 24px; }
+
+.qrWrap   { display: flex; justify-content: center; margin-bottom: 20px; }
+.qrCanvas { border-radius: 12px; border: 3px solid #e2e8f0; padding: 12px; background: #fff; }
+
+.memberCard {
+  background: #f8fafc; border-radius: 12px; padding: 16px;
+  margin-bottom: 20px; border: 1px solid #e2e8f0; text-align: left;
+}
+.memberCardRow {
+  display: flex; justify-content: space-between;
+  font-size: 14px; color: #475569; margin-bottom: 6px;
+}
+.memberCardRowLast { margin-bottom: 0; }
+.memberCardValue { font-weight: 600; color: #0f172a; }
+
+.checkinBtn {
+  width: 100%; padding: 16px; font-size: 17px; font-weight: 700;
+  border-radius: 12px; background: #16a34a; color: #fff;
+  border: none; cursor: pointer; margin-top: 4px; font-family: inherit;
+}
+.newBtn {
+  width: 100%; padding: 13px; font-size: 15px; font-weight: 600;
+  border-radius: 12px; background: transparent; color: #64748b;
+  border: 2px solid #e2e8f0; cursor: pointer; margin-top: 10px; font-family: inherit;
+}

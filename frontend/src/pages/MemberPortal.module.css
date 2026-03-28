@@ -1,0 +1,143 @@
+.page {
+  min-height: 100svh; background: #f1f5f9;
+  display: flex; flex-direction: column;
+}
+
+/* Header */
+.header {
+  background: #0f172a; color: #fff; padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px; flex-shrink: 0;
+}
+.logoText { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
+.logoutBtn {
+  background: rgba(255,255,255,0.1); border: none; color: #cbd5e1;
+  padding: 5px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 600;
+  font-family: inherit;
+}
+
+.body { flex: 1; padding: 24px; max-width: 640px; width: 100%; margin: 0 auto; }
+
+/* Profile card */
+.profileCard {
+  background: #fff; border-radius: 14px; padding: 28px 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 20px;
+}
+.avatar {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+.profileName  { font-size: 20px; font-weight: 700; color: #0f172a; }
+.profilePhone { font-size: 14px; color: #64748b; margin-top: 2px; }
+.profileRole  {
+  display: inline-block; margin-top: 6px; padding: 2px 10px;
+  background: #eff6ff; color: #1d4ed8; border-radius: 999px; font-size: 12px; font-weight: 600;
+}
+
+/* QR card */
+.qrCard {
+  background: #fff; border-radius: 14px; padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 16px; text-align: center;
+}
+.qrTitle   { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+.qrSub     { font-size: 13px; color: #64748b; margin-bottom: 16px; }
+.qrCanvas  { border-radius: 10px; border: 2px solid #e2e8f0; padding: 10px; }
+
+/* Membership card */
+.membershipCard {
+  background: #fff; border-radius: 14px; padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 16px;
+}
+.cardHeader { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.cardTitle  { font-size: 15px; font-weight: 700; color: #0f172a; }
+.planName   { font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 2px; }
+.planType   {
+  display: inline-block; padding: 2px 10px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; background: #eff6ff; color: #1d4ed8;
+}
+.statusBadgeActive    { background: #dcfce7; color: #166534; border-radius: 999px; padding: 3px 12px; font-size: 12px; font-weight: 700; }
+.statusBadgeExpired   { background: #fee2e2; color: #991b1b; border-radius: 999px; padding: 3px 12px; font-size: 12px; font-weight: 700; }
+
+/* Progress bar */
+.progressWrap { margin: 14px 0 6px; }
+.progressLabel { display: flex; justify-content: space-between; font-size: 13px; color: #64748b; margin-bottom: 6px; }
+.progressTrack { height: 10px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+.progressFill  { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #2563eb, #7c3aed); transition: width 0.4s ease; width: var(--progress, 0%); }
+.progressFillLow { background: linear-gradient(90deg, #ea580c, #dc2626); }
+
+.membershipLoading { color: #94a3b8; font-size: 14px; }
+.expiresText { font-size: 13px; color: #64748b; margin-top: 8px; }
+.registerHint { font-size: 13px; color: #94a3b8; text-align: center; margin-top: 10px; }
+.registerLink { color: #2563eb; }
+
+.noMembership { text-align: center; padding: 20px 0; color: #94a3b8; font-size: 14px; }
+.renewBtn {
+  width: 100%; padding: 13px; font-size: 15px; font-weight: 700; border-radius: 10px;
+  background: #2563eb; color: #fff; border: none; cursor: pointer; margin-top: 14px; font-family: inherit;
+}
+
+/* Check-in history */
+.historyCard {
+  background: #fff; border-radius: 14px; padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.historyTitle { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 14px; }
+.historyItem  {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px;
+}
+.historyItem:last-child { border-bottom: none; }
+.historyDate  { color: #374151; font-weight: 500; }
+.historyType  {
+  padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;
+}
+.typeIndividual    { background: #eff6ff; color: #1d4ed8; }
+.typeInstitutional { background: #f0fdf4; color: #166534; }
+.typeDependent     { background: #e0f2fe; color: #0369a1; }
+.historyEmpty { color: #94a3b8; font-size: 14px; text-align: center; padding: 16px 0; }
+
+/* Login gate — reuse same style as manager */
+.loginPage {
+  min-height: 100svh; background: #0f172a;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.loginCard {
+  background: #fff; border-radius: 20px; padding: 40px 36px;
+  width: 100%; max-width: 420px; box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+}
+.loginTitle { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+.loginSub   { font-size: 14px; color: #64748b; margin-bottom: 24px; }
+.label {
+  display: block; font-size: 12px; font-weight: 600; color: #475569;
+  margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px;
+}
+.input {
+  width: 100%; padding: 13px 15px; font-size: 20px; font-weight: 600;
+  border: 2px solid #e2e8f0; border-radius: 10px; background: #f8fafc;
+  color: #0f172a; letter-spacing: 2px; box-sizing: border-box; font-family: inherit;
+}
+.btn {
+  width: 100%; padding: 14px; font-size: 16px; font-weight: 700; border-radius: 10px;
+  background: #2563eb; color: #fff; margin-top: 12px; cursor: pointer; border: none; font-family: inherit;
+}
+.btnDisabled { background: #94a3b8; cursor: not-allowed; }
+.btnGhost { background: transparent; color: #64748b; border: 2px solid #e2e8f0; margin-top: 8px; }
+.otpGrid { display: grid; grid-template-columns: repeat(6,1fr); gap: 8px; margin: 4px 0; }
+.otpCell {
+  padding: 12px 0; font-size: 22px; font-weight: 700; text-align: center;
+  border: 2px solid #e2e8f0; border-radius: 8px; background: #f8fafc;
+  color: #0f172a; caret-color: transparent; outline: none; font-family: inherit;
+}
+.otpCellFilled { border-color: #2563eb; background: #eff6ff; }
+.devBadge {
+  background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px;
+  padding: 7px 12px; font-size: 13px; color: #92400e;
+  margin-top: 8px; text-align: center; font-family: monospace;
+}
+.error {
+  background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
+  padding: 9px 13px; font-size: 14px; color: #dc2626; margin-top: 10px; text-align: center;
+}

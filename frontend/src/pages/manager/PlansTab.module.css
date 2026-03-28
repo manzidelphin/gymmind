@@ -1,0 +1,53 @@
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; }
+
+.planCard {
+  background: #fff; border-radius: 12px; padding: 20px 22px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07); border: 2px solid transparent;
+  transition: border-color 0.15s;
+}
+.planCardInactive { opacity: 0.55; }
+.planName { font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+.planType {
+  display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  background: #eff6ff; color: #1d4ed8; margin-bottom: 12px;
+}
+.planPrice { font-size: 24px; font-weight: 800; color: #0f172a; }
+.planCurrency { font-size: 13px; color: #64748b; margin-left: 4px; }
+.planDetail { font-size: 13px; color: #64748b; margin-top: 4px; }
+.planActions { display: flex; gap: 8px; margin-top: 14px; }
+.deactivateBtn {
+  flex: 1; padding: 8px; font-size: 13px; font-weight: 600; border-radius: 6px;
+  border: 1px solid #dc2626; color: #dc2626; background: #fef2f2; cursor: pointer; font-family: inherit;
+}
+.activateBtn {
+  flex: 1; padding: 8px; font-size: 13px; font-weight: 600; border-radius: 6px;
+  border: 1px solid #16a34a; color: #16a34a; background: #f0fdf4; cursor: pointer; font-family: inherit;
+}
+
+/* Create form */
+.formCard {
+  background: #fff; border-radius: 12px; padding: 28px 28px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.formTitle { font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 20px; }
+.formRow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.formGroup { display: flex; flex-direction: column; margin-bottom: 14px; }
+.formLabel { font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+.formInput, .formSelect {
+  padding: 10px 12px; font-size: 14px; border: 1px solid #e2e8f0;
+  border-radius: 8px; background: #f8fafc; color: #0f172a; font-family: inherit;
+}
+.submitBtn {
+  padding: 12px 28px; font-size: 15px; font-weight: 700; border-radius: 8px;
+  background: #2563eb; color: #fff; border: none; cursor: pointer; font-family: inherit; margin-top: 4px;
+}
+.submitBtnDisabled { background: #94a3b8; cursor: not-allowed; }
+.error {
+  background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
+  padding: 8px 12px; font-size: 13px; color: #dc2626; margin-top: 10px;
+}
+.success {
+  background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;
+  padding: 8px 12px; font-size: 13px; color: #166534; margin-top: 10px;
+}
+.sectionTitle { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 16px; }

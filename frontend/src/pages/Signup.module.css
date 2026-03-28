@@ -1,0 +1,328 @@
+.page {
+  min-height: 100vh;
+  background: #0A1628;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 40px 32px 36px;
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Header ──────────────────────────────────────────── */
+.logoWrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.stepHeading {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.stepSub {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+/* ── Progress dots ───────────────────────────────────── */
+.progress {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.dot {
+  height: 4px;
+  flex: 1;
+  border-radius: 999px;
+  background: #e2e8f0;
+  transition: background 0.2s;
+}
+
+.dotActive {
+  background: #2563eb;
+}
+
+.dotDone {
+  background: #16a34a;
+}
+
+/* ── Form ─────────────────────────────────────────────── */
+.label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.input {
+  width: 100%;
+  padding: 13px 14px;
+  font-size: 15px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #0f172a;
+  margin-bottom: 18px;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #fff;
+}
+
+.inputError {
+  border-color: #dc2626;
+  background: #fef2f2;
+}
+
+.slugRow {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.slugRow .input {
+  margin-bottom: 0;
+  padding-right: 120px;
+}
+
+.slugStatus {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.slugAvailable  { color: #16a34a; }
+.slugTaken      { color: #dc2626; }
+.slugChecking   { color: #64748b; }
+
+.slugHint {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 6px;
+  margin-bottom: 18px;
+}
+
+.slugHint code {
+  background: #f1f5f9;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #0f172a;
+}
+
+/* ── OTP grid ─────────────────────────────────────────── */
+.otpGrid {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+  margin: 4px 0 20px;
+}
+
+.otpCell {
+  flex: 1;
+  min-width: 0;
+  max-width: 56px;
+  height: 64px;
+  padding: 0;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #0f172a;
+  caret-color: transparent;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.otpCell:focus {
+  border-color: #2563eb;
+  background: #fff;
+}
+
+.otpCellFilled {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.resendRow {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.resendBtn {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.resendBtn:disabled {
+  color: #94a3b8;
+  cursor: default;
+}
+
+/* ── Buttons ─────────────────────────────────────────── */
+.btnPrimary {
+  width: 100%;
+  padding: 15px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.btnPrimary:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.btnBack {
+  width: 100%;
+  padding: 13px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  background: transparent;
+  color: #64748b;
+  border: 2px solid #e2e8f0;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 10px;
+}
+
+.btnBack:hover {
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+/* ── Error banner ─────────────────────────────────────── */
+.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #dc2626;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+/* ── Dev OTP badge ────────────────────────────────────── */
+.devBadge {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 13px;
+  color: #92400e;
+  margin-bottom: 16px;
+  text-align: center;
+  font-family: monospace;
+}
+
+/* ── Success screen ───────────────────────────────────── */
+.successCard {
+  text-align: center;
+}
+
+.successIcon {
+  font-size: 52px;
+  margin-bottom: 12px;
+}
+
+.successTitle {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.successSub {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.gymSlugPill {
+  display: inline-block;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 4px 12px;
+  margin-bottom: 28px;
+  font-family: monospace;
+}
+
+/* ── Footer link ─────────────────────────────────────── */
+.footerLink {
+  text-align: center;
+  margin-top: 22px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.footerLink a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footerLink a:hover {
+  text-decoration: underline;
+}
+
+/* ── Mobile ──────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .card {
+    padding: 32px 20px 28px;
+  }
+}

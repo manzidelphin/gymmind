@@ -1,0 +1,31 @@
+.wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Injected onto the <input> — !important overrides page-specific border styles */
+.inputValid {
+  border-color: #22c55e !important;
+  outline-color: #22c55e !important;
+}
+
+.inputError {
+  border-color: #ef4444 !important;
+  outline-color: #ef4444 !important;
+}
+
+.errorMsg {
+  display: block;
+  font-size: 0.72rem;
+  color: #ef4444;
+  margin-top: 0.2rem;
+  padding-left: 0.1rem;
+}
+
+.validMsg {
+  display: block;
+  font-size: 0.72rem;
+  color: #22c55e;
+  margin-top: 0.2rem;
+  padding-left: 0.1rem;
+}

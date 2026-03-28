@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(mysql:*)",
+      "Bash(/dev/null -e \":*)",
+      "Bash(__NEW_LINE_169dcbe61d30d753__ mysql:*)",
+      "Bash(npx tsc:*)",
+      "Bash(node -e \"require\\(''./node_modules/jspdf/dist/jspdf.umd.min.js''\\); console.log\\(''jspdf ok''\\)\")",
+      "Bash(node -e \"require\\(''./node_modules/jspdf-autotable/dist/jspdf.plugin.autotable.js''\\); console.log\\(''autotable ok''\\)\")",
+      "Bash(/dev/null -e \"ALTER TABLE gyms ADD COLUMN IF NOT EXISTS email VARCHAR\\(255\\) NULL;\")",
+      "Bash(/dev/null -e \"ALTER TABLE gyms ADD COLUMN email VARCHAR\\(255\\) NULL;\")"
+    ]
+  }
+}

@@ -1,0 +1,128 @@
+.page { min-height: 100svh; background: #f1f5f9; display: flex; flex-direction: column; }
+
+.header {
+  background: #0f172a; color: #fff; padding: 0 32px;
+  display: flex; align-items: center; justify-content: space-between; height: 60px;
+}
+.logoText  { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
+.adminBadge {
+  background: #7c3aed; border-radius: 6px; padding: 3px 10px;
+  font-size: 12px; font-weight: 700; margin-left: 10px;
+}
+.userInfo { font-size: 13px; color: #94a3b8; display: flex; align-items: center; gap: 12px; }
+.logoutBtn {
+  background: rgba(255,255,255,0.1); border: none; color: #cbd5e1;
+  padding: 5px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 600; font-family: inherit;
+}
+
+.body { flex: 1; padding: 28px 32px; max-width: 1280px; width: 100%; margin: 0 auto; }
+
+/* Stats row */
+.statsRow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+.statCard {
+  background: #fff; border-radius: 12px; padding: 20px 22px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-left: 4px solid transparent;
+}
+.statNum   { font-size: 36px; font-weight: 800; line-height: 1; }
+.statLabel { font-size: 14px; color: #64748b; margin-top: 4px; }
+
+/* Section header */
+.sectionHeader {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+}
+.sectionTitle { font-size: 16px; font-weight: 700; color: #0f172a; }
+.addBtn {
+  padding: 9px 18px; font-size: 14px; font-weight: 600;
+  background: #2563eb; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-family: inherit;
+}
+
+/* Gyms table */
+.table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: 28px; }
+.th {
+  padding: 12px 16px; font-size: 12px; font-weight: 600; color: #64748b;
+  text-transform: uppercase; letter-spacing: 0.5px; text-align: left;
+  background: #f8fafc; border-bottom: 1px solid #e2e8f0;
+}
+.td { padding: 13px 16px; font-size: 14px; color: #374151; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+.tr:last-child .td { border-bottom: none; }
+.tr:hover .td { background: #f8fafc; }
+
+.badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.badgeActive    { background: #dcfce7; color: #166534; }
+.badgeSuspended { background: #fee2e2; color: #991b1b; }
+.badgeCancelled { background: #f1f5f9; color: #64748b; }
+.planBadge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12px; background: #f5f3ff; color: #6d28d9; font-weight: 600; }
+
+.actionBtn {
+  padding: 5px 12px; font-size: 12px; font-weight: 600; border-radius: 6px;
+  border: 1px solid; cursor: pointer; font-family: inherit; margin-right: 6px;
+}
+.suspendBtn  { border-color: #dc2626; color: #dc2626; background: #fef2f2; }
+.activateBtn { border-color: #16a34a; color: #16a34a; background: #f0fdf4; }
+
+/* Create gym form */
+.formCard {
+  background: #fff; border-radius: 12px; padding: 28px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.formTitle { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 20px; }
+.formGrid  { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.formGroup { display: flex; flex-direction: column; gap: 5px; }
+.formLabel { font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.4px; }
+.formInput, .formSelect {
+  padding: 10px 12px; font-size: 14px; border: 1px solid #e2e8f0;
+  border-radius: 8px; background: #f8fafc; color: #0f172a; font-family: inherit;
+}
+.submitBtn {
+  margin-top: 18px; padding: 12px 28px; font-size: 15px; font-weight: 700;
+  border-radius: 8px; background: #2563eb; color: #fff; border: none; cursor: pointer; font-family: inherit;
+}
+.submitBtnDisabled { background: #94a3b8; cursor: not-allowed; }
+.formError {
+  background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
+  padding: 8px 12px; font-size: 13px; color: #dc2626; margin-top: 10px;
+}
+.formSuccess {
+  background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;
+  padding: 8px 12px; font-size: 13px; color: #166534; margin-top: 10px;
+}
+
+/* Login gate */
+.loginPage, .loginWrap {
+  min-height: 100svh; background: #0f172a;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.loginCard {
+  background: #fff; border-radius: 20px; padding: 40px 36px;
+  width: 100%; max-width: 420px; box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+}
+.loginTitle { font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+.loginSub   { font-size: 14px; color: #64748b; margin-bottom: 28px; }
+.label {
+  display: block; font-size: 12px; font-weight: 600; color: #475569;
+  margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.input {
+  width: 100%; padding: 14px 16px; font-size: 20px; font-weight: 600;
+  border: 2px solid #e2e8f0; border-radius: 10px; background: #f8fafc;
+  color: #0f172a; letter-spacing: 2px; box-sizing: border-box; font-family: inherit;
+}
+.btn { width: 100%; padding: 15px; font-size: 16px; font-weight: 700; border-radius: 10px; background: #2563eb; color: #fff; margin-top: 14px; cursor: pointer; border: none; font-family: inherit; }
+.btnDisabled { background: #94a3b8; cursor: not-allowed; }
+.btnGhost { background: transparent; color: #64748b; border: 2px solid #e2e8f0; margin-top: 8px; }
+.otpGrid { display: flex; gap: 8px; justify-content: flex-start; width: fit-content; margin: 4px 0; }
+.otpCell {
+  width: 48px; height: 56px; font-size: 22px; font-weight: 700; text-align: center;
+  border: 2px solid #e2e8f0; border-radius: 8px; background: #f8fafc;
+  color: #0f172a; caret-color: transparent; outline: none; font-family: inherit;
+  flex-shrink: 0; box-sizing: border-box;
+}
+.otpCellFilled { border-color: #2563eb; background: #eff6ff; }
+.devBadge, .devCode {
+  background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px;
+  padding: 7px 12px; font-size: 13px; color: #92400e; margin-top: 8px; text-align: center; font-family: monospace;
+}
+.error {
+  background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
+  padding: 10px 14px; font-size: 14px; color: #dc2626; margin-top: 10px; text-align: center;
+}

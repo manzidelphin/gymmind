@@ -1,0 +1,660 @@
+/* ═══════════════════════════════════════════════════════════════
+   BASE STYLES = TABLET (min-width: 768px)
+   Centered card on dark navy background.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Page wrapper ─────────────────────────────────────────────── */
+.page {
+  min-height: 100svh;
+  background: #0A1628;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* ── Card ─────────────────────────────────────────────────────── */
+.card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 520px;
+  border: 0.5px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.45);
+  box-sizing: border-box;
+}
+
+/* ── Logo ─────────────────────────────────────────────────────── */
+.logo     { text-align: center; margin-bottom: 36px; }
+.logoText { font-size: 36px; font-weight: 800; color: #0f172a; letter-spacing: -1px; }
+.logoSub  { font-size: 14px; color: #64748b; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ── Labels ───────────────────────────────────────────────────── */
+.label {
+  display: block;
+  font-size: 13px; font-weight: 600; color: #475569;
+  margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+/* ── Phone input ──────────────────────────────────────────────── */
+.phoneInput {
+  width: 100%;
+  padding: 14px 22px;
+  font-size: 40px; font-weight: 700;
+  border: 2px solid #e0e0e0; border-radius: 14px;
+  background: #f8fafc; color: #0f172a;
+  letter-spacing: 4px; box-sizing: border-box; font-family: inherit;
+  min-height: 72px;
+}
+.phoneInput:focus { border-color: #0F6E56; outline: none; background: #fff; }
+
+/* ── Primary button ───────────────────────────────────────────── */
+.btn {
+  width: 100%;
+  padding: 18px;
+  font-size: 20px; font-weight: 700;
+  border-radius: 12px; background: #0F6E56; color: #fff;
+  margin-top: 16px; border: none; cursor: pointer; font-family: inherit;
+  min-height: 64px;
+  transition: background 0.15s;
+}
+.btn:active:not(:disabled) { transform: scale(0.98); }
+.btn:hover:not(:disabled)  { background: #0a5a46; }
+.btnDisabled { background: #94a3b8; cursor: not-allowed; }
+
+/* ── Ghost / back button ──────────────────────────────────────── */
+.backBtn {
+  width: 100%;
+  padding: 15px;
+  font-size: 15px; font-weight: 600;
+  border-radius: 12px; background: #fff; color: #0F6E56;
+  margin-top: 10px; border: 2px solid #0F6E56; cursor: pointer; font-family: inherit;
+  min-height: 56px;
+}
+.backBtn:hover { background: #f0faf6; }
+
+/* ── OTP grid ─────────────────────────────────────────────────── */
+.otpGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.otpCell {
+  width: 100%; min-height: 80px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; font-weight: 700;
+  border: 2px solid #e0e0e0; border-radius: 12px;
+  background: #f8fafc; color: #0f172a;
+  caret-color: transparent; outline: none; font-family: inherit;
+  box-sizing: border-box; text-align: center;
+}
+.otpCell:focus  { border-color: #0F6E56; background: #f0faf6; }
+.otpCellFilled  { border-color: #0F6E56; background: #fff; }
+
+/* ── Dev badge ────────────────────────────────────────────────── */
+.devBadge {
+  background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px;
+  padding: 8px 12px; font-size: 13px; color: #92400e;
+  margin-top: 10px; text-align: center; font-family: monospace;
+}
+
+/* ── Error ────────────────────────────────────────────────────── */
+.error {
+  background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px;
+  padding: 13px 16px; font-size: 15px; color: #dc2626;
+  margin-top: 12px; text-align: center;
+}
+
+/* ── Hint ─────────────────────────────────────────────────────── */
+.hint { font-size: 14px; color: #94a3b8; text-align: center; margin-top: 12px; }
+
+/* ── Result screens ───────────────────────────────────────────── */
+.resultBox {
+  border-radius: 18px; padding: 36px 28px; text-align: center;
+}
+.resultIcon  { font-size: 64px; line-height: 1; margin-bottom: 16px; }
+.resultName  { font-size: 32px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+.resultSub   { font-size: 16px; color: rgba(255,255,255,0.85); margin-bottom: 14px; }
+.resultBadge {
+  display: inline-block; background: rgba(255,255,255,0.2);
+  border-radius: 999px; padding: 8px 22px; font-size: 16px; font-weight: 600; color: #fff;
+}
+.resultBadgeWarn {
+  background: rgba(251,191,36,0.25);
+  border: 1px solid rgba(251,191,36,0.6);
+}
+.resultTitle { font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.resultDivider {
+  border: none; border-top: 1px solid rgba(255,255,255,0.3);
+  width: 100%; margin: 14px 0;
+}
+.resultCheckin {
+  font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 10px;
+}
+
+/* ── Gym owner signup link ────────────────────────────────────── */
+.signupLink {
+  text-align: center; font-size: 12px; color: #94a3b8;
+  margin-top: 20px; padding-top: 16px; border-top: 1px solid #f1f5f9;
+}
+.signupLink a { color: #2563eb; text-decoration: none; font-weight: 600; }
+.signupLink a:hover { text-decoration: underline; }
+
+/* ── Warning banner ───────────────────────────────────────────── */
+.warnBanner {
+  background: #fef3c7; border: 1px solid #fcd34d; border-radius: 10px;
+  padding: 12px 16px; font-size: 14px; font-weight: 600; color: #78350f;
+  margin-top: 12px; text-align: center;
+}
+
+/* ── Countdown bar ────────────────────────────────────────────── */
+.countdownBar {
+  text-align: center; font-size: 13px; color: #94a3b8;
+  margin-top: 14px; margin-bottom: 4px;
+}
+
+/* ── Action buttons ───────────────────────────────────────────── */
+.actionBtn {
+  width: 100%; padding: 16px; font-size: 18px; font-weight: 700;
+  border-radius: 12px; border: none; cursor: pointer; margin-top: 10px;
+  font-family: inherit; min-height: 56px;
+  transition: background 0.15s;
+}
+.actionBtn:active { transform: scale(0.98); }
+.actionBtnBlue       { background: #2563eb; color: #fff; }
+.actionBtnBlue:hover  { background: #1d4ed8; }
+.actionBtnCyan       { background: #0891b2; color: #fff; }
+.actionBtnCyan:hover  { background: #0e7490; }
+.actionBtnGhost      { background: #f0faf6; color: #0F6E56; border: 2px solid #0F6E56; }
+.actionBtnGhost:hover { background: #e0f5ee; }
+
+/* Walk-in two-line button */
+.actionBtnWalkin {
+  background: #f0fdfa; color: #0F6E56;
+  border: 2px solid #0F6E56;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px;
+}
+.actionBtnWalkin:hover { background: #ccfbf1; }
+.actionBtnWalkinMain { font-size: 18px; font-weight: 700; }
+.actionBtnWalkinSub  { font-size: 12px; font-weight: 500; color: #0d9488; opacity: 0.85; }
+
+/* Small ghost reception button */
+.receptionBtn {
+  width: 100%; padding: 12px; font-size: 14px; font-weight: 600;
+  border-radius: 10px; background: transparent; color: #64748b;
+  border: 1px solid #e2e8f0; cursor: pointer; margin-top: 6px;
+  font-family: inherit; min-height: 44px;
+  transition: background 0.15s, color 0.15s;
+}
+.receptionBtn:hover { background: #f8fafc; color: #475569; }
+
+.receptionNote {
+  text-align: center; margin-top: 16px; color: #7c3aed;
+  font-weight: 600; font-size: 15px;
+}
+
+/* ── Background colour utilities ──────────────────────────────── */
+.bgGreen   { background: #0F6E56; }
+.bgAmber   { background: #F59E0B; }
+.bgEmerald { background: #059669; }
+.bgBlue    { background: #0284c7; }
+.bgRed     { background: #A32D2D; }
+.bgOrange  { background: #ea580c; }
+.bgPurple  { background: #7c3aed; }
+.bgSlate   { background: #475569; }
+
+/* ── Inline name search ───────────────────────────────────────── */
+.claimActions { display: flex; flex-direction: column; gap: 0; }
+.inlineSearch { margin-top: 12px; }
+.inlineSearchInput {
+  width: 100%; padding: 16px 18px; font-size: 20px; font-weight: 600;
+  border: 2px solid #e2e8f0; border-radius: 14px; background: #f8fafc;
+  color: #0f172a; box-sizing: border-box; font-family: inherit; min-height: 56px;
+  margin-top: 10px;
+}
+.inlineSearchInput:focus { border-color: #0F6E56; outline: none; }
+.inlineResultList {
+  list-style: none; margin: 8px 0 0; padding: 0;
+  border: 2px solid #e2e8f0; border-radius: 14px; overflow: hidden;
+}
+.inlineResultItem {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px; background: #fff; border: none; cursor: pointer;
+  font-family: inherit; font-size: 17px; font-weight: 600; color: #0f172a;
+  text-align: left; border-bottom: 1px solid #f1f5f9; transition: background 0.1s;
+  min-height: 56px;
+}
+.inlineResultItem:last-child { border-bottom: none; }
+.inlineResultItem:hover { background: #f0faf6; }
+.inlineResultInst { font-size: 13px; font-weight: 400; color: #0F6E56; }
+
+/* ── Plans panel ──────────────────────────────────────────────── */
+.plansPanel { margin-top: 12px; }
+.panelTitle {
+  font-size: 16px; font-weight: 700; color: #0f172a;
+  text-align: center; margin-bottom: 12px;
+}
+.planCard {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; background: #f8fafc; border: 2px solid #e2e8f0;
+  border-radius: 14px; cursor: pointer; font-family: inherit;
+  margin-bottom: 10px; transition: border-color 0.15s, background 0.15s;
+  min-height: 64px;
+}
+.planCard:hover { border-color: #0F6E56; background: #f0faf6; }
+.planName  { font-size: 17px; font-weight: 700; color: #0f172a; }
+.planMeta  { font-size: 14px; color: #64748b; }
+.planPrice { font-size: 17px; font-weight: 800; color: #0F6E56; }
+
+/* ── Plan confirmation ────────────────────────────────────────── */
+.planConfirm {
+  margin-top: 12px; text-align: center;
+  background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 16px;
+  padding: 24px 20px;
+}
+.confirmIcon  { font-size: 48px; margin-bottom: 10px; }
+.confirmTitle { font-size: 20px; font-weight: 800; color: #15803d; margin-bottom: 14px; }
+.confirmDetails {
+  background: #fff; border-radius: 10px; padding: 16px;
+  margin-bottom: 16px; border: 1px solid #dcfce7;
+}
+.confirmPlanName     { font-size: 22px; font-weight: 800; color: #0f172a; }
+.confirmPlanDuration { font-size: 15px; color: #64748b; margin-top: 4px; }
+.confirmPlanPrice    { font-size: 26px; font-weight: 800; color: #0F6E56; margin-top: 8px; }
+.confirmMsg {
+  font-size: 15px; color: #475569; line-height: 1.6; margin-bottom: 16px;
+}
+.paymentNote {
+  background: #FAEEDA; border: 1px solid #EF9F27; border-radius: 10px;
+  padding: 12px 16px; font-size: 14px; color: #633806;
+  margin-bottom: 16px; text-align: center;
+}
+
+/* ── Walk-in panel ────────────────────────────────────────────── */
+.walkInPanel {
+  margin-top: 12px; text-align: center;
+  background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 16px;
+  padding: 24px 20px;
+}
+.walkInIcon  { font-size: 48px; margin-bottom: 10px; }
+.walkInTitle { font-size: 22px; font-weight: 800; color: #1e40af; margin-bottom: 12px; }
+.walkInMsg   { font-size: 16px; color: #1e40af; line-height: 1.6; margin-bottom: 16px; }
+
+/* ── Payment panel (Screen D) ────────────────────────────────── */
+.paymentPanel {
+  margin-top: 12px; text-align: center;
+  background: #f8fafc; border: 2px solid #e2e8f0;
+  border-radius: 16px; padding: 24px 20px;
+}
+
+.paymentWaiting {
+  margin-top: 14px;
+  background: #f0faf6; border: 1px solid #a7f3d0;
+  border-radius: 10px; padding: 14px 16px;
+  font-size: 15px; font-weight: 600; color: #065f46;
+  text-align: center;
+}
+
+
+/* ── Choose type panel (user_not_found) ───────────────────────── */
+.chooseTypePanel { margin-top: 8px; }
+.chooseTypeCard {
+  width: 100%; display: flex; flex-direction: column; align-items: flex-start;
+  padding: 18px 20px; border: 2px solid #e2e8f0; border-radius: 14px;
+  background: #fff; cursor: pointer; font-family: inherit; margin-bottom: 12px;
+  text-align: left; transition: border-color 0.15s, background 0.15s;
+  min-height: 80px;
+}
+.chooseTypeCard:hover { border-color: #2563eb; background: #eff6ff; }
+.chooseTypeCardTeal { border-color: #0F6E56; background: #f0fdfa; }
+.chooseTypeCardTeal:hover { border-color: #0d9488; background: #ccfbf1; }
+.chooseTypeIcon  { font-size: 28px; margin-bottom: 4px; }
+.chooseTypeLabel { font-size: 17px; font-weight: 700; color: #0f172a; }
+.chooseTypeSub   { font-size: 13px; color: #64748b; margin-top: 2px; }
+.chooseTypeSubTeal { font-size: 13px; color: #0F6E56; margin-top: 2px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE  (max-width: 767px)
+   Full-screen, no card. White background.
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+
+  /* Full-screen white layout */
+  .page {
+    background: #fff;
+    padding: 0;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow-x: hidden; /* contains negative-margin result box */
+  }
+
+  .card {
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    max-width: 100%;
+    /* top / sides / bottom + iPhone home bar */
+    padding: max(48px, calc(env(safe-area-inset-top) + 24px))
+             24px
+             max(32px, calc(env(safe-area-inset-bottom) + 16px));
+    min-height: 100svh;
+    box-sizing: border-box;
+  }
+
+  /* ── Logo ── */
+  .logo     { margin-bottom: 32px; }
+  .logoText { font-size: 28px; }
+  .logoSub  { font-size: 13px; letter-spacing: 2px; }
+
+  /* ── Labels ── */
+  .label { font-size: 12px; letter-spacing: 1px; }
+
+  /* ── Phone input: 32px font, 64px tall
+       NOTE: font-size ≥ 16px prevents iOS auto-zoom — 32px is fine ── */
+  .phoneInput {
+    font-size: 32px;
+    min-height: 64px;
+    padding: 12px 18px;
+    letter-spacing: 3px;
+  }
+
+  /* ── OTP grid: 8px gap, 64px cells, 28px font ── */
+  .otpGrid { gap: 8px; }
+  .otpCell {
+    min-height: 64px;
+    font-size: 28px;
+  }
+
+  /* ── Primary button: 56px tall, 18px font ── */
+  .btn {
+    min-height: 56px;
+    font-size: 18px;
+  }
+
+  /* ── Action buttons ── */
+  .actionBtn {
+    min-height: 56px;
+    font-size: 17px;
+  }
+
+  /* ── Back button: ensure 44px minimum touch target ── */
+  .backBtn { min-height: 44px; }
+
+  /* ── Result text ── */
+  .resultName  { font-size: 36px; }
+  .resultSub   { font-size: 15px; }
+  .resultTitle { font-size: 20px; }
+
+  /* ── Result box: full-bleed at top of screen on mobile ──
+     Negative margins break out of the card padding (48px top, 24px sides). ── */
+  .resultBox {
+    margin: max(-48px, calc(-1 * (env(safe-area-inset-top) + 24px))) -24px 24px;
+    border-radius: 0;
+    padding: max(64px, calc(env(safe-area-inset-top) + 40px)) 24px 40px;
+    min-height: 42svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Inline search inputs: 16px minimum for iOS zoom prevention ── */
+  .inlineSearchInput {
+    font-size: 16px;
+    min-height: 56px;
+  }
+
+  /* ── Plan cards: full tap area ── */
+  .planCard { min-height: 56px; }
+
+  /* ── Hint ── */
+  .hint { font-size: 13px; }
+}
+
+/* ── Service selection ────────────────────────────────────────── */
+.serviceSelectGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.serviceSelectCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  background: #f8fafc;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s;
+  min-height: 90px;
+}
+.serviceSelectCard:hover:not(:disabled) { border-color: #0F6E56; background: #f0faf6; }
+.serviceSelectCard:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.serviceSelectName {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.serviceSelectDesc {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.serviceSelectPrice {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0F6E56;
+}
+
+/* ── Redesigned success screen ────────────────────────────────── */
+.successBox {
+  border-radius: 16px;
+  padding: 36px 28px 32px;
+  text-align: center;
+}
+
+.successCheckCircle {
+  width: 72px;
+  height: 72px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.successName {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.successDivider {
+  width: 60px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
+  margin: 0 auto 14px;
+}
+
+.successServiceLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.successServiceBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 4px 16px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+.successDateTime {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+
+.successMeta {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.successCountdown {
+  text-align: center;
+  font-size: 13px;
+  color: #94a3b8;
+  margin-top: 16px;
+  margin-bottom: 4px;
+}
+
+.successBtn {
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 17px;
+  font-weight: 500;
+  border-radius: 10px;
+  background: #fff;
+  color: #0F6E56;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 10px;
+  transition: background 0.15s;
+}
+.successBtn:hover  { background: #f0fdf4; }
+.successBtn:active { transform: scale(0.98); }
+
+.pendingBtn {
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: 10px;
+  background: #fff;
+  color: #F59E0B;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 14px;
+  transition: background 0.15s;
+}
+.pendingBtn:hover  { background: #fffbeb; }
+.pendingBtn:active { transform: scale(0.98); }
+
+/* ── Walk-in service multi-select ────────────────────────────── */
+.walkinServiceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.walkinServiceCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  background: #f8fafc;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s;
+  min-height: 80px;
+  position: relative;
+}
+.walkinServiceCard:hover:not(:disabled) { border-color: #0F6E56; background: #f0faf6; }
+
+.walkinServiceCardSelected {
+  border-color: #0F6E56;
+  background: #f0faf6;
+}
+
+.walkinServiceCheck {
+  position: absolute;
+  top: 8px; right: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F6E56;
+  min-width: 16px;
+}
+
+.walkinServiceName {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.walkinServicePrice {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0F6E56;
+}
+
+.walkinTotal {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  padding: 10px 0 4px;
+}
+
+/* ── Walk-in success pills ────────────────────────────────────── */
+.walkinSuccessPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.walkinSuccessPill {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 14px;
+  border-radius: 20px;
+}
+
+@media (max-width: 767px) {
+  .successBox {
+    margin: max(-48px, calc(-1 * (env(safe-area-inset-top) + 24px))) -24px 24px;
+    border-radius: 0;
+    padding: max(64px, calc(env(safe-area-inset-top) + 40px)) 24px 40px;
+    min-height: 42svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+}

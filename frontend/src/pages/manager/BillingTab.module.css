@@ -1,0 +1,154 @@
+.section { }
+
+/* ── Header ── */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.title { font-size: 18px; font-weight: 700; color: #0f172a; margin: 0; }
+
+.monthNav { display: flex; align-items: center; gap: 12px; }
+.monthBtn {
+  width: 32px; height: 32px; border: 1px solid #e2e8f0; border-radius: 8px;
+  background: #fff; font-size: 20px; line-height: 1; cursor: pointer;
+  color: #475569; font-family: inherit; display: flex; align-items: center; justify-content: center;
+}
+.monthBtn:disabled { opacity: 0.35; cursor: default; }
+.monthLabel {
+  font-size: 15px; font-weight: 600; color: #0f172a;
+  min-width: 130px; text-align: center;
+}
+
+/* ── Summary cards ── */
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.summaryCard {
+  background: #fff; border-radius: 12px; padding: 18px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-left: 4px solid transparent;
+}
+.cardBlue  { border-left-color: #2563eb; }
+.cardGreen { border-left-color: #16a34a; }
+.cardAmber { border-left-color: #d97706; }
+.cardBlue  .summaryNum { color: #2563eb; }
+.cardGreen .summaryNum { color: #16a34a; }
+.cardAmber .summaryNum { color: #d97706; }
+.summaryNum   { font-size: 22px; font-weight: 800; line-height: 1; }
+.summaryLabel { font-size: 13px; color: #64748b; margin-top: 6px; }
+
+/* ── Institution cards ── */
+.instCard {
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: 16px; overflow: hidden;
+}
+.instCardHeader {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 18px 20px 0;
+}
+.instName { font-size: 16px; font-weight: 700; color: #0f172a; }
+.instMeta { font-size: 13px; color: #64748b; margin-top: 3px; }
+.instBody { padding: 14px 20px 18px; }
+
+.billingRow {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px;
+}
+.billingLabel  { font-size: 14px; color: #64748b; }
+.billingAmount { font-size: 22px; font-weight: 800; color: #0f172a; }
+.rateNote      { font-size: 12px; color: #94a3b8; margin-bottom: 12px; }
+
+.statusRow  { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.statusLabel { font-size: 13px; color: #64748b; }
+
+.badge {
+  display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 999px;
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
+}
+.badgePaid    { background: #dcfce7; color: #15803d; }
+.badgePending { background: #fef3c7; color: #b45309; }
+.badgeOverdue { background: #fee2e2; color: #b91c1c; }
+.badgeSub     { font-weight: 400; text-transform: none; font-size: 11px; letter-spacing: 0; }
+
+.refNote { font-size: 12px; color: #94a3b8; margin-bottom: 10px; }
+
+.breakdownBtn {
+  padding: 6px 14px; font-size: 13px; font-weight: 600;
+  background: #f8fafc; color: #475569; border: 1px solid #e2e8f0;
+  border-radius: 8px; cursor: pointer; font-family: inherit; white-space: nowrap; flex-shrink: 0;
+}
+.breakdownBtn:hover { background: #f1f5f9; }
+
+.markPaidBtn {
+  padding: 9px 22px; font-size: 14px; font-weight: 600;
+  background: #16a34a; color: #fff; border: none;
+  border-radius: 8px; cursor: pointer; font-family: inherit;
+}
+.markPaidBtn:hover { background: #15803d; }
+
+/* ── Breakdown table ── */
+.breakdownSection {
+  border-top: 1px solid #f1f5f9; padding: 16px 20px; background: #f8fafc;
+}
+.bdTable { width: 100%; border-collapse: collapse; font-size: 13px; }
+.bdTh {
+  padding: 8px 12px; font-size: 11px; font-weight: 600; color: #64748b;
+  text-transform: uppercase; letter-spacing: 0.5px; text-align: left;
+  border-bottom: 1px solid #e2e8f0; background: #fff;
+}
+.bdTd   { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; color: #374151; }
+.bdTr:last-child .bdTd { border-bottom: none; }
+.bdTotal .bdTd { font-weight: 700; color: #0f172a; background: #f1f5f9; border-bottom: none; }
+.depLabel { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+.empty { color: #94a3b8; font-size: 14px; text-align: center; padding: 32px; margin: 0; }
+
+/* ── Modal ── */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center; z-index: 200;
+}
+.modal {
+  background: #fff; border-radius: 16px; width: 100%; max-width: 440px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.22); overflow: hidden;
+}
+.modalHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px 0;
+}
+.modalTitle { font-size: 16px; font-weight: 700; color: #0f172a; margin: 0; }
+.modalClose {
+  font-size: 24px; color: #94a3b8; background: none; border: none;
+  cursor: pointer; line-height: 1; font-family: inherit; padding: 0;
+}
+.modalBody   { padding: 20px 24px; }
+.modalFooter { padding: 0 24px 20px; display: flex; gap: 10px; justify-content: flex-end; }
+
+.formGroup   { margin-bottom: 16px; }
+.formLabel   { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+.formInput {
+  width: 100%; padding: 9px 12px; font-size: 14px; box-sizing: border-box;
+  border: 1px solid #e2e8f0; border-radius: 8px; outline: none; font-family: inherit;
+}
+.formInput:focus { border-color: #2563eb; }
+.formTextarea {
+  width: 100%; padding: 9px 12px; font-size: 14px; box-sizing: border-box;
+  border: 1px solid #e2e8f0; border-radius: 8px; outline: none;
+  font-family: inherit; resize: vertical;
+}
+.formTextarea:focus { border-color: #2563eb; }
+.saveError { font-size: 13px; color: #b91c1c; margin: 0 0 8px; }
+
+.cancelBtn {
+  padding: 9px 20px; font-size: 14px; font-weight: 600;
+  background: #fff; color: #475569; border: 1px solid #e2e8f0;
+  border-radius: 8px; cursor: pointer; font-family: inherit;
+}
+.submitBtn {
+  padding: 9px 20px; font-size: 14px; font-weight: 600;
+  background: #16a34a; color: #fff; border: none;
+  border-radius: 8px; cursor: pointer; font-family: inherit;
+}
+.submitBtn:disabled { opacity: 0.5; cursor: default; }

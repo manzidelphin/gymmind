@@ -1,0 +1,116 @@
+.page {
+  min-height: 100svh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+
+.card {
+  background: #fff; border-radius: 20px; padding: 40px 36px;
+  width: 100%; max-width: 480px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+}
+
+.logo {
+  font-size: 22px; font-weight: 900; color: #2563eb;
+  letter-spacing: -0.5px; margin-bottom: 24px;
+}
+
+.title {
+  font-size: 26px; font-weight: 800; color: #0f172a;
+  margin: 0 0 6px; letter-spacing: -0.3px;
+}
+
+.sub { font-size: 14px; color: #64748b; margin: 0 0 24px; }
+
+.label {
+  display: block; font-size: 12px; font-weight: 600;
+  color: #475569; text-transform: uppercase; letter-spacing: 0.4px;
+  margin-bottom: 5px; margin-top: 14px;
+}
+.label:first-of-type { margin-top: 0; }
+
+.input {
+  width: 100%; padding: 11px 14px; font-size: 15px;
+  border: 1.5px solid #e2e8f0; border-radius: 10px;
+  background: #f8fafc; color: #0f172a; font-family: inherit;
+  box-sizing: border-box; transition: border-color 0.15s;
+}
+.input:focus { outline: none; border-color: #2563eb; background: #fff; }
+
+.slugWrap {
+  display: flex; align-items: center;
+  border: 1.5px solid #e2e8f0; border-radius: 10px;
+  background: #f8fafc; overflow: hidden;
+}
+.slugWrap:focus-within { border-color: #2563eb; background: #fff; }
+.slugPrefix {
+  padding: 11px 0 11px 14px; font-size: 14px;
+  color: #94a3b8; white-space: nowrap; flex-shrink: 0;
+}
+.slugInput {
+  flex: 1; padding: 11px 14px 11px 4px; font-size: 15px;
+  border: none; background: transparent; color: #0f172a;
+  font-family: inherit; outline: none;
+}
+.slugHint { font-size: 12px; color: #94a3b8; margin: 4px 0 0; }
+
+.btn {
+  width: 100%; padding: 14px; font-size: 16px; font-weight: 700;
+  background: #2563eb; color: #fff; border: none; border-radius: 12px;
+  cursor: pointer; font-family: inherit; margin-top: 22px;
+  transition: background 0.15s;
+}
+.btn:hover:not(:disabled) { background: #1d4ed8; }
+.btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+.btnGhost {
+  width: 100%; padding: 12px; font-size: 14px; font-weight: 600;
+  background: transparent; color: #64748b; border: 2px solid #e2e8f0;
+  border-radius: 12px; cursor: pointer; font-family: inherit; margin-top: 10px;
+}
+
+.error {
+  background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
+  padding: 10px 14px; font-size: 13px; color: #dc2626; margin-top: 12px;
+}
+
+.devBadge {
+  text-align: center; font-size: 13px; font-weight: 700;
+  color: #7c3aed; background: #f5f3ff; border: 1px solid #ddd6fe;
+  border-radius: 8px; padding: 8px; margin-top: 12px;
+}
+
+/* OTP grid */
+.otpGrid {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;
+  margin: 20px 0 8px; width: 100%;
+}
+.otpCell {
+  width: 100%; aspect-ratio: 1; text-align: center; font-size: 22px;
+  font-weight: 700; border: 2px solid #e2e8f0; border-radius: 12px;
+  background: #f8fafc; color: #0f172a; font-family: inherit;
+  outline: none; transition: border-color 0.15s;
+}
+.otpCell:focus { border-color: #2563eb; background: #fff; }
+.otpCellFilled { border-color: #2563eb; background: #eff6ff; }
+
+/* Success */
+.successIcon { font-size: 52px; text-align: center; margin-bottom: 12px; }
+
+.infoBox {
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
+  padding: 16px 18px; margin: 20px 0;
+}
+.infoRow {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 0; border-bottom: 1px solid #f1f5f9;
+}
+.infoRow:last-child { border-bottom: none; }
+.infoLabel { font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; }
+.infoValue { font-size: 13px; color: #0f172a; font-weight: 700; font-family: monospace; }
+
+.loginLink {
+  text-align: center; font-size: 13px; color: #94a3b8; margin-top: 16px;
+}
+.loginLink a { color: #2563eb; text-decoration: none; font-weight: 600; }

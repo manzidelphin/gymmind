@@ -1,0 +1,120 @@
+.container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  width: 340px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  pointer-events: all;
+  position: relative;
+  overflow: hidden;
+  animation: slideIn 0.3s ease forwards;
+}
+
+.toastExiting {
+  animation: slideOut 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(120%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes slideOut {
+  from { transform: translateX(0);    opacity: 1; }
+  to   { transform: translateX(120%); opacity: 0; }
+}
+
+/* Border left by type */
+.success { border-left: 4px solid #16a34a; }
+.error   { border-left: 4px solid #dc2626; }
+.warning { border-left: 4px solid #d97706; }
+.info    { border-left: 4px solid #2563eb; }
+
+/* Icon circle */
+.icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.iconSuccess { background: #dcfce7; color: #16a34a; }
+.iconError   { background: #fee2e2; color: #dc2626; }
+.iconWarning { background: #fef3c7; color: #d97706; }
+.iconInfo    { background: #dbeafe; color: #2563eb; }
+
+/* Content */
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.message {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+/* Close button */
+.close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #94a3b8;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  margin-left: 4px;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+
+.close:hover { color: #475569; }
+
+/* Progress bar */
+.progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  transform-origin: left;
+}
+
+.progressSuccess { background: rgba(22, 163, 74,  0.3); }
+.progressError   { background: rgba(220, 38, 38,  0.3); }
+.progressWarning { background: rgba(217, 119, 6,  0.3); }
+.progressInfo    { background: rgba(37, 99, 235,  0.3); }
+
+@keyframes shrink {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}

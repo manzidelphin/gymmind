@@ -1,0 +1,221 @@
+.page {
+  min-height: 100vh;
+  background: #0A1628;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 40px 32px 36px;
+  width: 100%;
+  max-width: 420px;
+  box-sizing: border-box;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Logo row ───────────────────────────────────────── */
+.logoRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 8px;
+}
+
+.logoText {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+}
+
+/* ── Headings ───────────────────────────────────────── */
+.title {
+  font-size: 22px;
+  font-weight: 500;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+/* ── Input ──────────────────────────────────────────── */
+.input {
+  width: 100%;
+  padding: 13px 14px;
+  font-size: 15px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #0f172a;
+  margin-bottom: 16px;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #0F6E56;
+  background: #fff;
+}
+
+/* ── Buttons ────────────────────────────────────────── */
+.btnPrimary {
+  width: 100%;
+  height: 56px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  background: #0F6E56;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+  margin-bottom: 10px;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: #0a5a46;
+}
+
+.btnPrimary:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.btnSecondary {
+  width: 100%;
+  height: 56px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 10px;
+  background: transparent;
+  color: #0F6E56;
+  border: 2px solid #0F6E56;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+  margin-bottom: 10px;
+}
+
+.btnSecondary:hover {
+  background: #f0fdf4;
+}
+
+.backLink {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 10px 0 0;
+  font-size: 13px;
+  color: #94a3b8;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: center;
+}
+
+.backLink:hover { color: #64748b; }
+
+/* ── Gym badge ──────────────────────────────────────── */
+.gymBadge {
+  display: inline-block;
+  background: #e6f4f0;
+  color: #0F6E56;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+/* ── OTP grid ───────────────────────────────────────── */
+.otpGrid {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.otpCell {
+  width: 44px;
+  height: 54px;
+  flex-shrink: 0;
+  padding: 0;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #0f172a;
+  caret-color: transparent;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.otpCell:focus    { border-color: #0F6E56; background: #fff; }
+.otpCellFilled    { border-color: #0F6E56; background: #e6f4f0; }
+
+/* ── Dev badge ──────────────────────────────────────── */
+.devBadge {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 13px;
+  color: #92400e;
+  margin-bottom: 16px;
+  text-align: center;
+  font-family: monospace;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Error ──────────────────────────────────────────── */
+.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #dc2626;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.errorLink {
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  text-align: left;
+  text-decoration: underline;
+}
+
+/* ── Mobile ─────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .card { padding: 32px 20px 28px; }
+  .otpCell { width: 40px; height: 50px; font-size: 20px; }
+}

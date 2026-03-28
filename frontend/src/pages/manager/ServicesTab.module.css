@@ -1,0 +1,289 @@
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.addBtn {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+.addBtn:hover { background: #1d4ed8; }
+
+.serviceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.serviceCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  border: 2px solid transparent;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.cardName {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.defaultBadge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.cardDesc {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.cardPrice {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0F6E56;
+  margin-bottom: 12px;
+}
+
+.cardActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.editBtn {
+  flex: 1;
+  padding: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid #2563eb;
+  color: #2563eb;
+  background: #eff6ff;
+  cursor: pointer;
+  font-family: inherit;
+}
+.editBtn:hover { background: #dbeafe; }
+
+.saveBtn {
+  flex: 1;
+  padding: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid #16a34a;
+  color: #16a34a;
+  background: #f0fdf4;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.cancelBtn {
+  flex: 1;
+  padding: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid #94a3b8;
+  color: #64748b;
+  background: #f8fafc;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.deactivateBtn {
+  flex: 1;
+  padding: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid #dc2626;
+  color: #dc2626;
+  background: #fef2f2;
+  cursor: pointer;
+  font-family: inherit;
+}
+.deactivateBtn:hover { background: #fee2e2; }
+
+.section {
+  margin-bottom: 32px;
+}
+
+.subSectionTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.sectionHint {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 16px 0;
+}
+
+.planServiceCard {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  margin-bottom: 10px;
+}
+
+.planServiceName {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.checkboxRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.serviceCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+.instServiceCard {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  margin-bottom: 12px;
+}
+
+.instName {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.instServiceGrid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 16px;
+  align-items: center;
+}
+
+.instServiceHeader {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.instServiceCell {
+  font-size: 14px;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+}
+
+.afBtn {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.afNone      { background: #f1f5f9; color: #94a3b8; border-color: #e2e8f0; }
+.afBoth      { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+.afEmployees { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+.afDependents { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+.emptyState {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 32px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+  grid-column: 1 / -1;
+}
+
+.loadingMsg {
+  color: #64748b;
+  font-size: 14px;
+  padding: 16px 0;
+}
+
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.toastSuccess { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+.toastError   { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+.mt8 { margin-top: 8px; }
+
+.walkinPriceBadge {
+  display: inline-block;
+  margin-left: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid #bfdbfe;
+}
