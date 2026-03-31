@@ -37,3 +37,16 @@ institutionApi.interceptors.request.use(config => {
   if (token) config.headers['Authorization'] = `Bearer ${token}`;
   return config;
 });
+
+/**
+ * HR Admin API — Authorization header only (hr_token), no X-Gym-Slug.
+ */
+export const hrApi = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL as string,
+});
+
+hrApi.interceptors.request.use(config => {
+  const token = localStorage.getItem('hr_token');
+  if (token) config.headers['Authorization'] = `Bearer ${token}`;
+  return config;
+});

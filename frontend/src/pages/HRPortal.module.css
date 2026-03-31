@@ -1,0 +1,415 @@
+/* ─────────────────────────────────────────────────────────────────
+   HR PORTAL — Corporate Employee Wellness Portal
+   Color palette:
+     Primary navy : #1E3A5F
+     Logo green   : #1a7a4a
+     Success      : #059669
+     Warning      : #D97706
+     Danger       : #DC2626
+     MoMo amber   : #F59E0B
+     Background   : #F1F5F9
+     Text         : #1E293B
+   ───────────────────────────────────────────────────────────────── */
+
+/* ── Root ── */
+.root {
+  min-height: 100vh;
+  background: #F1F5F9;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: #1E293B;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Navbar ── */
+.navbar {
+  background: #fff;
+  border-bottom: 1px solid #E2E8F0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.navLeft  { display: flex; align-items: center; gap: 12px; }
+.navCenter {
+  font-size: 15px; font-weight: 600; color: #475569;
+  letter-spacing: 0.01em; position: absolute; left: 50%; transform: translateX(-50%);
+}
+.navRight { display: flex; align-items: center; gap: 12px; }
+
+.navLogo {
+  font-size: 18px; font-weight: 800; color: #1a7a4a; letter-spacing: -0.5px;
+}
+.navGymName {
+  font-size: 13px; color: #64748B; font-weight: 500;
+  padding-left: 12px; border-left: 1px solid #E2E8F0;
+}
+.navInstBadge {
+  background: #EBF4FF; color: #1E3A5F; border: 1px solid #C3D9F0;
+  padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600;
+}
+.navPowered { font-size: 11px; color: #94A3B8; }
+.navBackBtn {
+  font-size: 13px; font-weight: 600; color: #1E3A5F;
+  text-decoration: none; padding: 5px 12px;
+  border: 1.5px solid #C3D9F0; border-radius: 6px;
+  transition: background 0.15s;
+}
+.navBackBtn:hover { background: #EBF4FF; }
+
+/* ── Splash (loading / error) ── */
+.splash {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: #64748B;
+}
+.splashError { color: #DC2626; }
+
+/* ── Hero summary bar ── */
+.hero {
+  background: #1E3A5F;
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.heroGrid {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+}
+
+.statCard {
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 10px;
+  padding: 14px 20px;
+  flex: 1;
+  min-width: 140px;
+}
+.statGreen { background: rgba(5,150,105,.2); border-color: rgba(5,150,105,.3); }
+.statRed   { background: rgba(220,38,38,.15); border-color: rgba(220,38,38,.25); }
+
+.statNum {
+  font-size: 22px; font-weight: 800; color: #fff; line-height: 1;
+}
+.statPct      { font-size: 14px; font-weight: 500; color: rgba(255,255,255,.65); }
+.statGreenNum { color: #6EE7B7; }
+.statRedNum   { color: #FCA5A5; }
+.statLabel    { font-size: 12px; color: rgba(255,255,255,.65); margin-top: 5px; }
+
+.heroBadge { flex-shrink: 0; }
+
+/* ── Status badges ── */
+.badge {
+  display: inline-flex; align-items: center; padding: 6px 16px;
+  border-radius: 999px; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.5px; text-transform: uppercase;
+}
+.badgePaid    { background: #DCFCE7; color: #059669; border: 1px solid #A7F3D0; }
+.badgePending { background: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; }
+.badgeOverdue { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
+
+/* ── Tab bar ── */
+.tabBar {
+  background: #fff;
+  border-bottom: 1px solid #E2E8F0;
+  padding: 0 32px;
+  display: flex;
+  gap: 0;
+}
+
+.tab {
+  padding: 14px 20px;
+  font-size: 14px; font-weight: 500; color: #64748B;
+  background: none; border: none; border-bottom: 3px solid transparent;
+  cursor: pointer; font-family: inherit; white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tab:hover { color: #1E3A5F; }
+
+.tabActive {
+  padding: 14px 20px;
+  font-size: 14px; font-weight: 600; color: #1E3A5F;
+  background: none; border: none; border-bottom: 3px solid #1E3A5F;
+  cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+
+/* ── Content area ── */
+.content {
+  flex: 1;
+  padding: 28px 32px;
+}
+
+.panel {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+
+/* ── Invoice tab ── */
+.paidBanner {
+  background: #ECFDF5; color: #065F46;
+  padding: 14px 24px; font-size: 14px; font-weight: 500;
+  border-bottom: 1px solid #A7F3D0;
+}
+
+.invoiceHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; border-bottom: 1px solid #F1F5F9;
+}
+.invoiceTitle { font-size: 16px; font-weight: 700; color: #1E293B; }
+.invoiceSub   { font-size: 13px; color: #64748B; margin-top: 3px; }
+
+.downloadBtn {
+  padding: 8px 18px; font-size: 13px; font-weight: 600;
+  background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0;
+  border-radius: 8px; cursor: pointer; font-family: inherit;
+}
+.downloadBtn:hover { background: #E2E8F0; }
+
+/* ── Table ── */
+.table { width: 100%; border-collapse: collapse; }
+
+.th {
+  padding: 10px 20px;
+  font-size: 11px; font-weight: 600; color: #64748B;
+  text-transform: uppercase; letter-spacing: 0.6px;
+  text-align: left; background: #F8FAFC;
+  border-bottom: 1px solid #E2E8F0;
+}
+.thRight { text-align: right; }
+
+.td {
+  padding: 12px 20px; font-size: 14px; color: #374151;
+  border-bottom: 1px solid #F1F5F9; vertical-align: middle;
+}
+.tdRight { text-align: right; }
+.tdBold  { padding: 13px 20px; font-weight: 700; color: #1E293B; background: #F8FAFC; border-top: 2px solid #E2E8F0; }
+
+.tr:hover .td { background: #FAFAFA; }
+
+.empName  { font-weight: 500; color: #1E293B; }
+.empPhone { font-size: 12px; color: #94A3B8; margin-top: 2px; }
+
+/* ── Attendance bar in invoice table ── */
+.barTrack {
+  height: 6px; background: #E2E8F0; border-radius: 999px; width: 100px; overflow: hidden;
+}
+.barFill {
+  height: 100%; background: #1E3A5F; border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+/* ── Total row ── */
+.totalRow .tdBold { border-bottom: none; }
+
+/* ── Pay section ── */
+.paySection {
+  padding: 24px; border-top: 1px solid #F1F5F9; display: flex; justify-content: center;
+}
+
+.momoBtn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 32px; font-size: 16px; font-weight: 700;
+  background: #F59E0B; color: #fff; border: none;
+  border-radius: 10px; cursor: pointer; font-family: inherit;
+  box-shadow: 0 4px 14px rgba(245,158,11,0.35);
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.momoBtn:hover { background: #D97706; box-shadow: 0 6px 18px rgba(245,158,11,0.45); }
+.momoIcon { font-size: 20px; }
+
+/* ── Employees tab ── */
+.empToolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px; border-bottom: 1px solid #F1F5F9;
+}
+.empToolbarTitle { font-size: 15px; font-weight: 700; color: #1E293B; }
+.empActions { display: flex; align-items: center; gap: 10px; }
+
+.csvBtn {
+  display: inline-flex; align-items: center; padding: 8px 16px;
+  font-size: 13px; font-weight: 600; color: #475569;
+  background: #F1F5F9; border: 1px solid #E2E8F0;
+  border-radius: 8px; cursor: pointer; font-family: inherit;
+}
+.csvBtn:hover { background: #E2E8F0; }
+.hiddenInput  { display: none; }
+
+.addBtn {
+  padding: 8px 18px; font-size: 13px; font-weight: 600;
+  background: #1E3A5F; color: #fff; border: none;
+  border-radius: 8px; cursor: pointer; font-family: inherit;
+}
+.addBtn:hover { background: #162d4b; }
+
+.csvHint { padding: 6px 24px 0; font-size: 12px; color: #94A3B8; }
+
+.bulkResult {
+  margin: 0 24px 0; padding: 10px 14px;
+  background: #F0FDF4; border: 1px solid #A7F3D0; border-radius: 8px;
+  font-size: 13px; color: #065F46; font-weight: 500;
+}
+.bulkErrors { margin: 6px 0 0; padding-left: 16px; font-size: 12px; color: #DC2626; }
+
+.statusActive    { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; background: #DCFCE7; color: #059669; }
+.statusUnclaimed { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; background: #FEF3C7; color: #D97706; }
+.muted { color: #CBD5E1; }
+
+.removeBtn {
+  padding: 4px 10px; font-size: 12px; font-weight: 500;
+  background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA;
+  border-radius: 6px; cursor: pointer; font-family: inherit;
+}
+.removeBtn:hover   { background: #FEE2E2; }
+.removeBtn:disabled { opacity: 0.5; cursor: default; }
+
+/* ── Attendance tab ── */
+.attHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px; border-bottom: 1px solid #F1F5F9;
+}
+
+.monthNav   { display: flex; align-items: center; gap: 10px; }
+.monthBtn {
+  width: 30px; height: 30px; border: 1px solid #E2E8F0; border-radius: 8px;
+  background: #fff; font-size: 18px; color: #475569; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-family: inherit;
+}
+.monthBtn:hover { background: #F1F5F9; }
+.monthLabel { font-size: 14px; font-weight: 600; color: #1E293B; min-width: 140px; text-align: center; }
+
+.attLoading { padding: 40px; text-align: center; color: #94A3B8; font-size: 14px; }
+.attEmpty   { padding: 40px; text-align: center; color: #94A3B8; font-size: 14px; grid-column: 1 / -1; }
+
+/* Attendance grid — CSS grid with sticky first column */
+.attGrid {
+  padding: 16px 24px;
+  display: grid;
+  grid-template-columns: 200px repeat(31, 22px) 50px;
+  gap: 3px;
+  overflow-x: auto;
+  align-items: center;
+}
+
+.attNameCol {
+  font-size: 13px; font-weight: 500; color: #1E293B;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  padding-right: 8px;
+}
+
+.attDayHead {
+  font-size: 10px; color: #94A3B8; text-align: center; font-weight: 600;
+}
+
+.attSumHead {
+  font-size: 10px; color: #94A3B8; font-weight: 600; text-align: center;
+  padding-left: 8px;
+}
+
+.attCell {
+  width: 18px; height: 18px; border-radius: 3px; margin: 0 auto;
+}
+.attPresent { background: #059669; }
+.attAbsent  { background: #E2E8F0; }
+.attToday   { outline: 2px solid #1E3A5F; outline-offset: 1px; }
+
+.attSum {
+  font-size: 13px; font-weight: 700; color: #1E293B;
+  text-align: center; padding-left: 8px;
+}
+
+.attLegend {
+  display: flex; align-items: center; gap: 4px;
+  padding: 12px 24px 16px; font-size: 12px; color: #64748B;
+}
+.legendDot {
+  display: inline-block; width: 12px; height: 12px; border-radius: 3px;
+}
+
+/* ── Footer ── */
+.footer {
+  background: #fff; border-top: 1px solid #E2E8F0;
+  padding: 16px 32px; font-size: 13px; color: #94A3B8;
+  display: flex; align-items: center; gap: 12px;
+}
+.footerSep { color: #CBD5E1; }
+
+/* ── Modals ── */
+.overlay {
+  position: fixed; inset: 0; background: rgba(15,23,42,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200; padding: 24px;
+}
+
+.modal {
+  background: #fff; border-radius: 14px; width: 100%; max-width: 460px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2); overflow: hidden;
+}
+
+.modalHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; border-bottom: 1px solid #F1F5F9;
+}
+.modalTitle { font-size: 16px; font-weight: 700; color: #1E293B; }
+.modalClose {
+  font-size: 24px; color: #94A3B8; background: none; border: none;
+  cursor: pointer; line-height: 1; padding: 0; font-family: inherit;
+}
+.modalBody   { padding: 20px 24px; }
+.modalFooter { padding: 0 24px 20px; display: flex; gap: 10px; justify-content: flex-end; }
+
+.formLabel { display: block; font-size: 13px; font-weight: 600; color: #374151; margin: 0 0 6px; margin-top: 14px; }
+.formLabel:first-child { margin-top: 0; }
+.req { color: #DC2626; }
+
+.formInput {
+  width: 100%; padding: 9px 12px; font-size: 14px; color: #1E293B;
+  border: 1px solid #E2E8F0; border-radius: 8px; outline: none;
+  font-family: inherit; box-sizing: border-box; background: #fff;
+}
+.formInput:focus { border-color: #1E3A5F; box-shadow: 0 0 0 3px rgba(30,58,95,0.1); }
+.formError { font-size: 13px; color: #DC2626; margin-top: 8px; }
+
+.btnPrimary {
+  padding: 9px 22px; font-size: 14px; font-weight: 600;
+  background: #1E3A5F; color: #fff; border: none;
+  border-radius: 8px; cursor: pointer; font-family: inherit;
+}
+.btnPrimary:hover    { background: #162d4b; }
+.btnPrimary:disabled { opacity: 0.5; cursor: default; }
+
+.btnSecondary {
+  padding: 9px 20px; font-size: 14px; font-weight: 600;
+  background: #fff; color: #475569; border: 1px solid #E2E8F0;
+  border-radius: 8px; cursor: pointer; font-family: inherit;
+}
+.btnSecondary:hover { background: #F1F5F9; }
+
+/* ── MoMo modal specifics ── */
+.momoAmount {
+  font-size: 32px; font-weight: 800; color: #F59E0B;
+  text-align: center; margin-bottom: 4px;
+}
+.momoSub { font-size: 13px; color: #64748B; text-align: center; margin-bottom: 20px; }
+
+.momoSubmitBtn {
+  padding: 10px 24px; font-size: 14px; font-weight: 700;
+  background: #F59E0B; color: #fff; border: none;
+  border-radius: 8px; cursor: pointer; font-family: inherit;
+}
+.momoSubmitBtn:hover    { background: #D97706; }
+.momoSubmitBtn:disabled { opacity: 0.5; cursor: default; }
+
+.momoSuccess { text-align: center; padding: 12px 0; }
+.momoSuccessIcon { font-size: 48px; margin-bottom: 12px; }
+.momoSuccessText { font-size: 14px; color: #065F46; font-weight: 500; line-height: 1.5; }

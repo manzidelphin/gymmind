@@ -13,6 +13,9 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import InstitutionPortal from './pages/InstitutionPortal';
 import InstitutionLogin from './pages/InstitutionLogin';
+import HRPortal from './pages/HRPortal';
+import HRLogin from './pages/HRLogin';
+import HRDashboard from './pages/HRDashboard';
 
 function GymRoutes() {
   return (
@@ -39,6 +42,9 @@ export default function App() {
           <Route path="/login"    element={<Login />} />
           <Route path="/institution/login" element={<InstitutionLogin />} />
           <Route path="/institution/:institutionSlug" element={<InstitutionPortal />} />
+          <Route path="/hr/login"     element={<HRLogin />} />
+          <Route path="/hr/dashboard" element={<HRDashboard />} />
+          <Route path="/hr/:token"    element={<HRPortal />} />
           <Route path="/:gymSlug/*" element={<GymRoutes />} />
           <Route path="/" element={<Landing />} />
         </Routes>

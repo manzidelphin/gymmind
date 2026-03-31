@@ -17,6 +17,12 @@ export function requireRole(...roles: Role[]) {
       return;
     }
 
+    // super_admin can access any gym-scoped route
+    if (req.user.role === 'super_admin') {
+      next();
+      return;
+    }
+
     if (!roles.includes(req.user.role)) {
       res.status(403).json({ error: 'Insufficient permissions' });
       return;

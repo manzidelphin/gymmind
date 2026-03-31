@@ -31,6 +31,18 @@ export async function sendOTP(phone: string, code: string): Promise<void> {
   });
 }
 
+export async function sendSms(phone: string, message: string): Promise<void> {
+  if (env.NODE_ENV !== 'production') {
+    console.log(`[DEV SMS] ${phone}: ${message}`);
+    return;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const AfricasTalking = require('africastalking');
+  const at = AfricasTalking({ username: env.AT_USERNAME, apiKey: env.AT_API_KEY });
+  await at.SMS.send({ to: [phone], message, from: 'GYMMIND' });
+}
+
 export async function saveRegistrationOTP(phone: string, code: string): Promise<void> {
   await pool.query(
     `INSERT INTO otps (gym_id, phone, code, expires_at)

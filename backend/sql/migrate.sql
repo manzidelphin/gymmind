@@ -80,6 +80,9 @@ CREATE TABLE IF NOT EXISTS walkin_payment_services (
   gym_id INT NOT NULL REFERENCES gyms(id)
 );
 
+-- Add email to users (optional, for institution HR admins)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(255) NULL;
+
 -- Institutional billing: tracks monthly invoices per institution
 CREATE TABLE IF NOT EXISTS institutional_payments (
   id INT AUTO_INCREMENT PRIMARY KEY,

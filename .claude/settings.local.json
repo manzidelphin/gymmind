@@ -9,7 +9,18 @@
       "Bash(node -e \"require\\(''./node_modules/jspdf/dist/jspdf.umd.min.js''\\); console.log\\(''jspdf ok''\\)\")",
       "Bash(node -e \"require\\(''./node_modules/jspdf-autotable/dist/jspdf.plugin.autotable.js''\\); console.log\\(''autotable ok''\\)\")",
       "Bash(/dev/null -e \"ALTER TABLE gyms ADD COLUMN IF NOT EXISTS email VARCHAR\\(255\\) NULL;\")",
-      "Bash(/dev/null -e \"ALTER TABLE gyms ADD COLUMN email VARCHAR\\(255\\) NULL;\")"
+      "Bash(/dev/null -e \"ALTER TABLE gyms ADD COLUMN email VARCHAR\\(255\\) NULL;\")",
+      "Bash(grep -o \"\"content\"\":\"\"[^\"\"]*\"\" C:/Users/manzi/.claude/projects/C--Users-manzi-GymMind/bd991e27-470d-40e2-9872-64584ab21fb9.jsonl)",
+      "Bash(netstat -ano)",
+      "Bash(curl -s \"http://localhost:3002/health\")",
+      "Bash(curl -s -X GET \"http://localhost:3002/api/billing/summary\" -H \"X-Gym-Slug: kigali-fitness\" -H \"Authorization: Bearer test\")",
+      "Bash(curl:*)",
+      "Bash(pkill -f \"ts-node-dev\")",
+      "Bash(pkill -f \"vite\")",
+      "Bash(cmd.exe /c \"netstat -ano | findstr :3002\")",
+      "Bash(powershell.exe -Command \"Get-NetTCPConnection -LocalPort 3002 -State Listen | Select-Object LocalPort,OwningProcess\" 2>/dev/null)",
+      "Bash(node -e \":*)",
+      "Bash(powershell.exe -Command \"Get-NetTCPConnection -LocalPort 3002 -State Listen | Select-Object OwningProcess\")"
     ]
   }
 }

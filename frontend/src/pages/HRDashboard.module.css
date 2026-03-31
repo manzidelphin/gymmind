@@ -1,0 +1,454 @@
+.root {
+  min-height: 100vh;
+  background: #F1F5F9;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Navbar ── */
+.navbar {
+  background: #fff;
+  border-bottom: 1px solid #E2E8F0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.navLogo {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1a7a4a;
+  letter-spacing: -0.5px;
+}
+
+.navTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748B;
+  padding-left: 16px;
+  border-left: 1px solid #E2E8F0;
+}
+
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.navMonth {
+  font-size: 13px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.logoutBtn {
+  background: none;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: #64748B;
+  cursor: pointer;
+  font-weight: 500;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.logoutBtn:hover {
+  border-color: #DC2626;
+  color: #DC2626;
+}
+
+/* ── Splash ── */
+.splash {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  font-size: 16px;
+  color: #64748B;
+}
+
+.splashError {
+  color: #DC2626;
+}
+
+/* ── Hero ── */
+.hero {
+  background: #1E3A5F;
+  padding: 32px 28px;
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .heroGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.statCard {
+  background: rgba(255,255,255,.1);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,.15);
+}
+
+.statGreen {
+  background: rgba(5,150,105,.2);
+  border-color: rgba(5,150,105,.3);
+}
+
+.statNum {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.statGreenNum {
+  color: #6EE7B7;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: rgba(255,255,255,.7);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.paidBadge {
+  color: #6EE7B7;
+  font-size: 18px;
+}
+
+.pendingBadge {
+  color: #FCD34D;
+  font-size: 18px;
+}
+
+/* ── Content ── */
+.content {
+  padding: 32px 28px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748B;
+  font-size: 15px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+/* ── Gym Card ── */
+.gymCard {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.cardGymName {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.cardInst {
+  font-size: 13px;
+  color: #64748B;
+  margin-bottom: 20px;
+}
+
+.cardStats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #F1F5F9;
+  border-radius: 10px;
+  padding: 14px 0;
+  margin-bottom: 20px;
+}
+
+.cardStat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.cardStatDivider {
+  width: 1px;
+  height: 30px;
+  background: #E2E8F0;
+}
+
+.cardStatNum {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.cardStatGreen {
+  color: #059669;
+}
+
+.cardStatLabel {
+  font-size: 11px;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.cardActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btnDetails {
+  flex: 1;
+  text-align: center;
+  padding: 9px 16px;
+  border: 1.5px solid #1E3A5F;
+  color: #1E3A5F;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnDetails:hover {
+  background: #EBF4FF;
+}
+
+.btnDetailsDisabled {
+  flex: 1;
+  text-align: center;
+  padding: 9px 16px;
+  border: 1.5px solid #E2E8F0;
+  color: #94A3B8;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.btnPay {
+  flex: 1;
+  padding: 9px 16px;
+  background: #F59E0B;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnPay:hover {
+  background: #D97706;
+}
+
+.btnEmployees {
+  padding: 9px 16px;
+  border: 1.5px solid #E2E8F0;
+  color: #64748B;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.btnEmployees:hover {
+  border-color: #94A3B8;
+}
+
+/* ── Status badges ── */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.badgePaid {
+  background: #D1FAE5;
+  color: #059669;
+}
+
+.badgePending {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.badgeOverdue {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.badgeNone {
+  background: #F1F5F9;
+  color: #94A3B8;
+}
+
+/* ── MoMo modal ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 24px;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 14px;
+  padding: 32px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.18);
+}
+
+.modalTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1E293B;
+  margin: 0 0 8px;
+}
+
+.modalSub {
+  font-size: 13px;
+  color: #64748B;
+  margin: 0 0 20px;
+  line-height: 1.6;
+}
+
+.modalLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+  margin-top: 14px;
+}
+
+.modalInput {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #D1D5DB;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+.modalInput:focus {
+  border-color: #1E3A5F;
+}
+
+.momoError {
+  font-size: 13px;
+  color: #DC2626;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 10px;
+}
+
+.momoSuccess {
+  font-size: 14px;
+  color: #059669;
+  background: #D1FAE5;
+  border: 1px solid #A7F3D0;
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.modalActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modalCancel {
+  flex: 1;
+  padding: 11px;
+  background: none;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #64748B;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.modalPay {
+  flex: 2;
+  padding: 11px;
+  background: #F59E0B;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.modalPay:hover:not(:disabled) {
+  background: #D97706;
+}
+
+.modalPay:disabled {
+  background: #FCD34D;
+  cursor: not-allowed;
+}

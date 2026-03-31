@@ -19,6 +19,7 @@ import institutionAuthRouter from './routes/institutionAuth';
 import institutionPortalRouter from './routes/institutionPortal';
 import servicesRouter from './routes/services';
 import billingRouter from './routes/institutionalBilling';
+import hrRouter from './routes/hr';
 import { authenticate } from './middleware/auth.middleware';
 import { checkExpiringMemberships, sendAttendanceReminders, sendMonthlyGymSummaries } from './services/expiry.service';
 
@@ -43,6 +44,7 @@ app.use('/api/institutions', institutionRoutes);
 app.use('/api/services', servicesRouter);
 app.use('/api/reports', reportRoutes);
 app.use('/api/billing', billingRouter);
+app.use('/api/hr',      hrRouter);
 app.use('/api/admin', gymAdminRoutes);
 app.use('/api/me', meRoutes);
 app.use('/api/payments', paymentsRouter);

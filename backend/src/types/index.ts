@@ -100,7 +100,8 @@ export interface JwtPayload {
   gymId: number | null;  // null for super_admin only
   role: User['role'];
   phone: string;
-  institutionId?: number;  // set for institution_admin role
+  institutionId?: number;   // set for institution_admin role (single)
+  institutionIds?: number[]; // set for HR admin login (multi-gym)
 }
 
 // Extend Express Request so every route handler gets req.gym and req.user

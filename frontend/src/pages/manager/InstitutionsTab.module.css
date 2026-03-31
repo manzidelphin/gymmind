@@ -68,6 +68,19 @@
   color: #0F6E56; font-family: monospace; word-break: break-all;
 }
 
+.hrAdminCell  { display: flex; flex-direction: column; gap: 6px; }
+.hrAdminList  { display: flex; flex-direction: column; gap: 4px; }
+.hrAdminRow   { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.hrAdminName  { font-weight: 600; color: #0f172a; }
+.hrAdminPhone { color: #64748b; font-size: 12px; }
+
+.addAdminBtn {
+  padding: 4px 10px; font-size: 12px; font-weight: 600; border-radius: 6px;
+  border: 1px dashed #0F6E56; color: #0F6E56; background: transparent;
+  cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.addAdminBtn:hover { background: #e6f4f0; }
+
 .loadingMsg { text-align: center; padding: 32px; color: #64748b; }
 .empty { text-align: center; padding: 48px; color: #94a3b8; font-size: 15px; background: #fff; border-radius: 12px; }
 

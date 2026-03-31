@@ -4,10 +4,18 @@ import api from '../../api/api';
 import PhoneInput from '../../components/PhoneInput';
 import s from './InstitutionsTab.module.css';
 
+interface HrAdmin {
+  id: number;
+  name: string;
+  phone: string | null;
+  email: string | null;
+}
+
 interface Institution {
   id: number; name: string; allows_dependents: boolean;
   rate_per_session: number; employee_count: number; member_count: number;
   slug: string | null; admin_phone: string | null; admin_name: string | null;
+  hr_admins: HrAdmin[];
 }
 
 interface Employee { name: string; phone?: string; dependents: { name: string }[]; }
@@ -124,6 +132,15 @@ export default function InstitutionsTab() {
   const [inviteError,     setInviteError]     = useState('');
   const [inviteResult,    setInviteResult]    = useState<{ portalUrl: string; slug: string } | null>(null);
 
+  // Add HR admin modal
+  const [addAdminInst,    setAddAdminInst]    = useState<Institution | null>(null);
+  const [addAdminName,    setAddAdminName]    = useState('');
+  const [addAdminPhone,   setAddAdminPhone]   = useState('');
+  const [addAdminPhoneOk, setAddAdminPhoneOk] = useState(false);
+  const [addAdminEmail,   setAddAdminEmail]   = useState('');
+  const [addAdminLoading, setAddAdminLoading] = useState(false);
+  const [addAdminError,   setAddAdminError]   = useState('');
+
   // Upload modal
   const [uploadInst,    setUploadInst]    = useState<Institution | null>(null);
   const [uploadParsed,  setUploadParsed]  = useState<Employee[]>([]);
@@ -194,6 +211,31 @@ export default function InstitutionsTab() {
     } catch (e: any) {
       setInviteError(e.response?.data?.error ?? 'Failed to invite admin.');
     } finally { setInviteLoading(false); }
+  }
+
+  function openAddAdmin(inst: Institution) {
+    setAddAdminInst(inst);
+    setAddAdminName('');
+    setAddAdminPhone('');
+    setAddAdminPhoneOk(false);
+    setAddAdminEmail('');
+    setAddAdminError('');
+  }
+
+  async function confirmAddAdmin() {
+    if (!addAdminInst || !addAdminName.trim() || !addAdminPhoneOk) return;
+    setAddAdminLoading(true); setAddAdminError('');
+    try {
+      await api.post(`/institutions/${addAdminInst.id}/hr-admins`, {
+        name:  addAdminName.trim(),
+        phone: addAdminPhone,
+        email: addAdminEmail.trim() || undefined,
+      });
+      setAddAdminInst(null);
+      fetchInstitutions();
+    } catch (e: any) {
+      setAddAdminError(e.response?.data?.error ?? 'Failed to add HR admin.');
+    } finally { setAddAdminLoading(false); }
   }
 
   function openUpload(inst: Institution) {
@@ -288,18 +330,21 @@ export default function InstitutionsTab() {
                   )}
                 </td>
                 <td className={s.td}>
-                  {inst.admin_name ? (
-                    <span className={s.adminInfo}>
-                      {inst.admin_name}
-                      <button type="button" className={s.reInviteBtn} onClick={() => openInvite(inst)}>
-                        Re-invite
-                      </button>
-                    </span>
-                  ) : (
-                    <button type="button" className={s.inviteBtn} onClick={() => openInvite(inst)}>
-                      + Invite Admin
+                  <div className={s.hrAdminCell}>
+                    {inst.hr_admins.length > 0 ? (
+                      <div className={s.hrAdminList}>
+                        {inst.hr_admins.map(a => (
+                          <div key={a.id} className={s.hrAdminRow}>
+                            <span className={s.hrAdminName}>{a.name}</span>
+                            {a.phone && <span className={s.hrAdminPhone}>{a.phone}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+                    <button type="button" className={s.addAdminBtn} onClick={() => openAddAdmin(inst)}>
+                      + Add HR Admin
                     </button>
-                  )}
+                  </div>
                 </td>
                 <td className={s.td}>
                   <button type="button" className={s.uploadBtn} onClick={() => openUpload(inst)}>
@@ -404,6 +449,53 @@ export default function InstitutionsTab() {
                 </button>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Add HR Admin Modal */}
+      {addAdminInst && (
+        <div className={s.overlay} onClick={() => setAddAdminInst(null)}>
+          <div className={s.modal} onClick={e => e.stopPropagation()}>
+            <p className={s.modalTitle}>Add HR Admin — {addAdminInst.name}</p>
+            <label className={s.formLabel}>Name</label>
+            <input
+              type="text"
+              placeholder="e.g. Jean Paul Habimana"
+              className={s.formInput}
+              value={addAdminName}
+              onChange={e => setAddAdminName(e.target.value)}
+              autoFocus
+            />
+            <label className={s.formLabel}>Phone</label>
+            <PhoneInput
+              value={addAdminPhone}
+              onChange={(v, valid) => { setAddAdminPhone(v); setAddAdminPhoneOk(valid); }}
+              inputClassName={s.formInput}
+              onEnter={confirmAddAdmin}
+            />
+            <label className={s.formLabel}>Email (optional)</label>
+            <input
+              type="email"
+              placeholder="admin@company.com"
+              className={s.formInput}
+              value={addAdminEmail}
+              onChange={e => setAddAdminEmail(e.target.value)}
+            />
+            {addAdminError && <div className={s.modalError}>{addAdminError}</div>}
+            <div className={s.modalActions}>
+              <button
+                type="button"
+                className={s.modalConfirm}
+                disabled={!addAdminName.trim() || !addAdminPhoneOk || addAdminLoading}
+                onClick={confirmAddAdmin}
+              >
+                {addAdminLoading ? 'Adding…' : 'Add HR Admin'}
+              </button>
+              <button type="button" className={s.modalCancel} onClick={() => setAddAdminInst(null)}>
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

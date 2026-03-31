@@ -70,9 +70,35 @@
 .badgePaid    { background: #dcfce7; color: #15803d; }
 .badgePending { background: #fef3c7; color: #b45309; }
 .badgeOverdue { background: #fee2e2; color: #b91c1c; }
+.badgeSent    { background: #dbeafe; color: #1d4ed8; }
 .badgeSub     { font-weight: 400; text-transform: none; font-size: 11px; letter-spacing: 0; }
 
 .refNote { font-size: 12px; color: #94a3b8; margin-bottom: 10px; }
+
+.cardActions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
+.invoiceBtn {
+  padding: 6px 14px; font-size: 13px; font-weight: 600;
+  background: #2563eb; color: #fff; border: none;
+  border-radius: 8px; cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.invoiceBtn:hover { background: #1d4ed8; }
+
+.sendHrBtn {
+  padding: 6px 14px; font-size: 13px; font-weight: 600;
+  background: #0e7490; color: #fff; border: none;
+  border-radius: 8px; cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.sendHrBtn:hover:not(:disabled) { background: #0c6277; }
+.sendHrBtn:disabled { opacity: 0.6; cursor: default; }
+
+.sendHrBtnSent {
+  padding: 6px 14px; font-size: 13px; font-weight: 600;
+  background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0;
+  border-radius: 8px; cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.sendHrBtnSent:hover:not(:disabled) { background: #e2e8f0; }
+.sendHrBtnSent:disabled { opacity: 0.6; cursor: default; }
 
 .breakdownBtn {
   padding: 6px 14px; font-size: 13px; font-weight: 600;

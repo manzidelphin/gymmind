@@ -404,11 +404,19 @@ router.post('/verify-otp', async (req: Request, res: Response) => {
   }
 
   const user = rows[0];
+
+  // When a super_admin logs in via a gym's OTP endpoint, scope their token
+  // to that gym so gym-scoped API calls work. If they have a gym-scoped account
+  // at this gym the query already returned that user instead (ORDER BY gym_id IS NULL ASC).
+  const tokenGymId = (user.role === 'super_admin' && user.gym_id === null)
+    ? req.gym.id
+    : user.gym_id;
+
   const token = signToken({
     userId: user.id,
-    gymId: user.gym_id,
-    role: user.role,
-    phone: user.phone,
+    gymId:  tokenGymId,
+    role:   user.role,
+    phone:  user.phone,
   });
 
   res.json({ user, token });

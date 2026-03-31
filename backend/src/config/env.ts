@@ -24,6 +24,9 @@ const envSchema = z.object({
   // Email / Gmail SMTP
   GMAIL_USER:         z.string().default(''),
   GMAIL_APP_PASSWORD: z.string().default(''),
+
+  // Frontend URL (used in SMS links)
+  FRONTEND_URL: z.string().default('gymmind.rw'),
 });
 
 const parsed = envSchema.safeParse(process.env);

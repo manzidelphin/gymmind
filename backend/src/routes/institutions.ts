@@ -60,8 +60,8 @@ router.get('/', requireRole('gym_owner', 'gym_manager'), async (req: Request, re
 
   const [rows] = await pool.query<any[]>(
     `SELECT i.*,
-            COUNT(DISTINCT CASE WHEN u.parent_id IS NULL THEN u.id END) AS employee_count,
-            COUNT(DISTINCT u.id) AS member_count
+            COUNT(DISTINCT CASE WHEN u.parent_id IS NULL AND u.role = 'member' THEN u.id END) AS employee_count,
+            COUNT(DISTINCT CASE WHEN u.role = 'member' THEN u.id END) AS member_count
      FROM institutions i
      LEFT JOIN users u ON u.institution_id = i.id AND u.gym_id = ?
      WHERE i.gym_id = ?
@@ -70,7 +70,21 @@ router.get('/', requireRole('gym_owner', 'gym_manager'), async (req: Request, re
     [gymId, gymId]
   );
 
-  res.json(rows);
+  const [adminRows] = await pool.query<any[]>(
+    `SELECT id, name, phone, email, institution_id
+     FROM users
+     WHERE gym_id = ? AND role = 'institution_admin'
+     ORDER BY name ASC`,
+    [gymId],
+  );
+
+  const adminsByInst: Record<number, { id: number; name: string; phone: string | null; email: string | null }[]> = {};
+  for (const admin of adminRows) {
+    if (!adminsByInst[admin.institution_id]) adminsByInst[admin.institution_id] = [];
+    adminsByInst[admin.institution_id].push({ id: admin.id, name: admin.name, phone: admin.phone ?? null, email: admin.email ?? null });
+  }
+
+  res.json(rows.map((r: any) => ({ ...r, hr_admins: adminsByInst[r.id] ?? [] })));
 });
 
 // ---------------------------------------------------------------
@@ -446,6 +460,67 @@ router.patch('/:id/services', requireRole('gym_owner', 'gym_manager'), async (re
   }
 
   res.json({ success: true });
+});
+
+// ---------------------------------------------------------------
+// POST /api/institutions/:id/hr-admins
+// Add an HR admin to an institution.
+// ---------------------------------------------------------------
+const hrAdminSchema = z.object({
+  name:  z.string().min(1).max(255),
+  phone: z.string().min(9),
+  email: z.string().email().optional(),
+});
+
+router.post('/:id/hr-admins', requireRole('gym_owner', 'gym_manager'), async (req: Request, res: Response) => {
+  const parsed = hrAdminSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.flatten().fieldErrors });
+    return;
+  }
+
+  let phone: string;
+  try {
+    phone = normalizePhone(parsed.data.phone);
+    if (!validatePhone(phone)) throw new Error('Invalid phone number format');
+  } catch (e: any) {
+    res.status(400).json({ error: e.message });
+    return;
+  }
+
+  const gymId  = req.gym.id;
+  const instId = parseInt(req.params.id);
+
+  const [instRows] = await pool.query<any[]>(
+    'SELECT id FROM institutions WHERE id = ? AND gym_id = ?',
+    [instId, gymId],
+  );
+  if (!instRows[0]) {
+    res.status(404).json({ error: 'Institution not found' });
+    return;
+  }
+
+  const [dupRows] = await pool.query<any[]>(
+    'SELECT id FROM users WHERE gym_id = ? AND phone = ?',
+    [gymId, phone],
+  );
+  if (dupRows[0]) {
+    res.status(409).json({ error: 'This phone number is already registered at this gym' });
+    return;
+  }
+
+  const [result] = await pool.query<any>(
+    `INSERT INTO users (gym_id, name, phone, email, role, status, institution_id)
+     VALUES (?, ?, ?, ?, 'institution_admin', 'active', ?)`,
+    [gymId, parsed.data.name, phone, parsed.data.email ?? null, instId],
+  );
+
+  const [[newAdmin]] = await pool.query<any[]>(
+    'SELECT id, name, phone, email, institution_id FROM users WHERE id = ?',
+    [result.insertId],
+  );
+
+  res.status(201).json(newAdmin);
 });
 
 export default router;

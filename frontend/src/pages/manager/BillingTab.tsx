@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import api from '../../api/api';
+import { useToast } from '../../context/ToastContext';
 import s from './BillingTab.module.css';
 
 interface InstitutionBilling {
@@ -10,8 +13,9 @@ interface InstitutionBilling {
   total_visits: number;
   calculated_amount: number;
   payment_id: number | null;
-  payment_status: 'pending' | 'paid' | 'overdue' | null;
+  payment_status: 'pending' | 'sent' | 'paid' | 'overdue' | null;
   paid_at: string | null;
+  sent_at: string | null;
   paid_amount: number | null;
   payment_reference: string | null;
 }
@@ -52,6 +56,8 @@ function isOverdue(inst: InstitutionBilling, month: string): boolean {
 }
 
 export default function BillingTab() {
+  const toast = useToast();
+
   const [month,        setMonth]        = useState(currentMonth());
   const [institutions, setInstitutions] = useState<InstitutionBilling[]>([]);
   const [loading,      setLoading]      = useState(false);
@@ -60,6 +66,9 @@ export default function BillingTab() {
   const [breakdown,        setBreakdown]        = useState<Record<number, BreakdownRow[]>>({});
   const [breakdownLoading, setBreakdownLoading] = useState<Record<number, boolean>>({});
   const [expanded,         setExpanded]         = useState<Set<number>>(new Set());
+
+  // Send-to-HR state
+  const [sendingToHr, setSendingToHr] = useState<Record<number, boolean>>({});
 
   // Mark-as-paid modal state
   const [modalInst, setModalInst] = useState<InstitutionBilling | null>(null);
@@ -115,6 +124,28 @@ export default function BillingTab() {
     setSaveError('');
   }
 
+  async function sendToHr(inst: InstitutionBilling) {
+    setSendingToHr(prev => ({ ...prev, [inst.id]: true }));
+    try {
+      const { data } = await api.post<{ success: boolean; sentTo: string[] }>(
+        '/billing/send-to-hr',
+        { institutionId: inst.id, month },
+      );
+      const phones = data.sentTo.join(', ');
+      toast.success('Invoice sent to HR', `Sent to ${phones} via SMS ✅`);
+      load(month);
+    } catch (e: any) {
+      const msg = e.response?.data?.error ?? 'Failed to send invoice to HR.';
+      if (msg.toLowerCase().includes('no hr admin')) {
+        toast.error('No HR admin found', `Add an HR admin to ${inst.name} first in the Institutions page`);
+      } else {
+        toast.error('Send failed', msg);
+      }
+    } finally {
+      setSendingToHr(prev => ({ ...prev, [inst.id]: false }));
+    }
+  }
+
   async function submitPayment() {
     if (!modalInst) return;
     setSaving(true); setSaveError('');
@@ -134,10 +165,111 @@ export default function BillingTab() {
     }
   }
 
-  function effectiveStatus(inst: InstitutionBilling): 'paid' | 'pending' | 'overdue' {
+  function generateInvoicePdf(inst: InstitutionBilling) {
+    const monthLabel    = formatMonth(month);
+    const generatedAt   = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const invoiceNumber = `INV-${month.replace('-', '')}-${inst.id}`;
+    const status        = effectiveStatus(inst);
+
+    const doc   = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pageW = 210;
+    const lm    = 20;
+    const rm    = 190;
+    const GREEN: [number, number, number] = [15, 110, 86];
+    const GRAY:  [number, number, number] = [100, 116, 139];
+    const DARK:  [number, number, number] = [15, 23, 42];
+
+    let y = 20;
+
+    // Header
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    doc.setTextColor(...GREEN);
+    doc.text('GymMind', lm, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(...GRAY);
+    doc.text('INVOICE', rm, y, { align: 'right' });
+    y += 6;
+    doc.setDrawColor(...GREEN);
+    doc.setLineWidth(0.5);
+    doc.line(lm, y, rm, y);
+    y += 8;
+
+    // Invoice meta
+    const meta: [string, string][] = [
+      ['Invoice #:',   invoiceNumber],
+      ['To:',          inst.name],
+      ['Period:',      monthLabel],
+      ['Generated:',   generatedAt],
+      ['Status:',      status.toUpperCase()],
+    ];
+    doc.setFontSize(10);
+    for (const [label, value] of meta) {
+      doc.setFont('helvetica', 'bold'); doc.setTextColor(...DARK);
+      doc.text(label, lm, y);
+      doc.setFont('helvetica', 'normal'); doc.setTextColor(55, 65, 81);
+      doc.text(value, lm + 36, y);
+      y += 6;
+    }
+    y += 4;
+
+    // Table
+    autoTable(doc, {
+      startY: y,
+      head: [['DESCRIPTION', 'VISITS', 'RATE (RWF)', 'AMOUNT (RWF)']],
+      body: [
+        [
+          `Gym access — ${monthLabel}`,
+          String(inst.total_visits),
+          inst.rate_per_session > 0 ? inst.rate_per_session.toLocaleString() : '—',
+          inst.calculated_amount.toLocaleString(),
+        ],
+        ['TOTAL', '', '', inst.calculated_amount.toLocaleString()],
+      ],
+      margin: { left: lm, right: 20 },
+      styles: { font: 'helvetica', fontSize: 10, cellPadding: 4, textColor: [55, 65, 81] },
+      headStyles: { fillColor: GREEN, textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 10 },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      columnStyles: { 0: { cellWidth: 80 }, 3: { halign: 'right' } },
+      didParseCell(data) {
+        if (data.row.index === 1) {
+          data.cell.styles.fontStyle = 'bold';
+          data.cell.styles.fillColor = [229, 231, 235];
+          data.cell.styles.textColor = DARK;
+        }
+      },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const afterY = (doc as any).lastAutoTable.finalY + 10;
+
+    if (inst.payment_status === 'paid' && inst.paid_at) {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...GREEN);
+      doc.text(`PAID on ${new Date(inst.paid_at).toLocaleDateString('en-GB')}${inst.payment_reference ? ` · Ref: ${inst.payment_reference}` : ''}`, lm, afterY);
+    }
+
+    // Footer
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.3);
+    doc.line(lm, 277, rm, 277);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...GRAY);
+    doc.text(`${inst.name} · ${monthLabel}`, lm, 282);
+    doc.text('gymmind.rw', pageW / 2, 282, { align: 'center' });
+    doc.text(generatedAt, rm, 282, { align: 'right' });
+
+    doc.save(`Invoice-${inst.name.replace(/\s+/g, '-')}-${month}.pdf`);
+  }
+
+  function effectiveStatus(inst: InstitutionBilling): 'paid' | 'pending' | 'sent' | 'overdue' {
     if (inst.payment_status === 'paid') return 'paid';
     if (isOverdue(inst, month)) return 'overdue';
-    return inst.payment_status ?? 'pending';
+    if (inst.payment_status === 'sent') return 'sent';
+    return 'pending';
   }
 
   const totalDue        = institutions.reduce((sum, i) => sum + i.calculated_amount, 0);
@@ -181,9 +313,8 @@ export default function BillingTab() {
       </div>
 
       {loading && <p className={s.empty}>Loading…</p>}
-      {error   && <p className={s.empty}>{error}</p>}
-      {!loading && institutions.length === 0 && !error && (
-        <p className={s.empty}>No institutions found.</p>
+      {!loading && institutions.length === 0 && (
+        <p className={s.empty}>{error || 'No invoices yet. Add an institution to get started.'}</p>
       )}
 
       {!loading && institutions.map(inst => {
@@ -201,9 +332,28 @@ export default function BillingTab() {
                   {inst.active_members} active member{inst.active_members !== 1 ? 's' : ''} · {inst.total_visits} visit{inst.total_visits !== 1 ? 's' : ''} this month
                 </div>
               </div>
-              <button type="button" className={s.breakdownBtn} onClick={() => toggleBreakdown(inst)}>
-                {isExpanded ? 'Hide Breakdown' : 'View Breakdown'}
-              </button>
+              <div className={s.cardActions}>
+                <button type="button" className={s.invoiceBtn} onClick={() => generateInvoicePdf(inst)}>
+                  + Generate Invoice
+                </button>
+                {status !== 'paid' && (
+                  <button
+                    type="button"
+                    className={status === 'sent' ? s.sendHrBtnSent : s.sendHrBtn}
+                    onClick={() => sendToHr(inst)}
+                    disabled={sendingToHr[inst.id]}
+                  >
+                    {sendingToHr[inst.id]
+                      ? 'Sending…'
+                      : status === 'sent'
+                        ? '✅ Sent — Resend?'
+                        : '📤 Send to HR'}
+                  </button>
+                )}
+                <button type="button" className={s.breakdownBtn} onClick={() => toggleBreakdown(inst)}>
+                  {isExpanded ? 'Hide' : 'Breakdown'}
+                </button>
+              </div>
             </div>
 
             <div className={s.instBody}>
@@ -227,6 +377,14 @@ export default function BillingTab() {
                     )}
                   </span>
                 )}
+                {status === 'sent' && (
+                  <span className={`${s.badge} ${s.badgeSent}`}>
+                    SENT
+                    {inst.sent_at && (
+                      <span className={s.badgeSub}> · {new Date(inst.sent_at).toLocaleDateString()}</span>
+                    )}
+                  </span>
+                )}
                 {status === 'pending' && (
                   <span className={`${s.badge} ${s.badgePending}`}>PENDING</span>
                 )}
@@ -235,13 +393,16 @@ export default function BillingTab() {
                 )}
               </div>
 
+              {inst.sent_at && status !== 'paid' && (
+                <div className={s.refNote}>Last sent: {new Date(inst.sent_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+              )}
               {inst.payment_reference && (
                 <div className={s.refNote}>Ref: {inst.payment_reference}</div>
               )}
 
               {status !== 'paid' && inst.total_visits > 0 && (
                 <button type="button" className={s.markPaidBtn} onClick={() => openModal(inst)}>
-                  Mark as Paid
+                  ✓ Mark as Paid
                 </button>
               )}
             </div>
