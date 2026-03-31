@@ -5,6 +5,7 @@ import { normalizePhone, validatePhone } from '../utils/phone';
 import { generateOTP, saveOTP, sendOTP, verifyOTP } from '../services/otp.service';
 import { signToken, verifyToken } from '../services/jwt.service';
 import { env } from '../config/env';
+import { generateInvoicePdf } from '../services/invoice.service';
 
 const router = Router();
 
@@ -351,6 +352,120 @@ router.get('/gym/:gymSlug/institution/:institutionId', hrAuth, async (req: Reque
     payment_reference: ipRow?.payment_reference  ?? null,
     total_paid:        ipRow?.total_amount != null ? Number(ipRow.total_amount) : null,
   });
+});
+
+// ---------------------------------------------------------------
+// GET /api/hr/:token/invoice.pdf
+// Streams a professional PDF invoice for the given HR token.
+// ---------------------------------------------------------------
+router.get('/:token/invoice.pdf', async (req: Request, res: Response) => {
+  const token = req.params.token;
+
+  try {
+    // Resolve via access_token (invoice) first
+    const [payRows] = await pool.query<any[]>(
+      `SELECT ip.*,
+              i.name  AS institution_name, i.rate_per_session,
+              i.gym_id, g.name AS gym_name
+       FROM institutional_payments ip
+       JOIN institutions i ON i.id = ip.institution_id
+       JOIN gyms g ON g.id = ip.gym_id
+       WHERE ip.access_token = ? LIMIT 1`,
+      [token],
+    );
+
+    let gymName: string;
+    let institutionName: string;
+    let ratePerSession: number;
+    let month: string;
+    let gymId: number;
+    let institutionId: number;
+    let paymentStatus: string | null;
+    let paidAt: string | null;
+    let paymentRef: string | null;
+
+    if (payRows[0]) {
+      const row  = payRows[0];
+      gymName         = row.gym_name;
+      institutionName = row.institution_name;
+      ratePerSession  = Number(row.rate_per_session);
+      month           = row.month as string;
+      gymId           = row.gym_id;
+      institutionId   = row.institution_id;
+      paymentStatus   = row.status   ?? null;
+      paidAt          = row.paid_at  ?? null;
+      paymentRef      = row.payment_reference ?? null;
+    } else {
+      // Fallback: institution slug
+      const [instRows] = await pool.query<any[]>(
+        `SELECT i.id, i.name, i.rate_per_session, i.gym_id, g.name AS gym_name
+         FROM institutions i JOIN gyms g ON g.id = i.gym_id
+         WHERE i.slug = ? LIMIT 1`,
+        [token],
+      );
+      if (!instRows[0]) { res.status(404).json({ error: 'Portal not found' }); return; }
+      const inst  = instRows[0];
+      gymName         = inst.gym_name;
+      institutionName = inst.name;
+      ratePerSession  = Number(inst.rate_per_session);
+      month           = currentMonth();
+      gymId           = inst.gym_id;
+      institutionId   = inst.id;
+
+      const [[ipRow]] = await pool.query<any[]>(
+        `SELECT status, paid_at, payment_reference FROM institutional_payments
+         WHERE institution_id = ? AND gym_id = ? AND month = ?`,
+        [institutionId, gymId, month],
+      );
+      paymentStatus = ipRow?.status             ?? null;
+      paidAt        = ipRow?.paid_at            ?? null;
+      paymentRef    = ipRow?.payment_reference  ?? null;
+    }
+
+    // Fetch employees + attendance for the month
+    const [empRows] = await pool.query<any[]>(
+      `SELECT u.name,
+              COUNT(DISTINCT DATE(c.checked_in_at)) AS days_attended
+       FROM users u
+       LEFT JOIN checkins c
+         ON c.user_id = u.id AND c.gym_id = u.gym_id
+         AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
+       WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member' AND u.parent_id IS NULL
+       GROUP BY u.id, u.name
+       ORDER BY u.name ASC`,
+      [month, gymId, institutionId],
+    );
+
+    const employees = empRows.map((r: any) => ({
+      name:          r.name,
+      days_attended: Number(r.days_attended),
+      amount:        Number(r.days_attended) * ratePerSession,
+    }));
+
+    const total = employees.reduce((s, e) => s + e.amount, 0);
+
+    const pdfBuffer = await generateInvoicePdf({
+      gymName,
+      institutionName,
+      month,
+      employees,
+      total,
+      ratePerSession,
+      paymentStatus,
+      paidAt,
+      paymentRef,
+      invoiceToken: token,
+    });
+
+    const filename = `${institutionName.replace(/\s+/g, '-')}-Invoice-${month}.pdf`;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+    res.end(pdfBuffer);
+  } catch (err) {
+    console.error('Invoice PDF error:', err);
+    res.status(500).json({ error: 'Failed to generate invoice' });
+  }
 });
 
 // ---------------------------------------------------------------

@@ -20,7 +20,9 @@
       "Bash(cmd.exe /c \"netstat -ano | findstr :3002\")",
       "Bash(powershell.exe -Command \"Get-NetTCPConnection -LocalPort 3002 -State Listen | Select-Object LocalPort,OwningProcess\" 2>/dev/null)",
       "Bash(node -e \":*)",
-      "Bash(powershell.exe -Command \"Get-NetTCPConnection -LocalPort 3002 -State Listen | Select-Object OwningProcess\")"
+      "Bash(powershell.exe -Command \"Get-NetTCPConnection -LocalPort 3002 -State Listen | Select-Object OwningProcess\")",
+      "Bash(Get-NetTCPConnection -LocalPort 3002 -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -ExpandProperty OwningProcess)"
     ]
   }
 }

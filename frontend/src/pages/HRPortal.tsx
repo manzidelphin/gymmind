@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { publicApi } from '../api/api';
 import s from './HRPortal.module.css';
 
@@ -200,59 +198,8 @@ export default function HRPortal() {
 
   // ─── Download PDF ────────────────────────────────────────────
   function downloadPdf() {
-    if (!data) return;
-    const BLUE: [number, number, number] = [26, 86, 219];
-    const DARK: [number, number, number] = [30, 41, 59];
-    const GRAY: [number, number, number] = [100, 116, 139];
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const lm = 20, rm = 190;
-    let y = 20;
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(20);
-    doc.setTextColor(...BLUE);
-    doc.text('Employee Wellness Invoice', lm, y);
-    y += 7;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(...GRAY);
-    doc.text(`${data.gym_name}  ·  ${data.institution.name}  ·  ${fmtMonth(data.month)}`, lm, y);
-    y += 5;
-    doc.setDrawColor(226, 232, 240);
-    doc.setLineWidth(0.5);
-    doc.line(lm, y, rm, y);
-    y += 8;
-
-    autoTable(doc, {
-      startY: y,
-      head: [['Employee', 'Days Attended', 'Amount (RWF)']],
-      body: [
-        ...data.employees.map(e => [e.name, String(e.days_attended), e.amount > 0 ? e.amount.toLocaleString() : '—']),
-        ['TOTAL', String(data.employees.reduce((s, e) => s + e.days_attended, 0)), data.total.toLocaleString()],
-      ],
-      margin: { left: lm, right: 20 },
-      styles: { font: 'helvetica', fontSize: 10, cellPadding: 4 },
-      headStyles: { fillColor: BLUE, textColor: [255, 255, 255], fontStyle: 'bold' },
-      alternateRowStyles: { fillColor: [248, 250, 252] },
-      columnStyles: { 2: { halign: 'right' } },
-      didParseCell(d) {
-        if (d.row.index === data.employees.length) {
-          d.cell.styles.fontStyle = 'bold';
-          d.cell.styles.fillColor = [241, 245, 249];
-          d.cell.styles.textColor = DARK;
-        }
-      },
-    });
-
-    if (data.payment_status === 'paid' && data.paid_at) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const afterY = (doc as any).lastAutoTable.finalY + 10;
-      doc.setFontSize(9); doc.setFont('helvetica', 'bold');
-      doc.setTextColor(5, 150, 105);
-      doc.text(`PAID · ${new Date(data.paid_at).toLocaleDateString('en-GB')}${data.payment_reference ? ` · Ref: ${data.payment_reference}` : ''}`, lm, afterY);
-    }
-
-    doc.save(`${data.institution.name.replace(/\s+/g, '-')}-Invoice-${data.month}.pdf`);
+    if (!token) return;
+    window.open(`${import.meta.env.VITE_API_BASE_URL}/hr/${token}/invoice.pdf`, '_blank');
   }
 
   // ─── Render states ────────────────────────────────────────────
