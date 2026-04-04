@@ -2,6 +2,8 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { hrApi, publicApi } from '../api/api';
 import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer,
@@ -107,6 +109,220 @@ function exportCsv(employees: Employee[], month: string) {
   a.href     = URL.createObjectURL(blob);
   a.download = `attendance-${month}.csv`;
   a.click();
+}
+
+// ── PDF Invoice generator ─────────────────────────────────────────
+function downloadInvoicePdf(e: GymEntry) {
+  // Decode HR admin phone from JWT
+  let hrPhone = '';
+  try {
+    const tok = localStorage.getItem('hr_token') ?? '';
+    const payload = JSON.parse(atob(tok.split('.')[1]));
+    hrPhone = payload.phone ?? '';
+  } catch { /* ignore */ }
+
+  const [year, mon] = e.month.split('-');
+  const invoiceNum  = `INV-${year}-${mon}-${e.institutionId}`;
+  const today       = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+  const dueDate     = new Date(+year, +mon, 0).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+  const subtotal    = e.invoiceAmount;
+  const vat         = Math.round(subtotal * 0.18);
+  const total       = subtotal + vat;
+
+  const statusLabel = e.invoiceStatus === 'paid' ? 'PAID'
+    : e.invoiceStatus === 'overdue' ? 'OVERDUE' : 'PENDING';
+
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const PW  = 210;
+  const ML  = 15;
+  const MR  = 15;
+  const CW  = PW - ML - MR; // 180mm
+
+  // ── Navy header bar ──
+  doc.setFillColor(15, 23, 42);
+  doc.rect(0, 0, PW, 28, 'F');
+
+  // Brand mark (green square)
+  doc.setFillColor(16, 185, 129);
+  doc.roundedRect(ML, 8, 12, 12, 2, 2, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(255, 255, 255);
+  doc.text('G', ML + 6, 16.5, { align: 'center' });
+
+  // GymMind wordmark
+  doc.setFontSize(16);
+  doc.text('GymMind', ML + 15, 16);
+
+  // OFFICIAL INVOICE (right-aligned)
+  doc.setFontSize(10);
+  doc.setTextColor(148, 163, 184);
+  doc.text('OFFICIAL INVOICE', PW - MR, 16, { align: 'right' });
+
+  // ── Invoice meta ──
+  let y = 38;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(15, 23, 42);
+  doc.text(`Invoice #: ${invoiceNum}`, ML, y);
+
+  // Status pill (right)
+  const pillColor: [number, number, number] =
+    e.invoiceStatus === 'paid'    ? [16, 185, 129] :
+    e.invoiceStatus === 'overdue' ? [220, 38, 38]  : [245, 158, 11];
+  doc.setFillColor(...pillColor);
+  const pillW = 28;
+  doc.roundedRect(PW - MR - pillW, y - 6, pillW, 8, 2, 2, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.setTextColor(255, 255, 255);
+  doc.text(statusLabel, PW - MR - pillW / 2, y - 0.5, { align: 'center' });
+
+  y += 7;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(100, 116, 139);
+  doc.text(`Date: ${today}`, ML, y);
+  y += 6;
+  doc.text(`Due: ${dueDate}`, ML, y);
+
+  // ── Divider ──
+  y += 8;
+  doc.setDrawColor(226, 232, 240);
+  doc.setLineWidth(0.3);
+  doc.line(ML, y, PW - MR, y);
+
+  // ── Bill To / Bill By ──
+  y += 8;
+  const col2 = ML + CW / 2 + 5;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.setTextColor(148, 163, 184);
+  doc.text('BILLED TO', ML, y);
+  doc.text('BILLED BY', col2, y);
+
+  y += 5;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(15, 23, 42);
+  doc.text(e.institutionName, ML, y);
+  doc.text('GymMind Platform', col2, y);
+
+  y += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(100, 116, 139);
+  if (hrPhone) doc.text(hrPhone, ML, y);
+  doc.text('billing@gymmind.rw', col2, y);
+  y += 5;
+  doc.text('TIN: 143715478', col2, y);
+
+  // ── Divider ──
+  y += 8;
+  doc.setDrawColor(226, 232, 240);
+  doc.line(ML, y, PW - MR, y);
+
+  // ── Services table ──
+  y += 6;
+  autoTable(doc, {
+    startY: y,
+    margin: { left: ML, right: MR },
+    head: [['Description', 'Qty', 'Unit Price (RWF)', 'Total (RWF)']],
+    body: [[
+      `Gym access — ${e.gymName}`,
+      String(e.thisMonthVisits),
+      e.ratePerSession.toLocaleString('en-RW'),
+      subtotal.toLocaleString('en-RW'),
+    ]],
+    headStyles: {
+      fillColor:  [15, 23, 42],
+      textColor:  [255, 255, 255],
+      fontStyle:  'bold',
+      fontSize:   9,
+      cellPadding: 4,
+    },
+    bodyStyles: {
+      fontSize:   10,
+      cellPadding: 4,
+      textColor:  [30, 41, 59],
+    },
+    alternateRowStyles: { fillColor: [248, 250, 252] },
+    columnStyles: {
+      0: { cellWidth: 80 },
+      1: { cellWidth: 20, halign: 'center' },
+      2: { cellWidth: 40, halign: 'right' },
+      3: { cellWidth: 40, halign: 'right', fontStyle: 'bold' },
+    },
+    tableLineColor: [226, 232, 240],
+    tableLineWidth: 0.2,
+  });
+
+  // ── Totals ──
+  y = (doc as any).lastAutoTable.finalY + 8;
+  const totX = PW - MR - 80;
+  const valX = PW - MR;
+
+  function totalRow(label: string, value: string, bold = false, green = false) {
+    doc.setFont('helvetica', bold ? 'bold' : 'normal');
+    doc.setFontSize(bold ? 11 : 10);
+    doc.setTextColor(green ? 16 : (bold ? 15 : 100), green ? 185 : (bold ? 23 : 116), green ? 129 : (bold ? 42 : 139));
+    doc.text(label, totX, y, { align: 'left' });
+    doc.text(value,  valX, y, { align: 'right' });
+    y += bold ? 7 : 6;
+  }
+
+  totalRow('Subtotal:', `${subtotal.toLocaleString('en-RW')} RWF`);
+  totalRow('VAT (18%):', `${vat.toLocaleString('en-RW')} RWF`);
+
+  // Divider above total
+  doc.setDrawColor(226, 232, 240);
+  doc.line(totX, y - 1, valX, y - 1);
+  y += 2;
+
+  totalRow('TOTAL DUE:', `${total.toLocaleString('en-RW')} RWF`, true, true);
+
+  // ── Payment instructions ──
+  y += 6;
+  doc.setFillColor(236, 253, 245);
+  doc.roundedRect(ML, y, CW, 22, 3, 3, 'F');
+  doc.setDrawColor(167, 243, 208);
+  doc.roundedRect(ML, y, CW, 22, 3, 3, 'S');
+
+  y += 6;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(5, 150, 105);
+  doc.text('PAYMENT INSTRUCTIONS', ML + 5, y);
+
+  y += 5;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(30, 41, 59);
+  doc.text(`Pay via MTN MoMo  ·  Reference: ${invoiceNum}`, ML + 5, y);
+
+  y += 5;
+  doc.setTextColor(100, 116, 139);
+  doc.text('Contact the gym for their MTN MoMo number if not shown on your portal.', ML + 5, y);
+
+  // ── Footer ──
+  const footY = 280;
+  doc.setDrawColor(226, 232, 240);
+  doc.line(ML, footY - 4, PW - MR, footY - 4);
+
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(9);
+  doc.setTextColor(100, 116, 139);
+  doc.text('"Thank you for investing in your employees\' wellness."', PW / 2, footY, { align: 'center' });
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(148, 163, 184);
+  doc.text('Powered by GymMind · gymmind.rw', PW / 2, footY + 5, { align: 'center' });
+
+  // ── Save ──
+  const safeName = e.institutionName.replace(/\s+/g, '-');
+  doc.save(`GymMind-Invoice-${e.month}-${safeName}.pdf`);
 }
 
 // ── Skeleton ──────────────────────────────────────────────────────
@@ -778,9 +994,7 @@ export default function HRDashboard() {
                             <td><InvoiceBadge status={e.invoiceStatus} /></td>
                             <td>
                               <div className={s.invActions}>
-                                {(e.invoiceStatus === 'pending' || e.invoiceStatus === 'overdue') && e.invoiceToken && (
-                                  <a href={`/api/hr/${e.invoiceToken}/invoice.pdf`} target="_blank" rel="noreferrer" className={s.btnSecondary}>📄 PDF</a>
-                                )}
+                                <button className={s.btnOutline} onClick={() => downloadInvoicePdf(e)}>📄 PDF</button>
                                 {(e.invoiceStatus === 'pending' || e.invoiceStatus === 'overdue') && (
                                   <button className={s.btnPrimary} onClick={() => openMomo(e)}>💳 Pay</button>
                                 )}
