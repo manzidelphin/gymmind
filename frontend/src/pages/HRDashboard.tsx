@@ -778,11 +778,11 @@ export default function HRDashboard() {
                             <td><InvoiceBadge status={e.invoiceStatus} /></td>
                             <td>
                               <div className={s.invActions}>
-                                {e.invoiceToken && (
-                                  <a href={`/api/hr/${e.invoiceToken}/invoice.pdf`} target="_blank" rel="noreferrer" className={s.btnSecondary}>↓ PDF</a>
+                                {(e.invoiceStatus === 'pending' || e.invoiceStatus === 'overdue') && e.invoiceToken && (
+                                  <a href={`/api/hr/${e.invoiceToken}/invoice.pdf`} target="_blank" rel="noreferrer" className={s.btnSecondary}>📄 PDF</a>
                                 )}
-                                {e.invoiceStatus !== 'paid' && e.invoiceToken && (
-                                  <button className={s.btnPrimary} onClick={() => openMomo(e)}>Pay</button>
+                                {(e.invoiceStatus === 'pending' || e.invoiceStatus === 'overdue') && (
+                                  <button className={s.btnPrimary} onClick={() => openMomo(e)}>💳 Pay</button>
                                 )}
                               </div>
                             </td>
