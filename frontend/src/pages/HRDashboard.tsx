@@ -1,9 +1,10 @@
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { hrApi, publicApi } from '../api/api';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import dayjs from 'dayjs';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer,
@@ -59,6 +60,19 @@ interface AttendanceRow {
   total_days: number;
 }
 
+interface AttendanceRecord {
+  id:               number;
+  checked_in_at:    string;
+  checkin_type:     string;
+  employee_id:      number;
+  employee_name:    string;
+  employee_phone:   string | null;
+  gym_name:         string;
+  gym_slug:         string;
+  plan_name:        string | null;
+  institution_name: string | null;
+}
+
 // ── Helpers ───────────────────────────────────────────────────────
 function fmtRwf(n: number) {
   return n.toLocaleString('en-RW') + ' RWF';
@@ -108,6 +122,27 @@ function exportCsv(employees: Employee[], month: string) {
   const a    = document.createElement('a');
   a.href     = URL.createObjectURL(blob);
   a.download = `attendance-${month}.csv`;
+  a.click();
+}
+
+function exportAttendanceCsv(records: AttendanceRecord[], from: string, to: string) {
+  const rows = [
+    ['Employee Name', 'Phone', 'Gym', 'Date', 'Time', 'Type', 'Check-in ID'],
+    ...records.map(r => [
+      r.employee_name,
+      r.employee_phone ?? '',
+      r.gym_name,
+      dayjs(r.checked_in_at).format('ddd, DD MMM YYYY'),
+      dayjs(r.checked_in_at).format('hh:mm A'),
+      r.checkin_type,
+      String(r.id),
+    ]),
+  ];
+  const csv  = rows.map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `GymMind-Attendance-${from}-${to}.csv`;
   a.click();
 }
 
@@ -383,6 +418,23 @@ export default function HRDashboard() {
   const [dragOver,      setDragOver]      = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Attendance log
+  const todayStr     = dayjs().format('YYYY-MM-DD');
+  const monthStart   = dayjs().startOf('month').format('YYYY-MM-DD');
+  const [attRecords,   setAttRecords]   = useState<AttendanceRecord[]>([]);
+  const [attTotal,     setAttTotal]     = useState(0);
+  const [attLoading,   setAttLoading]   = useState(false);
+  const [attPage,      setAttPage]      = useState(1);
+  const [attFrom,      setAttFrom]      = useState(monthStart);
+  const [attTo,        setAttTo]        = useState(todayStr);
+  const [attSearch,    setAttSearch]    = useState('');
+  const [attAutoRef,   setAttAutoRef]   = useState(false);
+  const [attLastUpd,   setAttLastUpd]   = useState<Date | null>(null);
+  const [attNewIds,    setAttNewIds]    = useState<Set<number>>(new Set());
+  const attAutoTimer   = useRef<ReturnType<typeof setInterval> | null>(null);
+  const prevIdsRef     = useRef<Set<number>>(new Set());
+  const ATT_PAGE_SIZE  = 50;
+
   // ── Init ─────────────────────────────────────────────────────
   useEffect(() => {
     loadDashboard();
@@ -434,6 +486,46 @@ export default function HRDashboard() {
     } catch { /* optional */ }
     finally { setLoadingAtt(false); }
   }
+
+  const loadAttendanceLog = useCallback(async (from: string, to: string, search: string) => {
+    setAttLoading(true);
+    try {
+      const params = new URLSearchParams({ from, to });
+      if (search.trim()) params.set('search', search.trim());
+      const { data } = await hrApi.get<{ records: AttendanceRecord[]; total: number }>(
+        `/hr/attendance?${params}`,
+      );
+      // Detect new rows for flash effect
+      const incoming = new Set(data.records.map(r => r.id));
+      const newOnes  = new Set([...incoming].filter(id => !prevIdsRef.current.has(id) && prevIdsRef.current.size > 0));
+      setAttNewIds(newOnes);
+      prevIdsRef.current = incoming;
+      setTimeout(() => setAttNewIds(new Set()), 2500);
+
+      setAttRecords(data.records);
+      setAttTotal(data.total);
+      setAttPage(1);
+      setAttLastUpd(new Date());
+    } catch { /* ignore */ }
+    finally { setAttLoading(false); }
+  }, []);
+
+  // Auto-refresh for attendance tab
+  useEffect(() => {
+    if (tab === 'attendance' && attAutoRef) {
+      attAutoTimer.current = setInterval(() => loadAttendanceLog(attFrom, attTo, attSearch), 30_000);
+    } else {
+      if (attAutoTimer.current) clearInterval(attAutoTimer.current);
+    }
+    return () => { if (attAutoTimer.current) clearInterval(attAutoTimer.current); };
+  }, [tab, attAutoRef, attFrom, attTo, attSearch, loadAttendanceLog]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Load attendance log when switching to tab
+  useEffect(() => {
+    if (tab === 'attendance' && attRecords.length === 0 && !attLoading) {
+      loadAttendanceLog(attFrom, attTo, attSearch);
+    }
+  }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Actions ───────────────────────────────────────────────────
   function logout() { localStorage.removeItem('hr_token'); navigate('/hr/login'); }
@@ -916,43 +1008,182 @@ export default function HRDashboard() {
           )}
 
           {/* ══ ATTENDANCE ══ */}
-          {tab === 'attendance' && (
-            <>
-              <div className={s.toolbar}>
-                {attMonth && <span className={s.monthTag}>{fmtMonth(attMonth)}</span>}
-                <button className={s.btnSecondary} onClick={() => detail && exportCsv(detail.employees, month)}>
-                  ↓ Export CSV
-                </button>
-              </div>
-              <div className={s.panel}>
-                {loadingAtt
-                  ? <div className={s.skStack}>{[...Array(8)].map((_, i) => <Sk key={i} h={44} />)}</div>
-                  : attendance.length > 0
-                    ? (
-                      <table className={s.table}>
-                        <thead><tr><th>Employee</th><th>Days attended</th><th>Days of month visited</th><th>Verified</th></tr></thead>
+          {tab === 'attendance' && (() => {
+            const pageStart  = (attPage - 1) * ATT_PAGE_SIZE;
+            const pageSlice  = attRecords.slice(pageStart, pageStart + ATT_PAGE_SIZE);
+            const totalPages = Math.max(1, Math.ceil(attRecords.length / ATT_PAGE_SIZE));
+            const uniqueEmps = new Set(attRecords.map(r => r.employee_id)).size;
+            const topEmp     = attRecords.length > 0
+              ? Object.entries(attRecords.reduce((acc, r) => {
+                  acc[r.employee_name] = (acc[r.employee_name] ?? 0) + 1; return acc;
+                }, {} as Record<string, number>))
+                  .sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—'
+              : '—';
+            const lastCheckin = attRecords[0]?.checked_in_at ?? null;
+
+            return (
+              <>
+                {/* ── Filters bar ── */}
+                <div className={s.attFilters}>
+                  <div className={s.attFilterLeft}>
+                    <div className={s.attDateRange}>
+                      <input
+                        type="date" className={s.attDateInput}
+                        value={attFrom} onChange={e => setAttFrom(e.target.value)}
+                      />
+                      <span className={s.attDateSep}>→</span>
+                      <input
+                        type="date" className={s.attDateInput}
+                        value={attTo} onChange={e => setAttTo(e.target.value)}
+                      />
+                    </div>
+                    <input
+                      type="search" className={s.attSearchInput}
+                      placeholder="Search employee name or phone…"
+                      value={attSearch}
+                      onChange={e => setAttSearch(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && loadAttendanceLog(attFrom, attTo, attSearch)}
+                    />
+                    <button
+                      className={s.btnPrimary}
+                      onClick={() => loadAttendanceLog(attFrom, attTo, attSearch)}
+                      disabled={attLoading}
+                    >
+                      {attLoading ? <span className={s.miniSpinner} /> : '🔍 Apply'}
+                    </button>
+                  </div>
+                  <div className={s.attFilterRight}>
+                    <label className={s.autoRefLabel}>
+                      <input
+                        type="checkbox" checked={attAutoRef}
+                        onChange={e => setAttAutoRef(e.target.checked)}
+                        className={s.autoRefCheck}
+                      />
+                      Auto-refresh 30s
+                    </label>
+                    <button
+                      className={s.btnSecondary}
+                      onClick={() => exportAttendanceCsv(attRecords, attFrom, attTo)}
+                      disabled={attRecords.length === 0}
+                    >
+                      ↓ Export CSV
+                    </button>
+                  </div>
+                </div>
+
+                {/* ── Last updated bar ── */}
+                {attLastUpd && (
+                  <div className={s.attUpdBar}>
+                    {attAutoRef && <span className={s.attPulseDot} />}
+                    Last updated: {timeAgo(attLastUpd.toISOString())}
+                    {attAutoRef && <span className={s.attLiveTag}>● LIVE</span>}
+                  </div>
+                )}
+
+                {/* ── Summary cards ── */}
+                <div className={s.attSummaryGrid}>
+                  <div className={s.attSummaryCard}>
+                    <div className={s.attSumN}>{attTotal}</div>
+                    <div className={s.attSumL}>Total Check-ins</div>
+                  </div>
+                  <div className={s.attSummaryCard}>
+                    <div className={s.attSumN}>{uniqueEmps}</div>
+                    <div className={s.attSumL}>Unique Employees</div>
+                  </div>
+                  <div className={s.attSummaryCard}>
+                    <div className={s.attSumN} title={topEmp} style={{ fontSize: topEmp.length > 14 ? 13 : undefined }}>{topEmp}</div>
+                    <div className={s.attSumL}>Most Active</div>
+                  </div>
+                  <div className={s.attSummaryCard}>
+                    <div className={s.attSumN}>{timeAgo(lastCheckin)}</div>
+                    <div className={s.attSumL}>Last Check-in</div>
+                  </div>
+                </div>
+
+                {/* ── Main table ── */}
+                <div className={s.panel}>
+                  <div className={s.panelHead}>
+                    <h3>Attendance Log</h3>
+                    <span className={s.attCount}>
+                      {attRecords.length > 0
+                        ? `Showing ${pageStart + 1}–${Math.min(pageStart + ATT_PAGE_SIZE, attRecords.length)} of ${attRecords.length}`
+                        : '0 records'}
+                    </span>
+                  </div>
+
+                  {attLoading ? (
+                    <div className={s.skStack}>{[...Array(8)].map((_, i) => <Sk key={i} h={48} />)}</div>
+                  ) : pageSlice.length > 0 ? (
+                    <>
+                      <table className={`${s.table} ${s.attTable}`}>
+                        <thead>
+                          <tr>
+                            <th className={s.thNum}>#</th>
+                            <th>Employee</th>
+                            <th>Phone</th>
+                            <th>Gym</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
                         <tbody>
-                          {attendance.map(row => (
-                            <tr key={row.user_id}>
-                              <td className={s.tdName}>{row.name}</td>
-                              <td><span className={s.cnt}>{row.total_days}</span></td>
+                          {pageSlice.map((rec, idx) => (
+                            <tr
+                              key={rec.id}
+                              className={`${s.attRow} ${attNewIds.has(rec.id) ? s.attRowFlash : ''}`}
+                            >
+                              <td className={s.tdNum}>{pageStart + idx + 1}</td>
                               <td>
-                                <div className={s.dayDots}>
-                                  {row.days.map(d => <span key={d} className={s.dayDot} title={`Day ${d}`}>{d}</span>)}
-                                  {row.days.length === 0 && <span className={s.tdMuted}>No visits</span>}
+                                <div className={s.empCell}>
+                                  <div className={s.empAvatar}>
+                                    {rec.employee_name.slice(0, 2).toUpperCase()}
+                                  </div>
+                                  <span className={s.tdName}>{rec.employee_name}</span>
                                 </div>
                               </td>
-                              <td><span className={s.verifiedBadge}>✓ OTP</span></td>
+                              <td className={s.tdMuted}>{rec.employee_phone ?? '—'}</td>
+                              <td className={s.tdMuted}>{rec.gym_name}</td>
+                              <td className={s.tdDate}>{dayjs(rec.checked_in_at).format('ddd, DD MMM YYYY')}</td>
+                              <td className={s.tdTime}>{dayjs(rec.checked_in_at).format('hh:mm A')}</td>
+                              <td><CheckinTypeBadge type={rec.checkin_type} /></td>
+                              <td><span className={s.verifiedBadge}>✓ Verified</span></td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
-                    )
-                    : <Empty icon="📅" title="No attendance records" sub="Records appear once employees start checking in." />
-                }
-              </div>
-            </>
-          )}
+
+                      {/* Pagination */}
+                      {totalPages > 1 && (
+                        <div className={s.attPagination}>
+                          <button
+                            className={s.btnSecondary}
+                            onClick={() => setAttPage(p => Math.max(1, p - 1))}
+                            disabled={attPage === 1}
+                          >
+                            ← Previous
+                          </button>
+                          <span className={s.attPageInfo}>
+                            Page {attPage} of {totalPages}
+                          </span>
+                          <button
+                            className={s.btnSecondary}
+                            onClick={() => setAttPage(p => Math.min(totalPages, p + 1))}
+                            disabled={attPage === totalPages}
+                          >
+                            Next →
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <Empty icon="📅" title="No check-ins found for this period" sub="Adjust the date range or search filters and click Apply." />
+                  )}
+                </div>
+              </>
+            );
+          })()}
 
           {/* ══ INVOICES ══ */}
           {tab === 'invoices' && (
@@ -1182,4 +1413,11 @@ function Empty({ icon, title, sub }: { icon: string; title: string; sub: string 
       <div className={s.emptySub}>{sub}</div>
     </div>
   );
+}
+
+function CheckinTypeBadge({ type }: { type: string }) {
+  if (type === 'institutional') return <span className={`${s.badge} ${s.bTypeInst}`}>Institutional</span>;
+  if (type === 'dependent')     return <span className={`${s.badge} ${s.bTypeDep}`}>Dependent</span>;
+  if (type === 'walkin')        return <span className={`${s.badge} ${s.bTypeWalk}`}>Walk-in</span>;
+  return <span className={`${s.badge} ${s.bTypeInd}`}>Individual</span>;
 }

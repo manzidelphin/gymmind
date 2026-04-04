@@ -210,6 +210,87 @@ router.post('/auth/verify-otp', async (req: Request, res: Response) => {
 });
 
 // ---------------------------------------------------------------
+// GET /api/hr/attendance
+// Auth: hrAuth
+// Query: ?from=YYYY-MM-DD&to=YYYY-MM-DD&employeeId=&search=
+// Returns raw check-in log for the HR admin's institutions.
+// ---------------------------------------------------------------
+const dateParamSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
+router.get('/attendance', hrAuth, async (req: Request, res: Response) => {
+  const { institutionIds } = (req as any).hrPayload as HrPayload;
+  if (!institutionIds.length) { res.json({ records: [], total: 0 }); return; }
+
+  // Default range: first day of current month → today
+  const now       = new Date();
+  const y         = now.getFullYear();
+  const m         = String(now.getMonth() + 1).padStart(2, '0');
+  const defaultFrom = `${y}-${m}-01`;
+  const defaultTo   = `${y}-${m}-${String(now.getDate()).padStart(2, '0')}`;
+
+  const fromRaw = (req.query.from as string) || defaultFrom;
+  const toRaw   = (req.query.to   as string) || defaultTo;
+
+  if (!dateParamSchema.safeParse(fromRaw).success || !dateParamSchema.safeParse(toRaw).success) {
+    res.status(400).json({ error: 'from/to must be YYYY-MM-DD' });
+    return;
+  }
+
+  const employeeId = req.query.employeeId ? parseInt(req.query.employeeId as string) : null;
+  const search     = ((req.query.search as string) || '').trim();
+
+  try {
+    const params: any[] = [
+      institutionIds,
+      `${fromRaw} 00:00:00`,
+      `${toRaw} 23:59:59`,
+    ];
+
+    let extraWhere = '';
+    if (employeeId) {
+      extraWhere += ' AND c.user_id = ?';
+      params.push(employeeId);
+    }
+    if (search) {
+      extraWhere += ' AND (u.name LIKE ? OR u.phone LIKE ?)';
+      params.push(`%${search}%`, `%${search}%`);
+    }
+
+    const [rows] = await pool.query<any[]>(
+      `SELECT
+         c.id,
+         c.checked_in_at,
+         c.checkin_type,
+         u.id        AS employee_id,
+         u.name      AS employee_name,
+         u.phone     AS employee_phone,
+         g.name      AS gym_name,
+         g.slug      AS gym_slug,
+         mp.name     AS plan_name,
+         i.name      AS institution_name
+       FROM checkins c
+       JOIN users u  ON u.id  = c.user_id
+       JOIN gyms g   ON g.id  = c.gym_id
+       LEFT JOIN user_memberships um ON um.id = c.membership_id
+       LEFT JOIN membership_plans mp ON mp.id = um.plan_id
+       LEFT JOIN institutions i      ON i.id  = u.institution_id
+       WHERE u.institution_id IN (?)
+         AND c.gym_id = u.gym_id
+         AND c.checked_in_at BETWEEN ? AND ?
+         ${extraWhere}
+       ORDER BY c.checked_in_at DESC
+       LIMIT 500`,
+      params,
+    );
+
+    res.json({ records: rows, total: rows.length });
+  } catch (err) {
+    console.error('HR attendance log error:', err);
+    res.status(500).json({ error: 'Failed to load attendance' });
+  }
+});
+
+// ---------------------------------------------------------------
 // GET /api/hr/dashboard
 // Returns all gyms/institutions this HR admin manages with
 // current-month billing summary.
