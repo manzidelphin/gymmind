@@ -1,127 +1,391 @@
+/* ── Layout ──────────────────────────────────────────────────────── */
 .root {
+  display: flex;
   min-height: 100vh;
-  background: #F1F5F9;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Left panel ──────────────────────────────────────────────────── */
+.left {
+  flex: 0 0 55%;
+  background: #0F172A;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 48px;
+  position: relative;
+  overflow: hidden;
 }
 
-.card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,.10);
-  border: 1px solid #E2E8F0;
-  padding: 48px 40px;
+.left::before {
+  content: '';
+  position: absolute;
+  top: -200px;
+  right: -200px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.left::after {
+  content: '';
+  position: absolute;
+  bottom: -150px;
+  left: -100px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.leftInner {
+  max-width: 520px;
   width: 100%;
-  max-width: 420px;
-  text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
-.logo {
-  font-size: 22px;
+/* ── Brand ───────────────────────────────────────────────────────── */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 56px;
+}
+
+.brandMark {
+  width: 40px;
+  height: 40px;
+  background: #10B981;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
   font-weight: 800;
-  color: #1a7a4a;
-  letter-spacing: -0.5px;
-  margin-bottom: 16px;
+  color: #fff;
 }
 
-.title {
-  font-size: 26px;
+.brandName {
+  font-size: 22px;
   font-weight: 700;
-  color: #1E293B;
-  margin: 0 0 8px;
+  color: #fff;
+  letter-spacing: -0.3px;
 }
 
-.sub {
-  font-size: 14px;
+/* ── Hero ────────────────────────────────────────────────────────── */
+.heroSection {
+  margin-bottom: 40px;
+}
+
+.heroTitle {
+  font-size: 42px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  letter-spacing: -0.8px;
+  margin: 0 0 16px;
+}
+
+.heroSub {
+  font-size: 16px;
+  color: #94A3B8;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 400px;
+}
+
+/* ── Value list ──────────────────────────────────────────────────── */
+.valueList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.valueItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  color: #CBD5E1;
+  line-height: 1.4;
+}
+
+.valueItem svg {
+  flex-shrink: 0;
+}
+
+/* ── Quote ───────────────────────────────────────────────────────── */
+.quote {
+  border-left: 3px solid #10B981;
+  padding: 12px 0 12px 20px;
+  margin: 0 0 40px;
+}
+
+.quote p {
+  font-size: 17px;
+  font-style: italic;
+  color: #E2E8F0;
+  margin: 0 0 6px;
+  font-weight: 500;
+}
+
+.quote footer {
+  font-size: 13px;
   color: #64748B;
-  margin: 0 0 32px;
 }
 
-.form {
+/* ── Trusted by ──────────────────────────────────────────────────── */
+.trusted {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  text-align: left;
 }
 
-.label {
-  font-size: 13px;
+.trustedLabel {
+  font-size: 11px;
   font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.trustedLogos {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.logoChip {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #94A3B8;
+}
+
+/* ── Right panel ─────────────────────────────────────────────────── */
+.right {
+  flex: 1;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+}
+
+.formWrap {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* ── Form header ─────────────────────────────────────────────────── */
+.formHeader {
+  margin-bottom: 36px;
+}
+
+.formBadge {
+  display: inline-block;
+  background: #ECFDF5;
+  color: #059669;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+
+.formTitle {
+  font-size: 30px;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0 0 6px;
+  letter-spacing: -0.5px;
+}
+
+.formSub {
+  font-size: 15px;
+  color: #64748B;
+  margin: 0;
+}
+
+/* ── Form controls ───────────────────────────────────────────────── */
+.label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
   color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
 }
 
 .input {
   width: 100%;
-  padding: 11px 14px;
-  border: 1.5px solid #D1D5DB;
-  border-radius: 8px;
-  font-size: 15px;
-  color: #1E293B;
-  outline: none;
+  padding: 14px 16px;
+  font-size: 16px;
+  border: 2px solid #E5E7EB;
+  border-radius: 10px;
+  background: #F9FAFB;
+  color: #0F172A;
+  margin-bottom: 20px;
+  font-family: inherit;
   box-sizing: border-box;
-  background: #fff;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, background 0.15s;
 }
 
 .input:focus {
-  border-color: #1E3A5F;
-}
-
-.inputCode {
-  font-size: 24px;
-  letter-spacing: 8px;
-  text-align: center;
+  outline: none;
+  border-color: #10B981;
+  background: #fff;
 }
 
 .error {
-  font-size: 13px;
-  color: #DC2626;
   background: #FEF2F2;
   border: 1px solid #FECACA;
-  border-radius: 6px;
-  padding: 8px 12px;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #DC2626;
+  margin-bottom: 16px;
 }
 
+/* ── OTP ─────────────────────────────────────────────────────────── */
+.otpHint {
+  font-size: 14px;
+  color: #64748B;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.otpGrid {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.otpCell {
+  flex: 1;
+  height: 60px;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  border: 2px solid #E5E7EB;
+  border-radius: 10px;
+  background: #F9FAFB;
+  color: #0F172A;
+  caret-color: transparent;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.otpCell:focus {
+  border-color: #10B981;
+  background: #fff;
+}
+
+.otpCellFilled {
+  border-color: #10B981;
+  background: #ECFDF5;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────── */
 .btn {
-  padding: 12px;
-  background: #1E3A5F;
+  width: 100%;
+  padding: 15px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 10px;
+  background: #10B981;
   color: #fff;
   border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s;
-  margin-top: 4px;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, transform 0.1s;
+  margin-bottom: 12px;
 }
 
 .btn:hover:not(:disabled) {
-  background: #162d4b;
+  background: #059669;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .btn:disabled {
-  background: #7BA6C8;
+  background: #D1FAE5;
+  color: #6EE7B7;
   cursor: not-allowed;
 }
 
-.btnLink {
-  background: none;
-  border: none;
-  color: #1E3A5F;
-  font-size: 13px;
+.btnGhost {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  background: transparent;
+  color: #64748B;
+  border: 2px solid #E5E7EB;
   cursor: pointer;
-  padding: 4px 0;
-  text-align: center;
+  font-family: inherit;
+  transition: border-color 0.15s, color 0.15s;
+  margin-bottom: 24px;
 }
 
-.btnLink:hover {
+.btnGhost:hover {
+  border-color: #94A3B8;
+  color: #374151;
+}
+
+/* ── Spinner ─────────────────────────────────────────────────────── */
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+.formFooter {
+  text-align: center;
+  font-size: 14px;
+  color: #94A3B8;
+}
+
+.contactLink {
+  color: #10B981;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.contactLink:hover {
   text-decoration: underline;
 }
 
-.powered {
-  margin-top: 36px;
-  font-size: 12px;
-  color: #9CA3AF;
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .left { display: none; }
+  .right { padding: 32px 24px; }
 }
