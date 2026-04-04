@@ -99,3 +99,7 @@ CREATE TABLE IF NOT EXISTS institutional_payments (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY unique_institution_month (institution_id, month, gym_id)
 );
+
+-- Add city column to gyms (captured during self-signup)
+ALTER TABLE gyms
+  ADD COLUMN IF NOT EXISTS city VARCHAR(100) NULL AFTER slug;

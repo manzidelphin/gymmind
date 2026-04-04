@@ -9,6 +9,7 @@ CREATE TABLE gyms (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   slug VARCHAR(100) UNIQUE NOT NULL,
+  city VARCHAR(100) NULL,
   phone VARCHAR(20) NULL,
   address TEXT NULL,
   subscription_plan ENUM('trial', 'basic', 'pro', 'enterprise') DEFAULT 'trial',

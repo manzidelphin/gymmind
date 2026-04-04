@@ -18,6 +18,10 @@ function slugify(name: string): string {
     .slice(0, 50);
 }
 
+function isEmailValid(v: string): boolean {
+  return v.includes('@') && v.includes('.');
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type Step = 1 | 2 | 3 | 4;
@@ -35,9 +39,11 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
 
   // Step 1 — gym info
-  const [gymName, setGymName]   = useState('');
-  const [slug, setSlug]         = useState('');
-  const [slugState, setSlugState] = useState<SlugState>('idle');
+  const [gymName, setGymName]             = useState('');
+  const [slug, setSlug]                   = useState('');
+  const [slugState, setSlugState]         = useState<SlugState>('idle');
+  const [city, setCity]                   = useState('');
+  const [subscriptionPlan, setSubscriptionPlan] = useState('');
   const slugDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Step 2 — owner info
@@ -114,8 +120,16 @@ export default function Signup() {
   // ── Send OTP ────────────────────────────────────────────────────────────────
 
   async function sendOtp() {
-    setLoading(true);
     setError('');
+    if (!isPhoneValid(momoNumber)) {
+      setError('Please enter a valid MoMo payment number.');
+      return;
+    }
+    if (!isEmailValid(email.trim())) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    setLoading(true);
     try {
       const r = await publicApi.post('/signup/send-otp', { phone: ownerPhone });
       if (r.data.devCode) setDevCode(r.data.devCode);
@@ -141,13 +155,14 @@ export default function Signup() {
       const r = await publicApi.post('/signup/create-gym', {
         gymName,
         slug,
+        city,
+        subscriptionPlan,
         ownerName,
         ownerPhone,
-        momoNumber: momoNumber || undefined,
-        email: email.trim() || undefined,
+        momoNumber,
+        email: email.trim(),
         otp: code,
       });
-      // Store credentials so GymContext initialises correctly on navigation
       localStorage.setItem('token',   r.data.token);
       localStorage.setItem('gymSlug', r.data.gym.slug);
       localStorage.setItem('user',    JSON.stringify(r.data.user));
@@ -178,13 +193,17 @@ export default function Signup() {
     gymName.trim().length >= 2 &&
     /^[a-z0-9-]{3,50}$/.test(slug) &&
     slugState !== 'invalid' &&
-    slugState !== 'taken';
+    slugState !== 'taken' &&
+    city.trim().length >= 2 &&
+    subscriptionPlan !== '';
 
   // ── Step 2 validation ──────────────────────────────────────────────────────
 
   const step2Valid =
     ownerName.trim().length >= 1 &&
-    isPhoneValid(ownerPhone);
+    isPhoneValid(ownerPhone) &&
+    isPhoneValid(momoNumber) &&
+    isEmailValid(email.trim());
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -210,7 +229,7 @@ export default function Signup() {
         {step === 1 && (
           <>
             <div className={s.stepHeading}>Set up your gym</div>
-            <div className={s.stepSub}>Choose a name and a unique URL for your gym.</div>
+            <div className={s.stepSub}>Tell us about your gym to get started.</div>
 
             {error && <div className={s.error}>{error}</div>}
 
@@ -245,6 +264,28 @@ export default function Signup() {
             <div className={s.slugHint}>
               Members will check in at: <code>{window.location.host}/<strong>{slug || 'your-gym'}</strong>/checkin</code>
             </div>
+
+            <label className={s.label}>City / Location</label>
+            <input
+              className={s.input}
+              type="text"
+              placeholder="e.g. Kigali, Butare, Musanze"
+              value={city}
+              onChange={e => setCity(e.target.value)}
+            />
+
+            <label className={s.label}>Subscription Plan</label>
+            <select
+              className={s.input}
+              value={subscriptionPlan}
+              onChange={e => setSubscriptionPlan(e.target.value)}
+            >
+              <option value="">Select a plan…</option>
+              <option value="trial">Starter — 50,000 RWF / month</option>
+              <option value="basic">Basic — 100,000 RWF / month</option>
+              <option value="pro">Pro — 180,000 RWF / month</option>
+              <option value="enterprise">Enterprise — 350,000+ RWF / month</option>
+            </select>
 
             <button
               className={s.btnPrimary}
@@ -281,14 +322,14 @@ export default function Signup() {
               inputClassName={s.input}
             />
 
-            <label className={s.label}>MoMo payment number <span style={{ color: '#94a3b8', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional — can be set later)</span></label>
+            <label className={s.label}>MoMo payment number</label>
             <PhoneInput
               value={momoNumber}
               onChange={(v) => setMomoNumber(v)}
               inputClassName={s.input}
             />
 
-            <label className={s.label}>Email address <span style={{ color: '#94a3b8', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional — for monthly reports)</span></label>
+            <label className={s.label}>Email address</label>
             <input
               className={s.input}
               type="email"

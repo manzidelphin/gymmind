@@ -78,13 +78,15 @@ router.post('/send-otp', async (req: Request, res: Response) => {
 // Verifies OTP, creates gym + gym_owner user, returns JWT.
 // ---------------------------------------------------------------
 const createGymSchema = z.object({
-  gymName:    z.string().min(2).max(100),
-  slug:       z.string().min(3).max(50).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase letters, numbers, and hyphens only'),
-  ownerName:  z.string().min(1).max(255),
-  ownerPhone: z.string().min(9),
-  momoNumber: z.string().optional(),
-  email:      z.string().email().optional(),
-  otp:        z.string().length(6),
+  gymName:          z.string().min(2).max(100),
+  slug:             z.string().min(3).max(50).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase letters, numbers, and hyphens only'),
+  city:             z.string().min(2).max(100),
+  subscriptionPlan: z.enum(['trial', 'basic', 'pro', 'enterprise']),
+  ownerName:        z.string().min(1).max(255),
+  ownerPhone:       z.string().min(9),
+  momoNumber:       z.string().min(9),
+  email:            z.string().email(),
+  otp:              z.string().length(6),
 });
 
 router.post('/create-gym', async (req: Request, res: Response) => {
@@ -94,7 +96,7 @@ router.post('/create-gym', async (req: Request, res: Response) => {
     return;
   }
 
-  const { gymName, slug, ownerName, otp, email: gymEmail } = parsed.data;
+  const { gymName, slug, city, subscriptionPlan, ownerName, otp, email: gymEmail } = parsed.data;
 
   let ownerPhone: string;
   try {
@@ -119,20 +121,20 @@ router.post('/create-gym', async (req: Request, res: Response) => {
     return;
   }
 
-  // Normalize momo number if provided
-  let momoNumber: string | null = null;
-  if (parsed.data.momoNumber?.trim()) {
-    try {
-      momoNumber = normalizePhone(parsed.data.momoNumber.trim());
-    } catch {
-      // Ignore — momo can be set later in Settings
-    }
+  // Normalize momo number
+  let momoNumber: string;
+  try {
+    momoNumber = normalizePhone(parsed.data.momoNumber);
+    if (!validatePhone(momoNumber)) throw new Error('Invalid MoMo number format');
+  } catch (e: any) {
+    res.status(400).json({ error: e.message });
+    return;
   }
 
   // Create gym
   const [gymResult] = await pool.query<any>(
-    `INSERT INTO gyms (name, slug, phone, momo_number, email) VALUES (?, ?, ?, ?, ?)`,
-    [gymName, slug, ownerPhone, momoNumber, gymEmail ?? null]
+    `INSERT INTO gyms (name, slug, city, subscription_plan, phone, momo_number, email) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [gymName, slug, city, subscriptionPlan, ownerPhone, momoNumber, gymEmail]
   );
   const gymId: number = gymResult.insertId;
 
