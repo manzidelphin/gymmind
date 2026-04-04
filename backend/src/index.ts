@@ -32,6 +32,23 @@ app.use(cors());
 app.use(express.json());
 
 // ---------------------------------------------------------------
+// Public routes — no auth, no gym middleware
+// ---------------------------------------------------------------
+
+// GET /api/public/check-slug?slug=xxx
+// Used by signup page to check slug availability before the gym exists.
+app.get('/api/public/check-slug', async (req, res) => {
+  const slug = ((req.query.slug as string) || '').trim().toLowerCase();
+  if (!slug || !/^[a-z0-9-]{3,50}$/.test(slug)) {
+    res.json({ available: false });
+    return;
+  }
+  const { pool } = await import('./config/db');
+  const [rows] = await pool.query<any[]>('SELECT id FROM gyms WHERE slug = ?', [slug]);
+  res.json({ available: !rows[0] });
+});
+
+// ---------------------------------------------------------------
 // Routes
 // ---------------------------------------------------------------
 app.use('/api/auth', authRoutes);

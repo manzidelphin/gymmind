@@ -61,7 +61,7 @@ export default function Signup() {
     if (!value) { setSlugState('idle'); return; }
     if (!/^[a-z0-9-]{3,50}$/.test(value)) { setSlugState('invalid'); return; }
     setSlugState('checking');
-    publicApi.get(`/signup/check-slug?slug=${encodeURIComponent(value)}`)
+    publicApi.get(`/public/check-slug?slug=${encodeURIComponent(value)}`)
       .then(r => setSlugState(r.data.available ? 'available' : 'taken'))
       .catch(() => setSlugState('idle'));
   }, []);
@@ -243,7 +243,7 @@ export default function Signup() {
               {slugState === 'invalid' && <span className={`${s.slugStatus} ${s.slugTaken}`}>✗ Invalid</span>}
             </div>
             <div className={s.slugHint}>
-              Members will check in at: <code>gymmind.app/<strong>{slug || 'your-gym'}</strong>/checkin</code>
+              Members will check in at: <code>{window.location.host}/<strong>{slug || 'your-gym'}</strong>/checkin</code>
             </div>
 
             <button
@@ -386,7 +386,7 @@ export default function Signup() {
             <div className={s.successSub}>
               <strong>{gymName}</strong> is ready. Members can start checking in right away.
             </div>
-            <div className={s.gymSlugPill}>gymmind.app/{createdSlug}/checkin</div>
+            <div className={s.gymSlugPill}>{window.location.host}/{createdSlug}/checkin</div>
             <button
               className={s.btnPrimary}
               onClick={() => navigate(`/${createdSlug}/manager`)}
