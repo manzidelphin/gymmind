@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { hrApi, publicApi } from '../api/api';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -159,7 +159,6 @@ export default function HRDashboard() {
 
   // ── Init ─────────────────────────────────────────────────────
   useEffect(() => {
-    if (!localStorage.getItem('hr_token')) { navigate('/hr/login'); return; }
     loadDashboard();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -178,8 +177,13 @@ export default function HRDashboard() {
       const { data } = await hrApi.get<GymEntry[]>('/hr/dashboard');
       setEntries(data);
     } catch (e: any) {
-      if (e.response?.status === 401) { localStorage.removeItem('hr_token'); navigate('/hr/login'); }
-      else setDashError('Failed to load dashboard. Please refresh.');
+      const status = e.response?.status;
+      if (status === 401 || status === 403) {
+        localStorage.removeItem('hr_token');
+        navigate('/hr/login');
+      } else {
+        setDashError('Failed to load dashboard. Please refresh.');
+      }
     } finally { setLoadingDash(false); }
   }
 
@@ -294,6 +298,11 @@ export default function HRDashboard() {
     { id: 'invoices',   icon: '📄', label: 'Invoices' },
     { id: 'settings',   icon: '⚙️', label: 'Settings' },
   ];
+
+  // ── Auth guard — redirect immediately, never show loading for unauthenticated users ──
+  if (!localStorage.getItem('hr_token')) {
+    return <Navigate to="/hr/login" replace />;
+  }
 
   // ── Loading / error screens ───────────────────────────────────
   if (loadingDash) {
