@@ -1,6 +1,7 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { hrApi, publicApi } from '../api/api';
+import * as XLSX from 'xlsx';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer,
@@ -144,10 +145,10 @@ export default function HRDashboard() {
 
   // MoMo modal
   const [momoEntry,   setMomoEntry]   = useState<GymEntry | null>(null);
-  const [momoName,    setMomoName]    = useState('');
   const [momoPhone,   setMomoPhone]   = useState('');
   const [momoLoading, setMomoLoading] = useState(false);
-  const [momoResult,  setMomoResult]  = useState<string | null>(null);
+  const [momoConfirm, setMomoConfirm] = useState(false);
+  const [momoSuccess, setMomoSuccess] = useState<{ message: string; reference: string } | null>(null);
   const [momoError,   setMomoError]   = useState('');
 
   // Add employee modal
@@ -156,6 +157,15 @@ export default function HRDashboard() {
   const [addPhone,   setAddPhone]   = useState('');
   const [addLoading, setAddLoading] = useState(false);
   const [addError,   setAddError]   = useState('');
+
+  // Excel upload
+  interface UploadRow { name: string; phone: string; valid: boolean }
+  const [uploadPreview, setUploadPreview] = useState<UploadRow[]>([]);
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [uploadResult,  setUploadResult]  = useState<{ created: number; skipped: number } | null>(null);
+  const [uploadError,   setUploadError]   = useState('');
+  const [dragOver,      setDragOver]      = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ── Init ─────────────────────────────────────────────────────
   useEffect(() => {
@@ -213,23 +223,87 @@ export default function HRDashboard() {
   function logout() { localStorage.removeItem('hr_token'); navigate('/hr/login'); }
 
   function openMomo(e: GymEntry) {
-    setMomoEntry(e); setMomoName(''); setMomoPhone('');
-    setMomoResult(null); setMomoError('');
+    setMomoEntry(e); setMomoPhone('');
+    setMomoSuccess(null); setMomoError(''); setMomoConfirm(false);
   }
 
   async function submitPay() {
-    if (!momoEntry?.invoiceToken || !momoName.trim() || !momoPhone.trim()) return;
+    if (!momoEntry?.invoiceToken || !momoPhone.trim() || !momoConfirm) return;
     setMomoLoading(true); setMomoError('');
     try {
       const { data } = await publicApi.post<{ message: string; reference: string }>(
         `/hr/${momoEntry.invoiceToken}/pay`,
-        { hrName: momoName.trim(), momoPhone: momoPhone.trim() },
+        { hrName: momoEntry.institutionName, momoPhone: momoPhone.trim() },
       );
-      setMomoResult(`${data.message}  ·  Ref: ${data.reference}`);
+      setMomoSuccess({ message: data.message, reference: data.reference });
       loadDashboard();
     } catch (e: any) {
       setMomoError(e.response?.data?.error ?? 'Payment failed. Try again.');
     } finally { setMomoLoading(false); }
+  }
+
+  // ── Upload helpers ────────────────────────────────────────────
+  function downloadTemplate() {
+    const csv = '"Name","Phone"\n"Jean-Paul Habimana","0788123456"\n"Alice Uwimana","0722345678"';
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'employees-template.csv';
+    a.click();
+  }
+
+  function parseUploadFile(file: File) {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = new Uint8Array(ev.target!.result as ArrayBuffer);
+        const wb   = XLSX.read(data, { type: 'array' });
+        const ws   = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: '' });
+        const preview: UploadRow[] = rows.map((r) => {
+          const name  = String(r['Name']  || r['name']  || r['NAME']  || '').trim();
+          const phone = String(r['Phone'] || r['phone'] || r['PHONE'] || '').trim();
+          return { name, phone, valid: name.length > 0 };
+        }).filter(r => r.name || r.phone);
+        setUploadPreview(preview);
+        setUploadResult(null);
+        setUploadError('');
+      } catch {
+        setUploadError('Could not parse the file. Please use the provided template.');
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function handleUploadDrop(ev: React.DragEvent) {
+    ev.preventDefault(); setDragOver(false);
+    const file = ev.dataTransfer.files[0];
+    if (file) parseUploadFile(file);
+  }
+
+  function handleUploadChange(ev: React.ChangeEvent<HTMLInputElement>) {
+    const file = ev.target.files?.[0];
+    if (file) parseUploadFile(file);
+    ev.target.value = '';
+  }
+
+  async function submitUpload() {
+    const e = entries[0];
+    const token = e?.invoiceToken ?? e?.gymSlug;
+    const valid = uploadPreview.filter(r => r.valid);
+    if (!token || !valid.length) return;
+    setUploadLoading(true); setUploadError('');
+    try {
+      const { data } = await hrApi.post<{ created: number; skipped: number }>(
+        `/hr/${token}/employees/bulk`,
+        { employees: valid.map(r => ({ name: r.name, phone: r.phone || undefined })) },
+      );
+      setUploadResult(data);
+      setUploadPreview([]);
+      if (e) loadDetail(e);
+    } catch (err: any) {
+      setUploadError(err.response?.data?.error ?? 'Upload failed. Please try again.');
+    } finally { setUploadLoading(false); }
   }
 
   async function addEmployee() {
@@ -473,6 +547,69 @@ export default function HRDashboard() {
           {/* ══ EMPLOYEES ══ */}
           {tab === 'employees' && (
             <>
+              {/* Upload zone */}
+              <div className={s.panel}>
+                <div className={s.panelHead}>
+                  <h3>Bulk Upload via Excel / CSV</h3>
+                  <button className={s.btnSecondary} onClick={downloadTemplate}>↓ Download Template</button>
+                </div>
+                <div
+                  className={`${s.uploadZone} ${dragOver ? s.uploadZoneDrag : ''}`}
+                  onDragOver={ev => { ev.preventDefault(); setDragOver(true); }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={handleUploadDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <div className={s.uploadIcon}>📊</div>
+                  <div className={s.uploadTitle}>Drop your Excel or CSV file here</div>
+                  <div className={s.uploadSub}>Supports .xlsx, .xls, .csv · Columns: Name, Phone</div>
+                  <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" className={s.hiddenInput} onChange={handleUploadChange} />
+                </div>
+
+                {uploadError && <div className={s.inlineError}>{uploadError}</div>}
+
+                {uploadResult && (
+                  <div className={s.uploadSuccess}>
+                    ✓ Upload complete — <strong>{uploadResult.created}</strong> added
+                    {uploadResult.skipped > 0 && `, ${uploadResult.skipped} skipped (duplicates)`}
+                  </div>
+                )}
+
+                {uploadPreview.length > 0 && (
+                  <div className={s.uploadPreview}>
+                    <div className={s.uploadPreviewHead}>
+                      <span>{uploadPreview.filter(r => r.valid).length} valid employees ready to import</span>
+                      <button className={s.clearBtn} onClick={() => setUploadPreview([])}>✕ Clear</button>
+                    </div>
+                    <table className={s.table}>
+                      <thead><tr><th>Name</th><th>Phone</th><th>Status</th></tr></thead>
+                      <tbody>
+                        {uploadPreview.map((row, i) => (
+                          <tr key={i}>
+                            <td className={s.tdName}>{row.name || <span className={s.tdMuted}>—</span>}</td>
+                            <td className={s.tdMuted}>{row.phone || '—'}</td>
+                            <td>
+                              {row.valid
+                                ? <span className={`${s.badge} ${s.bPaid}`}>✓ Valid</span>
+                                : <span className={`${s.badge} ${s.bOverdue}`}>⚠ Missing name</span>}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <div className={s.uploadActions}>
+                      <button
+                        className={s.btnPrimary}
+                        onClick={submitUpload}
+                        disabled={uploadLoading || uploadPreview.filter(r => r.valid).length === 0}
+                      >
+                        {uploadLoading ? 'Uploading…' : `Import ${uploadPreview.filter(r => r.valid).length} Employees`}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className={s.toolbar}>
                 <input
                   className={s.searchInput}
@@ -699,28 +836,76 @@ export default function HRDashboard() {
               <button className={s.modalClose} onClick={() => setMomoEntry(null)} disabled={momoLoading}>✕</button>
             </div>
             <div className={s.modalBody}>
-              <div className={s.modalInvoice}>
-                <span>{momoEntry.gymName} · {momoEntry.institutionName}</span>
-                <span className={s.modalAmt}>{fmtRwf(momoEntry.invoiceAmount)}</span>
-              </div>
-              {momoResult
-                ? <div className={s.momoSuccess}>{momoResult}</div>
-                : (
-                  <>
-                    <label className={s.lbl}>Your Name</label>
-                    <input className={s.inp} placeholder="Full name" value={momoName} onChange={e => setMomoName(e.target.value)} />
-                    <label className={s.lbl}>MoMo Phone</label>
-                    <input className={s.inp} type="tel" placeholder="07XX XXX XXX" value={momoPhone} onChange={e => setMomoPhone(e.target.value)} />
-                    {momoError && <div className={s.inlineError}>{momoError}</div>}
-                    <div className={s.modalFoot}>
-                      <button className={s.btnSecondary} onClick={() => setMomoEntry(null)} disabled={momoLoading}>Cancel</button>
-                      <button className={s.btnPrimary} onClick={submitPay} disabled={momoLoading || !momoName.trim() || !momoPhone.trim()}>
-                        {momoLoading ? 'Processing…' : 'Pay Now'}
-                      </button>
+
+              {momoSuccess ? (
+                /* ── Success screen ── */
+                <div className={s.momoSuccessScreen}>
+                  <div className={s.successCheckWrap}>
+                    <div className={s.successCheck}>
+                      <svg viewBox="0 0 52 52" className={s.checkSvg}>
+                        <circle cx="26" cy="26" r="25" fill="none" className={s.checkCircle} />
+                        <path d="M14 27l8 8 16-16" fill="none" className={s.checkMark} />
+                      </svg>
                     </div>
-                  </>
-                )
-              }
+                  </div>
+                  <div className={s.successTitle}>Payment Initiated!</div>
+                  <div className={s.successSub}>Check your MTN MoMo phone for a USSD prompt to approve the payment.</div>
+                  <div className={s.successRef}>Ref: {momoSuccess.reference}</div>
+                  <button className={s.btnPrimary} onClick={() => setMomoEntry(null)}>Done</button>
+                </div>
+              ) : momoLoading ? (
+                /* ── Loading screen ── */
+                <div className={s.momoLoadingScreen}>
+                  <div className={s.momoSpinner} />
+                  <div className={s.momoLoadingText}>Sending payment request…</div>
+                  <div className={s.momoLoadingSub}>A USSD prompt will appear on {momoPhone}</div>
+                </div>
+              ) : (
+                /* ── Form ── */
+                <>
+                  <div className={s.modalInvoice}>
+                    <div>
+                      <div className={s.modalInvoiceGym}>{momoEntry.gymName}</div>
+                      <div className={s.modalInvoiceInst}>{momoEntry.institutionName} · {fmtMonth(momoEntry.month)}</div>
+                    </div>
+                    <span className={s.modalAmt}>{fmtRwf(momoEntry.invoiceAmount)}</span>
+                  </div>
+                  <div className={s.momoNote}>
+                    You will receive a USSD prompt on your MTN MoMo phone to approve this payment.
+                  </div>
+                  <label className={s.lbl}>MoMo Phone Number</label>
+                  <input
+                    className={s.inp}
+                    type="tel"
+                    placeholder="07XX XXX XXX"
+                    value={momoPhone}
+                    onChange={e => setMomoPhone(e.target.value)}
+                    autoFocus
+                  />
+                  <label className={s.checkboxRow}>
+                    <input
+                      type="checkbox"
+                      checked={momoConfirm}
+                      onChange={e => setMomoConfirm(e.target.checked)}
+                      className={s.checkboxInput}
+                    />
+                    <span className={s.checkboxLabel}>
+                      I confirm this payment of <strong>{fmtRwf(momoEntry.invoiceAmount)}</strong> for {fmtMonth(momoEntry.month)}
+                    </span>
+                  </label>
+                  {momoError && <div className={s.inlineError}>{momoError}</div>}
+                  <div className={s.modalFoot}>
+                    <button className={s.btnSecondary} onClick={() => setMomoEntry(null)}>Cancel</button>
+                    <button
+                      className={s.btnPrimary}
+                      onClick={submitPay}
+                      disabled={!momoPhone.trim() || !momoConfirm}
+                    >
+                      Pay Now
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

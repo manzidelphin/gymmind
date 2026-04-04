@@ -822,6 +822,247 @@
   line-height: 1.5;
 }
 
+/* ── Upload zone ─────────────────────────────────────────────────── */
+.uploadZone {
+  border: 2px dashed #D1FAE5;
+  border-radius: 12px;
+  background: #F8FAFC;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 36px 24px;
+  cursor: pointer;
+  margin: 0 20px 16px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.uploadZone:hover, .uploadZoneDrag {
+  border-color: #10B981;
+  background: #ECFDF5;
+}
+
+.uploadIcon { font-size: 32px; }
+
+.uploadTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0F172A;
+}
+
+.uploadSub {
+  font-size: 13px;
+  color: #94A3B8;
+}
+
+.hiddenInput { display: none; }
+
+.uploadSuccess {
+  background: #ECFDF5;
+  color: #059669;
+  font-size: 13px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin: 0 20px 16px;
+}
+
+.uploadPreview {
+  margin: 0 20px 20px;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.uploadPreviewHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #F8FAFC;
+  border-bottom: 1px solid #E2E8F0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.clearBtn {
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: #94A3B8;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.1s;
+}
+.clearBtn:hover { color: #374151; }
+
+.uploadActions {
+  padding: 14px 16px;
+  border-top: 1px solid #E2E8F0;
+  background: #F8FAFC;
+}
+
+.uploadActions .btnPrimary { width: 100%; }
+
+/* ── MoMo success screen ──────────────────────────────────────────── */
+.momoSuccessScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0 8px;
+  text-align: center;
+}
+
+.successCheckWrap {
+  margin-bottom: 4px;
+}
+
+.successCheck {
+  width: 72px;
+  height: 72px;
+}
+
+.checkSvg {
+  width: 72px;
+  height: 72px;
+}
+
+.checkCircle {
+  stroke: #10B981;
+  stroke-width: 2;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: drawCircle 0.6s ease forwards;
+}
+
+.checkMark {
+  stroke: #10B981;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: drawMark 0.4s ease 0.5s forwards;
+}
+
+@keyframes drawCircle {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes drawMark {
+  to { stroke-dashoffset: 0; }
+}
+
+.successTitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.3px;
+}
+
+.successSub {
+  font-size: 14px;
+  color: #64748B;
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+.successRef {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94A3B8;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-family: monospace;
+}
+
+.momoSuccessScreen .btnPrimary {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* ── MoMo loading screen ─────────────────────────────────────────── */
+.momoLoadingScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  text-align: center;
+}
+
+.momoSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #D1FAE5;
+  border-top-color: #10B981;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.momoLoadingText {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.momoLoadingSub {
+  font-size: 13px;
+  color: #94A3B8;
+}
+
+/* ── MoMo form extras ────────────────────────────────────────────── */
+.modalInvoiceGym {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.modalInvoiceInst {
+  font-size: 12px;
+  color: #94A3B8;
+  margin-top: 2px;
+}
+
+.momoNote {
+  background: #FFF7ED;
+  border: 1px solid #FED7AA;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #92400E;
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  cursor: pointer;
+}
+
+.checkboxInput {
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: #10B981;
+  cursor: pointer;
+}
+
+.checkboxLabel {
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.5;
+}
+
 /* ── Responsive ──────────────────────────────────────────────────── */
 @media (max-width: 1100px) {
   .statGrid { grid-template-columns: repeat(2, 1fr); }
