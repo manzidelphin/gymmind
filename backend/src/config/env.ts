@@ -27,6 +27,17 @@ const envSchema = z.object({
 
   // Frontend URL (used in SMS links)
   FRONTEND_URL: z.string().default('gymmind.rw'),
+
+  // MTN MoMo Collections
+  MTN_MOMO_SUBSCRIPTION_KEY: z.string().default(''),
+  MTN_MOMO_PRIMARY_KEY:      z.string().default(''),
+  MTN_MOMO_SECONDARY_KEY:    z.string().default(''),
+  MTN_MOMO_API_USER_ID:      z.string().default(''),
+  MTN_MOMO_API_KEY:          z.string().default(''),
+  MTN_MOMO_BASE_URL:         z.string().default('https://sandbox.momodeveloper.mtn.com'),
+  MTN_MOMO_ENV:              z.string().default('sandbox'),
+  MTN_MOMO_ENVIRONMENT:      z.string().default('sandbox'),
+  MTN_MOMO_CURRENCY:         z.string().default('RWF'),
 });
 
 const parsed = envSchema.safeParse(process.env);

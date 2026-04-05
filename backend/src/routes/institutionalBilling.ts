@@ -7,8 +7,145 @@ import { resolveGym } from '../middleware/gym.middleware';
 import { requireRole } from '../middleware/role.middleware';
 import { sendSms } from '../services/otp.service';
 import { env } from '../config/env';
+import { verifyToken } from '../services/jwt.service';
+import { requestPayment, getPaymentStatus } from '../services/momo.service';
 
 const router = Router();
+
+// ---------------------------------------------------------------
+// POST /api/billing/momo-webhook
+// Public — MTN MoMo calls this after payment resolves.
+// Required DB migrations (run once):
+//   ALTER TABLE institutional_payments ADD COLUMN momo_reference_id VARCHAR(100) NULL;
+//   ALTER TABLE gyms ADD COLUMN momo_number VARCHAR(20) NULL;
+// ---------------------------------------------------------------
+router.post('/momo-webhook', async (req: Request, res: Response) => {
+  try {
+    const { referenceId, status, financialTransactionId } = req.body ?? {};
+    if (!referenceId) { res.status(400).json({ error: 'Missing referenceId' }); return; }
+
+    if (status === 'SUCCESSFUL') {
+      await pool.query(
+        `UPDATE institutional_payments
+         SET status = 'paid',
+             paid_at = NOW(),
+             payment_reference = ?
+         WHERE momo_reference_id = ?`,
+        [financialTransactionId ?? referenceId, referenceId],
+      );
+    }
+
+    res.status(200).json({ received: true });
+  } catch (err) {
+    console.error('[MoMo webhook] error:', err);
+    res.status(500).json({ error: 'Webhook processing failed' });
+  }
+});
+
+// ---------------------------------------------------------------
+// POST /api/billing/institutions/:id/request-payment
+// HR admin authenticated — initiates MTN MoMo push to their phone.
+// Body: { momoPhone, month? }
+// ---------------------------------------------------------------
+const requestPaymentSchema = z.object({
+  momoPhone: z.string().min(9).max(20),
+  month:     z.string().regex(/^\d{4}-\d{2}$/).optional(),
+});
+
+router.post('/institutions/:id/request-payment', async (req: Request, res: Response) => {
+  // ── Verify HR admin token ──
+  const authHeader = req.headers.authorization;
+  const hrToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  if (!hrToken) { res.status(401).json({ error: 'Unauthorized' }); return; }
+
+  let hrPayload: any;
+  try {
+    hrPayload = verifyToken(hrToken);
+    if (hrPayload.role !== 'institution_admin') throw new Error('Forbidden');
+  } catch {
+    res.status(401).json({ error: 'Invalid or expired token' }); return;
+  }
+
+  const institutionId = parseInt(req.params.id, 10);
+  if (!(hrPayload.institutionIds as number[] | undefined)?.includes(institutionId)) {
+    res.status(403).json({ error: 'Access denied to this institution' }); return;
+  }
+
+  const parsed = requestPaymentSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.flatten().fieldErrors }); return;
+  }
+
+  const momoPhone = parsed.data.momoPhone;
+  const month     = parsed.data.month ?? currentMonth();
+
+  try {
+    // Get institution
+    const [[inst]] = await pool.query<any[]>(
+      'SELECT id, name, gym_id, rate_per_session FROM institutions WHERE id = ? LIMIT 1',
+      [institutionId],
+    );
+    if (!inst) { res.status(404).json({ error: 'Institution not found' }); return; }
+
+    // Resolve invoice amount: prefer existing record, else calculate from visits
+    const [[existing]] = await pool.query<any[]>(
+      `SELECT id, total_amount, status FROM institutional_payments
+       WHERE institution_id = ? AND gym_id = ? AND month = ? LIMIT 1`,
+      [institutionId, inst.gym_id, month],
+    );
+
+    let amount: number;
+    if (existing && Number(existing.total_amount) > 0) {
+      amount = Number(existing.total_amount);
+    } else {
+      const [[visitRow]] = await pool.query<any[]>(
+        `SELECT COUNT(DISTINCT c.id) AS visits
+         FROM checkins c JOIN users u ON u.id = c.user_id
+         WHERE c.gym_id = ? AND u.institution_id = ?
+           AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?`,
+        [inst.gym_id, institutionId, month],
+      );
+      amount = Number(visitRow?.visits ?? 0) * Number(inst.rate_per_session);
+    }
+
+    if (amount <= 0) {
+      res.status(400).json({ error: 'No billable amount for this period' }); return;
+    }
+
+    // Initiate MoMo request-to-pay
+    const externalId  = `GYM-${institutionId}-${month}-${Date.now()}`;
+    const referenceId = await requestPayment({
+      amount,
+      currency:    env.MTN_MOMO_CURRENCY,
+      payerPhone:  momoPhone,
+      referenceId: externalId,
+      description: `GymMind invoice — ${inst.name} ${month}`,
+    });
+
+    // Persist referenceId + update status to 'sent'
+    if (existing) {
+      await pool.query(
+        `UPDATE institutional_payments
+         SET momo_reference_id = ?, status = IF(status = 'paid', 'paid', 'sent'), sent_at = NOW()
+         WHERE id = ?`,
+        [referenceId, existing.id],
+      );
+    } else {
+      await pool.query(
+        `INSERT INTO institutional_payments
+           (gym_id, institution_id, month, total_amount, currency, status, momo_reference_id, sent_at)
+         VALUES (?, ?, ?, ?, 'RWF', 'sent', ?, NOW())`,
+        [inst.gym_id, institutionId, month, amount, referenceId],
+      );
+    }
+
+    res.json({ success: true, message: 'Payment request sent to HR phone', referenceId });
+  } catch (err: any) {
+    console.error('[MoMo] request-payment error:', err);
+    res.status(500).json({ error: err.message ?? 'Payment request failed. Check MoMo configuration.' });
+  }
+});
+
 router.use(resolveGym, authenticate, requireRole('gym_owner', 'gym_manager'));
 
 const monthSchema = z.string().regex(/^\d{4}-\d{2}$/, 'month must be YYYY-MM');

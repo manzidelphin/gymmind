@@ -72,6 +72,47 @@ export async function requestPayment(params: {
   return referenceId;
 }
 
+// ── Provision sandbox API user (call once per new subscription key) ──
+export async function createApiUser(
+  subscriptionKey:      string,
+  referenceId:          string,
+  providerCallbackHost: string,
+): Promise<void> {
+  await axios.post(
+    `${BASE_URL}/v1_0/apiuser`,
+    { providerCallbackHost },
+    {
+      headers: {
+        'X-Reference-Id':            referenceId,
+        'Ocp-Apim-Subscription-Key': subscriptionKey,
+        'Content-Type':              'application/json',
+      },
+    },
+  );
+}
+
+// ── Create API key for a provisioned user ─────────────────────
+export async function createApiKey(
+  subscriptionKey: string,
+  referenceId:     string,
+): Promise<string> {
+  const response = await axios.post(
+    `${BASE_URL}/v1_0/apiuser/${referenceId}/apikey`,
+    {},
+    { headers: { 'Ocp-Apim-Subscription-Key': subscriptionKey } },
+  );
+  return response.data.apiKey as string;
+}
+
+// ── Get Bearer token (public wrapper around getAccessToken) ───
+export async function getToken(
+  subscriptionKey: string,
+  apiUserId:       string,
+  apiKey:          string,
+): Promise<string> {
+  return getAccessToken(subscriptionKey, apiUserId, apiKey);
+}
+
 // ── Check payment status ───────────────────────────────────────
 export async function getPaymentStatus(params: {
   referenceId: string;

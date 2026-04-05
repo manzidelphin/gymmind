@@ -542,11 +542,14 @@ export default function HRDashboard() {
     if (!momoEntry || !momoPhone.trim() || !momoConfirm) return;
     setMomoLoading(true); setMomoError('');
     try {
-      const { data } = await publicApi.post<{ message: string; reference: string }>(
-        `/hr/${momoEntry.institutionId}/pay`,
-        { hrName: momoEntry.institutionName, momoPhone: momoPhone.trim() },
+      const { data } = await hrApi.post<{ success: boolean; message: string; referenceId: string }>(
+        `/billing/institutions/${momoEntry.institutionId}/request-payment`,
+        { momoPhone: momoPhone.trim() },
       );
-      setMomoSuccess({ message: data.message, reference: data.reference });
+      setMomoSuccess({
+        message:   'Payment request sent! Check your phone for MTN MoMo prompt',
+        reference: data.referenceId ?? '',
+      });
       loadDashboard();
     } catch (e: any) {
       setMomoError(e.response?.data?.error ?? 'Payment failed. Try again.');
