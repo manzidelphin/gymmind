@@ -96,6 +96,10 @@ function timeAgo(iso: string | null): string {
   return `${days}d ago`;
 }
 
+function effStatus(e: GymEntry) {
+  return e.invoiceStatus ?? (e.invoiceAmount > 0 ? 'pending' : null);
+}
+
 function daysInMonth(ym: string): number {
   const [y, m] = ym.split('-').map(Number);
   return new Date(y, m, 0).getDate();
@@ -987,7 +991,7 @@ export default function HRDashboard() {
                         </div>
                         <div className={s.gymCardFoot}>
                           {e.invoiceToken && <a href={`/hr/${e.invoiceToken}`} className={s.btnSecondary}>View Invoice</a>}
-                          {(e.invoiceStatus === 'pending' || e.invoiceStatus === 'overdue') && (
+                          {(effStatus(e) === 'pending' || effStatus(e) === 'overdue') && (
                             <button className={s.btnPrimary} onClick={() => openMomo(e)}>Pay Now</button>
                           )}
                         </div>
@@ -1218,11 +1222,11 @@ export default function HRDashboard() {
                             <td>{e.gymName}</td>
                             <td><span className={s.cnt}>{e.thisMonthVisits}</span></td>
                             <td className={s.tdAmount}>{fmtRwf(e.invoiceAmount)}</td>
-                            <td><InvoiceBadge status={e.invoiceStatus} /></td>
+                            <td><InvoiceBadge status={effStatus(e)} /></td>
                             <td>
                               <div className={s.invActions}>
                                 <button className={s.btnOutline} onClick={() => downloadInvoicePdf(e)}>📄 PDF</button>
-                                {(e.invoiceStatus === 'pending' || e.invoiceStatus === 'overdue') && (
+                                {(effStatus(e) === 'pending' || effStatus(e) === 'overdue') && (
                                   <button className={s.btnPrimary} onClick={() => openMomo(e)}>💳 Pay</button>
                                 )}
                               </div>
@@ -1254,7 +1258,7 @@ export default function HRDashboard() {
               <div className={s.panel}>
                 <div className={s.panelHead}><h3>Billing Summary</h3></div>
                 <SettingsRow label="Current Period"   value={fmtMonth(month)} />
-                <SettingsRow label="Invoice Status"   value={<InvoiceBadge status={entry.invoiceStatus} />} />
+                <SettingsRow label="Invoice Status"   value={<InvoiceBadge status={effStatus(entry)} />} />
                 <SettingsRow label="Total Employees"  value={`${entry.employeeCount} enrolled`} />
                 <SettingsRow label="Total This Month" value={fmtRwf(entry.invoiceAmount)} />
                 <div className={s.settingsNote}>

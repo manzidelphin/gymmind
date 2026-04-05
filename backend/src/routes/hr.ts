@@ -497,15 +497,25 @@ router.get('/:token/invoice.pdf', async (req: Request, res: Response) => {
       paidAt          = row.paid_at  ?? null;
       paymentRef      = row.payment_reference ?? null;
     } else {
-      // Fallback: institution slug
+      // Fallback: institution slug, then numeric ID
       const [instRows] = await pool.query<any[]>(
         `SELECT i.id, i.name, i.rate_per_session, i.gym_id, g.name AS gym_name
          FROM institutions i JOIN gyms g ON g.id = i.gym_id
          WHERE i.slug = ? LIMIT 1`,
         [token],
       );
-      if (!instRows[0]) { res.status(404).json({ error: 'Portal not found' }); return; }
-      const inst  = instRows[0];
+      let instRow: any = instRows[0] ?? null;
+      if (!instRow && /^\d+$/.test(token)) {
+        const [numRows] = await pool.query<any[]>(
+          `SELECT i.id, i.name, i.rate_per_session, i.gym_id, g.name AS gym_name
+           FROM institutions i JOIN gyms g ON g.id = i.gym_id
+           WHERE i.id = ? LIMIT 1`,
+          [parseInt(token, 10)],
+        );
+        instRow = numRows[0] ?? null;
+      }
+      if (!instRow) { res.status(404).json({ error: 'Portal not found' }); return; }
+      const inst  = instRow;
       gymName         = inst.gym_name;
       institutionName = inst.name;
       ratePerSession  = Number(inst.rate_per_session);
@@ -514,7 +524,7 @@ router.get('/:token/invoice.pdf', async (req: Request, res: Response) => {
       institutionId   = inst.id;
 
       const [[ipRow]] = await pool.query<any[]>(
-        `SELECT status, paid_at, payment_reference FROM institutional_payments
+        `SELECT status, paid_at FROM institutional_payments
          WHERE institution_id = ? AND gym_id = ? AND month = ?`,
         [institutionId, gymId, month],
       );
@@ -636,7 +646,7 @@ router.get('/:token', async (req: Request, res: Response) => {
       return;
     }
 
-    // Fallback: institution slug
+    // Fallback: institution slug, then numeric ID
     const [instRows] = await pool.query<any[]>(
       `SELECT i.id, i.name, i.rate_per_session, i.gym_id, g.name AS gym_name
        FROM institutions i JOIN gyms g ON g.id = i.gym_id
@@ -644,15 +654,25 @@ router.get('/:token', async (req: Request, res: Response) => {
       [token],
     );
 
-    if (!instRows[0]) { res.status(404).json({ error: 'Portal not found' }); return; }
+    let instRow: any = instRows[0] ?? null;
+    if (!instRow && /^\d+$/.test(token)) {
+      const [numRows] = await pool.query<any[]>(
+        `SELECT i.id, i.name, i.rate_per_session, i.gym_id, g.name AS gym_name
+         FROM institutions i JOIN gyms g ON g.id = i.gym_id
+         WHERE i.id = ? LIMIT 1`,
+        [parseInt(token, 10)],
+      );
+      instRow = numRows[0] ?? null;
+    }
+    if (!instRow) { res.status(404).json({ error: 'Portal not found' }); return; }
 
-    const inst   = instRows[0];
+    const inst   = instRow;
     const gymId  = inst.gym_id;
     const ratePS = Number(inst.rate_per_session);
     const month  = currentMonth();
 
     const [ipRows] = await pool.query<any[]>(
-      `SELECT status, paid_at, payment_reference, total_amount FROM institutional_payments
+      `SELECT status, paid_at, total_amount FROM institutional_payments
        WHERE institution_id = ? AND gym_id = ? AND month = ?`,
       [inst.id, gymId, month],
     );
@@ -700,6 +720,71 @@ router.get('/:token', async (req: Request, res: Response) => {
 });
 
 // ---------------------------------------------------------------
+// GET /api/hr/:token/checkins?from=YYYY-MM-DD&to=YYYY-MM-DD&search=
+// Returns individual check-in records for all institution members.
+// ---------------------------------------------------------------
+router.get('/:token/checkins', async (req: Request, res: Response) => {
+  const token  = req.params.token;
+  const from   = (req.query.from   as string) || '';
+  const to     = (req.query.to     as string) || '';
+  const search = (req.query.search as string) || '';
+
+  try {
+    const inst = await resolveInstitution(token);
+    if (!inst) { res.status(404).json({ error: 'Portal not found' }); return; }
+
+    const conditions: string[] = [
+      'u.gym_id = ?', 'u.institution_id = ?', 'u.role = \'member\'',
+    ];
+    const params: unknown[] = [inst.gymId, inst.institutionId];
+
+    if (from) { conditions.push('DATE(c.checked_in_at) >= ?'); params.push(from); }
+    if (to)   { conditions.push('DATE(c.checked_in_at) <= ?'); params.push(to);   }
+    if (search) {
+      conditions.push('(u.name LIKE ? OR u.phone LIKE ?)');
+      params.push(`%${search}%`, `%${search}%`);
+    }
+
+    const [rows] = await pool.query<any[]>(
+      `SELECT c.id,
+              u.name  AS employee_name,
+              u.phone AS phone,
+              g.name  AS gym_name,
+              c.checked_in_at,
+              c.checkin_type
+       FROM checkins c
+       JOIN users u ON u.id = c.user_id
+       JOIN gyms  g ON g.id = c.gym_id
+       WHERE ${conditions.join(' AND ')}
+       ORDER BY c.checked_in_at DESC
+       LIMIT 500`,
+      params,
+    );
+
+    const records = rows.map((r: any) => ({
+      id:            r.id,
+      employee_name: r.employee_name,
+      phone:         r.phone        ?? null,
+      gym_name:      r.gym_name,
+      date:          r.checked_in_at ? r.checked_in_at.toISOString().slice(0, 10) : null,
+      time:          r.checked_in_at ? r.checked_in_at.toISOString().slice(11, 19) : null,
+      type:          r.checkin_type  ?? 'institutional',
+    }));
+
+    const uniqueEmployees = new Set(rows.map((r: any) => r.employee_name)).size;
+    const nameCounts: Record<string, number> = {};
+    for (const r of rows) nameCounts[r.employee_name] = (nameCounts[r.employee_name] ?? 0) + 1;
+    const mostActive = Object.entries(nameCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+    const lastCheckin = rows[0]?.checked_in_at ?? null;
+
+    res.json({ records, total: records.length, uniqueEmployees, mostActive, lastCheckin });
+  } catch (err) {
+    console.error('HR checkins error:', err);
+    res.status(500).json({ error: 'Failed to load check-ins' });
+  }
+});
+
+// ---------------------------------------------------------------
 // GET /api/hr/:token/attendance?month=YYYY-MM
 // Returns per-employee attendance: which specific days they visited.
 // ---------------------------------------------------------------
@@ -726,7 +811,7 @@ router.get('/:token/attendance', async (req: Request, res: Response) => {
        LEFT JOIN checkins c
          ON c.user_id = u.id AND c.gym_id = u.gym_id
          AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
-       WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member' AND u.parent_id IS NULL
+       WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member'
        GROUP BY u.id, u.name
        ORDER BY u.name ASC`,
       [monthParam, inst.gymId, inst.institutionId],
@@ -922,20 +1007,68 @@ router.post('/:token/pay', async (req: Request, res: Response) => {
        WHERE ip.access_token = ? LIMIT 1`,
       [token],
     );
-    if (!payRows[0]) { res.status(404).json({ error: 'Invoice not found' }); return; }
-    if (payRows[0].status === 'paid') { res.status(409).json({ error: 'Invoice already paid' }); return; }
+
+    let invoiceId: number;
+    let invoiceStatus: string;
+    let invoiceAmount: number;
+
+    if (payRows[0]) {
+      if (payRows[0].status === 'paid') { res.status(409).json({ error: 'Invoice already paid' }); return; }
+      invoiceId     = payRows[0].id;
+      invoiceStatus = payRows[0].status;
+      invoiceAmount = Number(payRows[0].total_amount);
+    } else {
+      // Fallback: resolve by slug or numeric ID
+      const inst = await resolveInstitution(token);
+      if (!inst) { res.status(404).json({ error: 'Invoice not found' }); return; }
+
+      const month = currentMonth();
+      const [[existingRow]] = await pool.query<any[]>(
+        `SELECT id, status, total_amount FROM institutional_payments
+         WHERE institution_id = ? AND gym_id = ? AND month = ? LIMIT 1`,
+        [inst.institutionId, inst.gymId, month],
+      );
+
+      if (existingRow) {
+        if (existingRow.status === 'paid') { res.status(409).json({ error: 'Invoice already paid' }); return; }
+        invoiceId     = existingRow.id;
+        invoiceStatus = existingRow.status;
+        invoiceAmount = Number(existingRow.total_amount);
+      } else {
+        // Calculate current-month total and create invoice record
+        const [[visitRow]] = await pool.query<any[]>(
+          `SELECT COUNT(DISTINCT c.id) AS visits
+           FROM checkins c
+           JOIN users u ON u.id = c.user_id
+           WHERE c.gym_id = ? AND u.institution_id = ?
+             AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?`,
+          [inst.gymId, inst.institutionId, month],
+        );
+        const visits = Number(visitRow?.visits ?? 0);
+        const total  = visits * inst.ratePerSession;
+
+        const [ins] = await pool.query<any>(
+          `INSERT INTO institutional_payments (gym_id, institution_id, month, total_amount, status)
+           VALUES (?, ?, ?, ?, 'pending')`,
+          [inst.gymId, inst.institutionId, month, total],
+        );
+        invoiceId     = ins.insertId;
+        invoiceStatus = 'pending';
+        invoiceAmount = total;
+      }
+    }
 
     const ref = `MOMO-${Date.now()}-${parsed.data.momoPhone.replace(/\D/g, '').slice(-4)}`;
 
     await pool.query(
       `UPDATE institutional_payments SET payment_reference = ?, notes = ? WHERE id = ?`,
-      [ref, `HR: ${parsed.data.hrName} | Phone: ${parsed.data.momoPhone}`, payRows[0].id],
+      [ref, `HR: ${parsed.data.hrName} | Phone: ${parsed.data.momoPhone}`, invoiceId],
     );
 
     res.json({
       message:   'Payment initiated. Approve the MoMo prompt on your phone.',
       reference: ref,
-      amount:    Number(payRows[0].total_amount),
+      amount:    invoiceAmount,
       phone:     parsed.data.momoPhone,
     });
   } catch (err) {

@@ -71,17 +71,17 @@ router.get('/', requireRole('gym_owner', 'gym_manager'), async (req: Request, re
   );
 
   const [adminRows] = await pool.query<any[]>(
-    `SELECT id, name, phone, email, institution_id
+    `SELECT id, name, phone, institution_id
      FROM users
      WHERE gym_id = ? AND role = 'institution_admin'
      ORDER BY name ASC`,
     [gymId],
   );
 
-  const adminsByInst: Record<number, { id: number; name: string; phone: string | null; email: string | null }[]> = {};
+  const adminsByInst: Record<number, { id: number; name: string; phone: string | null }[]> = {};
   for (const admin of adminRows) {
     if (!adminsByInst[admin.institution_id]) adminsByInst[admin.institution_id] = [];
-    adminsByInst[admin.institution_id].push({ id: admin.id, name: admin.name, phone: admin.phone ?? null, email: admin.email ?? null });
+    adminsByInst[admin.institution_id].push({ id: admin.id, name: admin.name, phone: admin.phone ?? null });
   }
 
   res.json(rows.map((r: any) => ({ ...r, hr_admins: adminsByInst[r.id] ?? [] })));
@@ -510,13 +510,13 @@ router.post('/:id/hr-admins', requireRole('gym_owner', 'gym_manager'), async (re
   }
 
   const [result] = await pool.query<any>(
-    `INSERT INTO users (gym_id, name, phone, email, role, status, institution_id)
-     VALUES (?, ?, ?, ?, 'institution_admin', 'active', ?)`,
-    [gymId, parsed.data.name, phone, parsed.data.email ?? null, instId],
+    `INSERT INTO users (gym_id, name, phone, role, status, institution_id)
+     VALUES (?, ?, ?, 'institution_admin', 'active', ?)`,
+    [gymId, parsed.data.name, phone, instId],
   );
 
   const [[newAdmin]] = await pool.query<any[]>(
-    'SELECT id, name, phone, email, institution_id FROM users WHERE id = ?',
+    'SELECT id, name, phone, institution_id FROM users WHERE id = ?',
     [result.insertId],
   );
 
