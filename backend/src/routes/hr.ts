@@ -57,6 +57,26 @@ async function resolveInstitution(token: string): Promise<ResolvedInst | null> {
       ratePerSession:  Number(instRows[0].rate_per_session),
     };
   }
+
+  // Also resolve by numeric institution ID (used by HR Dashboard)
+  if (/^\d+$/.test(token)) {
+    const [idRows] = await pool.query<any[]>(
+      `SELECT i.id, i.name, i.rate_per_session, i.gym_id, g.name AS gym_name
+       FROM institutions i JOIN gyms g ON g.id = i.gym_id
+       WHERE i.id = ? LIMIT 1`,
+      [parseInt(token, 10)],
+    );
+    if (idRows[0]) {
+      return {
+        gymId:           idRows[0].gym_id,
+        institutionId:   idRows[0].id,
+        institutionName: idRows[0].name,
+        gymName:         idRows[0].gym_name,
+        ratePerSession:  Number(idRows[0].rate_per_session),
+      };
+    }
+  }
+
   return null;
 }
 

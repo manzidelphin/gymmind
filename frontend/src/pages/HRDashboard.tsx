@@ -444,8 +444,8 @@ export default function HRDashboard() {
   useEffect(() => {
     const e = entries[0];
     if (!e) return;
-    if (!detail)           loadDetail(e);
-    if (!attendance.length && e.invoiceToken) loadAttendance(e.invoiceToken, e.month);
+    if (!detail) loadDetail(e);
+    if (!attendance.length) loadAttendance(String(e.institutionId), e.month);
   }, [entries]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Data fetchers ─────────────────────────────────────────────
@@ -466,10 +466,9 @@ export default function HRDashboard() {
   }
 
   async function loadDetail(e: GymEntry) {
-    const token = e.invoiceToken ?? e.gymSlug;
     setLoadingDetail(true);
     try {
-      const { data } = await hrApi.get<DetailData>(`/hr/${token}`);
+      const { data } = await hrApi.get<DetailData>(`/hr/${e.institutionId}`);
       setDetail(data);
     } catch { /* optional */ }
     finally { setLoadingDetail(false); }
@@ -536,11 +535,11 @@ export default function HRDashboard() {
   }
 
   async function submitPay() {
-    if (!momoEntry?.invoiceToken || !momoPhone.trim() || !momoConfirm) return;
+    if (!momoEntry || !momoPhone.trim() || !momoConfirm) return;
     setMomoLoading(true); setMomoError('');
     try {
       const { data } = await publicApi.post<{ message: string; reference: string }>(
-        `/hr/${momoEntry.invoiceToken}/pay`,
+        `/hr/${momoEntry.institutionId}/pay`,
         { hrName: momoEntry.institutionName, momoPhone: momoPhone.trim() },
       );
       setMomoSuccess({ message: data.message, reference: data.reference });
@@ -597,13 +596,12 @@ export default function HRDashboard() {
 
   async function submitUpload() {
     const e = entries[0];
-    const token = e?.invoiceToken ?? e?.gymSlug;
     const valid = uploadPreview.filter(r => r.valid);
-    if (!token || !valid.length) return;
+    if (!e || !valid.length) return;
     setUploadLoading(true); setUploadError('');
     try {
       const { data } = await hrApi.post<{ created: number; skipped: number }>(
-        `/hr/${token}/employees/bulk`,
+        `/hr/${e.institutionId}/employees/bulk`,
         { employees: valid.map(r => ({ name: r.name, phone: r.phone || undefined })) },
       );
       setUploadResult(data);
@@ -616,13 +614,12 @@ export default function HRDashboard() {
 
   async function addEmployee() {
     const e = entries[0];
-    const token = e?.invoiceToken ?? e?.gymSlug;
-    if (!token || !addName.trim()) return;
+    if (!e || !addName.trim()) return;
     setAddLoading(true); setAddError('');
     try {
-      await hrApi.post(`/hr/${token}/employees`, { name: addName.trim(), phone: addPhone.trim() || undefined });
+      await hrApi.post(`/hr/${e.institutionId}/employees`, { name: addName.trim(), phone: addPhone.trim() || undefined });
       setAddOpen(false); setAddName(''); setAddPhone('');
-      if (e) loadDetail(e);
+      loadDetail(e);
     } catch (err: any) {
       setAddError(err.response?.data?.error ?? 'Failed to add employee.');
     } finally { setAddLoading(false); }
@@ -630,11 +627,10 @@ export default function HRDashboard() {
 
   async function removeEmployee(userId: number) {
     const e = entries[0];
-    const token = e?.invoiceToken ?? e?.gymSlug;
-    if (!token || !confirm('Remove this employee from the programme?')) return;
+    if (!e || !confirm('Remove this employee from the programme?')) return;
     try {
-      await hrApi.delete(`/hr/${token}/employees/${userId}`);
-      if (e) loadDetail(e);
+      await hrApi.delete(`/hr/${e.institutionId}/employees/${userId}`);
+      loadDetail(e);
     } catch { /* ignore */ }
   }
 
@@ -991,7 +987,7 @@ export default function HRDashboard() {
                         </div>
                         <div className={s.gymCardFoot}>
                           {e.invoiceToken && <a href={`/hr/${e.invoiceToken}`} className={s.btnSecondary}>View Invoice</a>}
-                          {e.invoiceStatus !== 'paid' && e.invoiceToken && (
+                          {(e.invoiceStatus === 'pending' || e.invoiceStatus === 'overdue') && (
                             <button className={s.btnPrimary} onClick={() => openMomo(e)}>Pay Now</button>
                           )}
                         </div>
@@ -1196,9 +1192,9 @@ export default function HRDashboard() {
                     Based on {totalVisits} check-ins at {fmtRwf(entry?.ratePerSession ?? 0)} per visit
                   </div>
                 </div>
-                {entry?.invoiceToken && (
+                {entry && (
                   <a
-                    href={`/api/hr/${entry.invoiceToken}/invoice.pdf`}
+                    href={`/api/hr/${entry.institutionId}/invoice.pdf`}
                     target="_blank"
                     rel="noreferrer"
                     className={s.btnPrimary}
