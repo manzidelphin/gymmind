@@ -133,8 +133,8 @@ router.post('/create-gym', async (req: Request, res: Response) => {
 
   // Create gym
   const [gymResult] = await pool.query<any>(
-    `INSERT INTO gyms (name, slug, city, subscription_plan, phone, momo_number, email) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [gymName, slug, city, subscriptionPlan, ownerPhone, momoNumber, gymEmail]
+    `INSERT INTO gyms (name, slug, phone) VALUES (?, ?, ?)`,
+    [gymName, slug, ownerPhone]
   );
   const gymId: number = gymResult.insertId;
 
