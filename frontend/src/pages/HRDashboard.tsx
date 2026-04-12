@@ -62,15 +62,19 @@ interface AttendanceRow {
 
 interface AttendanceRecord {
   id:               number;
-  checked_in_at:    string;
-  checkin_type:     string;
-  employee_id:      number;
   employee_name:    string;
-  employee_phone:   string | null;
+  date:             string;
+  time:             string;
+  employee_id?:     number;
+  checked_in_at?:   string;
+  checkin_type?:    string;
+  employee_phone?:  string | null;
+  phone?:           string | null;
   gym_name:         string;
-  gym_slug:         string;
-  plan_name:        string | null;
-  institution_name: string | null;
+  gym_slug?:        string;
+  plan_name?:       string | null;
+  institution_name?: string | null;
+  type?:            string;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────
@@ -134,11 +138,11 @@ function exportAttendanceCsv(records: AttendanceRecord[], from: string, to: stri
     ['Employee Name', 'Phone', 'Gym', 'Date', 'Time', 'Type', 'Check-in ID'],
     ...records.map(r => [
       r.employee_name,
-      r.employee_phone ?? '',
+      r.employee_phone ?? r.phone ?? '',
       r.gym_name,
-      dayjs(r.checked_in_at).format('ddd, DD MMM YYYY'),
-      dayjs(r.checked_in_at).format('hh:mm A'),
-      r.checkin_type,
+      r.date ? dayjs(r.date).format('ddd, DD MMM YYYY') : '',
+      r.time ?? '',
+      r.checkin_type ?? r.type ?? '',
       String(r.id),
     ]),
   ];
@@ -1148,11 +1152,11 @@ export default function HRDashboard() {
                                   <span className={s.tdName}>{rec.employee_name}</span>
                                 </div>
                               </td>
-                              <td className={s.tdMuted}>{rec.employee_phone ?? '—'}</td>
+                              <td className={s.tdMuted}>{rec.employee_phone ?? rec.phone ?? '—'}</td>
                               <td className={s.tdMuted}>{rec.gym_name}</td>
-                              <td className={s.tdDate}>{dayjs(rec.checked_in_at).format('ddd, DD MMM YYYY')}</td>
-                              <td className={s.tdTime}>{dayjs(rec.checked_in_at).format('hh:mm A')}</td>
-                              <td><CheckinTypeBadge type={rec.checkin_type} /></td>
+                              <td className={s.tdDate}>{rec.date ? dayjs(rec.date).format('ddd, DD MMM YYYY') : '—'}</td>
+                              <td className={s.tdTime}>{rec.time ?? '—'}</td>
+                              <td><CheckinTypeBadge type={rec.checkin_type ?? rec.type ?? 'institutional'} /></td>
                               <td><span className={s.verifiedBadge}>✓ Verified</span></td>
                             </tr>
                           ))}
