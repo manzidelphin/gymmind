@@ -1015,14 +1015,16 @@ export default function HRDashboard() {
             const pageStart  = (attPage - 1) * ATT_PAGE_SIZE;
             const pageSlice  = attRecords.slice(pageStart, pageStart + ATT_PAGE_SIZE);
             const totalPages = Math.max(1, Math.ceil(attRecords.length / ATT_PAGE_SIZE));
-            const uniqueEmps = new Set(attRecords.map(r => r.employee_id)).size;
+            const uniqueEmps = new Set(attRecords.map(r => r.employee_name)).size;
             const topEmp     = attRecords.length > 0
               ? Object.entries(attRecords.reduce((acc, r) => {
                   acc[r.employee_name] = (acc[r.employee_name] ?? 0) + 1; return acc;
                 }, {} as Record<string, number>))
                   .sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—'
               : '—';
-            const lastCheckin = attRecords[0]?.checked_in_at ?? null;
+            const lastCheckin = attRecords[0]
+              ? `${attRecords[0].date} ${attRecords[0].time}`
+              : null;
 
             return (
               <>
