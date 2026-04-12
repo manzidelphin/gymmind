@@ -203,20 +203,22 @@ router.post('/', async (req: Request, res: Response) => {
   }
 
   // Record the successful check-in
-  // Rate-limit: prevent duplicate check-ins within 30 minutes for the same user
+  // Rate-limit: prevent duplicate check-ins for the same service within 10 hours
+  const serviceId = parsed.data.serviceId ?? null;
   const [recentRows] = await pool.query<any[]>(
     `SELECT id FROM checkins
      WHERE gym_id = ? AND user_id = ?
-       AND checked_in_at > DATE_SUB(NOW(), INTERVAL 30 MINUTE)
+       AND (service_id = ? OR (service_id IS NULL AND ? IS NULL))
+       AND checked_in_at > DATE_SUB(NOW(), INTERVAL 10 HOUR)
      LIMIT 1`,
-    [gymId, userId]
+    [gymId, userId, serviceId, serviceId]
   );
 
   if (recentRows[0]) {
     res.json({
       allowed: false,
       reason: 'already_checked_in',
-      message: 'Already checked in within the last 30 minutes',
+      message: 'Already checked in for this service today',
       user: { name: result.user!.name },
     });
     return;
