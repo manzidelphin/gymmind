@@ -438,6 +438,8 @@ export default function HRDashboard() {
   const [attSearch,    setAttSearch]    = useState('');
   const [attAutoRef,   setAttAutoRef]   = useState(false);
   const [attLastUpd,   setAttLastUpd]   = useState<Date | null>(null);
+  const [attUnique,    setAttUnique]    = useState<number>(0);
+  const [attLastCheckin, setAttLastCheckin] = useState<string | null>(null);
   const [attNewIds,    setAttNewIds]    = useState<Set<number>>(new Set());
   const attAutoTimer   = useRef<ReturnType<typeof setInterval> | null>(null);
   const prevIdsRef     = useRef<Set<number>>(new Set());
@@ -500,7 +502,7 @@ export default function HRDashboard() {
       const params = new URLSearchParams({ from, to });
       if (search.trim()) params.set('search', search.trim());
       const { data } = await hrApi.get<{ records: AttendanceRecord[]; total: number }>(
-        `/hr/attendance?${params}`,
+        `/hr/${(window as any).__hrInstitutionId || token}/checkins?${params}`,
       );
       // Detect new rows for flash effect
       const incoming = new Set(data.records.map(r => r.id));
@@ -510,6 +512,8 @@ export default function HRDashboard() {
       setTimeout(() => setAttNewIds(new Set()), 2500);
 
       setAttRecords(data.records);
+        setAttUnique(new Set(data.records.map((r: AttRecord) => r.employee_name)).size);
+        setAttLastCheckin(data.records[0] ? `${data.records[0].date} ${data.records[0].time}` : null);
       setAttTotal(data.total);
       setAttPage(1);
       setAttLastUpd(new Date());
@@ -1019,16 +1023,14 @@ export default function HRDashboard() {
             const pageStart  = (attPage - 1) * ATT_PAGE_SIZE;
             const pageSlice  = attRecords.slice(pageStart, pageStart + ATT_PAGE_SIZE);
             const totalPages = Math.max(1, Math.ceil(attRecords.length / ATT_PAGE_SIZE));
-            const uniqueEmps = new Set(attRecords.map(r => r.employee_name)).size;
+            const uniqueEmps = attUnique > 0 ? attUnique : new Set(attRecords.map(r => r.employee_name)).size;
             const topEmp     = attRecords.length > 0
               ? Object.entries(attRecords.reduce((acc, r) => {
                   acc[r.employee_name] = (acc[r.employee_name] ?? 0) + 1; return acc;
                 }, {} as Record<string, number>))
                   .sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—'
               : '—';
-            const lastCheckin = attRecords[0]
-              ? `${attRecords[0].date} ${attRecords[0].time}`
-              : null;
+            const lastCheckin = attRecords[0] ? `${attRecords[0].date} ${attRecords[0].time}` : null;
 
             return (
               <>
