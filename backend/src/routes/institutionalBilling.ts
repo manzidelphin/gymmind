@@ -248,12 +248,7 @@ router.get('/institutions', async (req: Request, res: Response) => {
        i.rate_per_session,
        COUNT(DISTINCT CASE WHEN c.id IS NOT NULL THEN c.user_id END) AS active_members,
        COUNT(c.id)                                                    AS total_visits,
-       SUM(CASE WHEN c.id IS NOT NULL THEN COALESCE(
-         s.walkin_price,
-         (SELECT walkin_price FROM services
-          WHERE gym_id = i.gym_id AND is_default = 1 LIMIT 1),
-         0
-       ) END)                                                         AS calculated_amount,
+       COUNT(c.id) * i.rate_per_session                               AS calculated_amount,
        ip.id               AS payment_id,
        ip.status           AS payment_status,
        ip.paid_at,
@@ -266,8 +261,6 @@ router.get('/institutions', async (req: Request, res: Response) => {
      LEFT JOIN checkins c
        ON c.user_id = u.id AND c.gym_id = i.gym_id
        AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
-     LEFT JOIN services s
-       ON c.service_id = s.id AND s.gym_id = i.gym_id
      LEFT JOIN institutional_payments ip
        ON ip.institution_id = i.id AND ip.gym_id = i.gym_id AND ip.month = ?
      WHERE i.gym_id = ?
@@ -333,23 +326,18 @@ router.get('/institutions/:id/breakdown', async (req: Request, res: Response) =>
        parent.name   AS parent_name,
        s.id          AS service_id,
        s.name        AS service_name,
-       COALESCE(s.walkin_price,
-         (SELECT walkin_price FROM services
-          WHERE gym_id = u.gym_id AND is_default = 1 LIMIT 1),
-         0)          AS service_price,
+       i.rate_per_session AS service_price,
        COUNT(c.id)   AS visit_count,
-       COUNT(c.id) * COALESCE(s.walkin_price,
-         (SELECT walkin_price FROM services
-          WHERE gym_id = u.gym_id AND is_default = 1 LIMIT 1),
-         0)          AS subtotal
+       COUNT(c.id) * i.rate_per_session AS subtotal
      FROM users u
+     JOIN institutions i ON i.id = u.institution_id AND i.gym_id = u.gym_id
      LEFT JOIN users parent ON u.parent_id = parent.id AND parent.gym_id = u.gym_id
      LEFT JOIN checkins c
        ON c.user_id = u.id AND c.gym_id = u.gym_id
        AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
      LEFT JOIN services s ON c.service_id = s.id
      WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member'
-     GROUP BY u.id, u.name, u.parent_id, parent.name, s.id, s.name, s.walkin_price
+     GROUP BY u.id, u.name, u.parent_id, parent.name, s.id, s.name, i.rate_per_session
      ORDER BY u.name ASC, s.name ASC`,
     [month, gymId, institutionId],
   );
