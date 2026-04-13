@@ -1,0 +1,76 @@
+(function(){
+  function init(){
+    if(window.__gmDone||!document.body)return;
+    window.__gmDone=1;
+    var btn=document.createElement('button');
+    btn.id='gm-ai-btn';
+    btn.style.cssText='position:fixed;bottom:28px;right:28px;width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#0F6E56,#1a9b7a);border:none;cursor:pointer;z-index:9999;box-shadow:0 8px 32px rgba(15,110,86,0.4);font-size:24px;display:flex;align-items:center;justify-content:center;transition:all 0.3s';
+    btn.innerHTML='🤖';
+    var panel=document.createElement('div');
+    panel.id='gm-ai-panel';
+    panel.style.cssText='position:fixed;bottom:104px;right:28px;width:420px;height:560px;background:#fff;border-radius:24px;box-shadow:0 24px 80px rgba(0,0,0,0.18);display:none;flex-direction:column;z-index:9998;overflow:hidden';
+    panel.innerHTML='<div style="background:linear-gradient(135deg,#0F6E56,#1a9b7a);padding:18px 20px;display:flex;align-items:center;gap:12px"><span style="font-size:22px">🤖</span><div style="flex:1"><div style="color:#fff;font-weight:800;font-size:16px">GymMind AI</div><div id="gm-sub" style="color:rgba(255,255,255,0.7);font-size:12px">HR Assistant</div></div><div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.1);padding:4px 10px;border-radius:20px"><div style="width:7px;height:7px;border-radius:50%;background:#34d399"></div><span style="color:rgba(255,255,255,0.85);font-size:11px">Live</span></div></div><div id="gm-msgs" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#f8fafc"></div><div style="padding:12px 16px;background:#fff;border-top:1px solid #f1f5f9;display:flex;gap:8px"><input id="gm-inp" placeholder="Ask anything about your data..." style="flex:1;padding:11px 15px;border:1.5px solid #e2e8f0;border-radius:14px;font-size:13.5px;outline:none;font-family:inherit"/><button id="gm-go" style="width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#0F6E56,#1a9b7a);border:none;cursor:pointer;font-size:18px;color:white">&#9658;</button></div><div style="text-align:center;font-size:10px;color:#cbd5e1;padding:5px;background:#fff">Powered by Claude AI</div>';
+    document.body.appendChild(btn);
+    document.body.appendChild(panel);
+    var open=false,busy=false;
+    btn.onclick=function(){
+      open=!open;
+      panel.style.display=open?'flex':'none';
+      btn.innerHTML=open?'&#10005;':'🤖';
+      if(open&&!document.getElementById('gm-msgs').children.length){
+        var n=window.__hrInstName||'your institution';
+        document.getElementById('gm-sub').textContent='HR Assistant · '+n;
+        addmsg('assistant','Hi! I am your GymMind AI for **'+n+'**.\n\nI can explain your billing, attendance, and employee visits. What would you like to know?');
+      }
+      if(open)setTimeout(function(){document.getElementById('gm-inp').focus();},100);
+    };
+    document.getElementById('gm-inp').addEventListener('keydown',function(e){if(e.key==='Enter')gosend();});
+    document.getElementById('gm-go').onclick=gosend;
+    function addmsg(r,t,ld){
+      var el=document.getElementById('gm-msgs');
+      var d=document.createElement('div');
+      d.style.cssText='display:flex;justify-content:'+(r==='user'?'flex-end':'flex-start')+';gap:8px;align-items:flex-end';
+      var b=document.createElement('div');
+      b.style.cssText='max-width:80%;padding:10px 14px;border-radius:'+(r==='user'?'20px 20px 4px 20px':'4px 20px 20px 20px')+';background:'+(r==='user'?'linear-gradient(135deg,#0F6E56,#1a9b7a)':'#fff')+';color:'+(r==='user'?'#fff':'#374151')+';font-size:13.5px;line-height:1.6;'+(r==='assistant'?'border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,0.06)':'');
+      b.innerHTML=ld?'<em style="opacity:0.5">thinking...</em>':t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+      d.appendChild(b);el.appendChild(d);el.scrollTop=el.scrollHeight;return b;
+    }
+    async function gosend(){
+      var inp=document.getElementById('gm-inp');
+      var t=inp.value.trim();if(!t||busy)return;
+      inp.value='';busy=true;document.getElementById('gm-go').disabled=true;
+      addmsg('user',t);var lb=addmsg('assistant','',true);
+      var ctx={};
+      try{
+        var tok=localStorage.getItem('hr_token');
+        var h={'Authorization':'Bearer '+tok,'Content-Type':'application/json'};
+        var fr=new Date(Date.now()-30*86400000).toISOString().slice(0,10);
+        var to=new Date().toISOString().slice(0,10);
+        var id=window.__hrInstitutionId;
+        var rs=await Promise.all([
+          fetch('/api/hr/attendance?from='+fr+'&to='+to,{headers:h}).then(function(x){return x.json();}).catch(function(){return null;}),
+          id?fetch('/api/hr/'+id+'/billing-report?from='+fr+'&to='+to,{headers:h}).then(function(x){return x.json();}).catch(function(){return null;}):Promise.resolve(null)
+        ]);
+        ctx={attendance:rs[0],billing:rs[1]};
+      }catch(e){}
+      try{
+        var bubs=Array.from(document.getElementById('gm-msgs').children).slice(0,-1).map(function(d){
+          var b=d.querySelector('div');
+          var isU=b&&b.style.background.indexOf('0F6E56')>-1;
+          return{role:isU?'user':'assistant',content:b?b.innerText:''};
+        });
+        var res=await fetch('/api/hr/ai-chat',{
+          method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('hr_token')},
+          body:JSON.stringify({systemPrompt:'You are GymMind AI, HR assistant for '+(window.__hrInstName||'MMI')+'. LIVE DATA:'+JSON.stringify(ctx)+'. Be concise, use **bold** for key numbers, format RWF with commas.',
+            messages:bubs.slice(-6).concat([{role:'user',content:t}])})
+        });
+        var dd=await res.json();
+        var rep=(dd.content&&dd.content[0]&&dd.content[0].text)||'Sorry, something went wrong.';
+        lb.innerHTML=rep.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+      }catch(e){lb.innerHTML='Network error. Try again.';}
+      busy=false;document.getElementById('gm-go').disabled=false;
+    }
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){setTimeout(init,2000);});}
+  else{setTimeout(init,2000);}
+})();
