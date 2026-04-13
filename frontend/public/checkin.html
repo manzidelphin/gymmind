@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>GymMind Check-In</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f172a;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:16px}
+.card{background:#fff;border-radius:24px;padding:40px 32px;width:100%;max-width:420px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.4)}
+.logo{width:68px;height:68px;background:#0F6E56;border-radius:16px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center}
+h1{font-size:28px;font-weight:700;color:#0f172a;margin-bottom:4px}
+.gym-name{color:#64748b;font-size:13px;text-transform:uppercase;letter-spacing:1px;margin-bottom:28px}
+label{display:block;text-align:left;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;letter-spacing:0.5px}
+input[type=tel]{width:100%;padding:16px;border:2px solid #e5e7eb;border-radius:12px;font-size:20px;outline:none;color:#0f172a;transition:border-color 0.2s}
+input[type=tel]:focus{border-color:#0F6E56}
+.btn{display:block;width:100%;padding:16px;background:#0F6E56;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;margin-top:16px;transition:background 0.2s}
+.btn:hover{background:#0a5a47}
+.btn:disabled{background:#d1fae5;cursor:not-allowed;color:#6b7280}
+.btn-secondary{background:#f8fafc;color:#374151;border:2px solid #e5e7eb}
+.btn-secondary:hover{background:#f1f5f9}
+.otp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin:12px 0;width:100%}
+.otp-grid input{padding:8px 2px;font-size:16px;font-weight:700;text-align:center;border:2px solid #e5e7eb;border-radius:8px;outline:none;color:#0f172a;min-width:0;width:100%}
+.otp-grid input:focus{border-color:#0F6E56}
+.devcode{background:#fef9c3;color:#854d0e;padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none}
+.hint{color:#64748b;font-size:13px;margin-top:8px}
+.result-icon{font-size:72px;margin-bottom:16px}
+.result-title{font-size:24px;font-weight:700;margin-bottom:8px}
+.result-msg{color:#64748b;font-size:15px;margin-bottom:24px}
+.service-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.service-btn{padding:14px 10px;border:2px solid #e5e7eb;border-radius:12px;background:#f8fafc;cursor:pointer;font-size:14px;font-weight:600;color:#374151;transition:all 0.2s;text-align:center}
+.service-btn:hover{border-color:#0F6E56;background:#f0fdf4;color:#0F6E56}
+.service-btn.selected{border-color:#0F6E56;background:#0F6E56;color:#fff}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <svg width="40" height="40" viewBox="0 0 64 64" fill="none">
+      <line x1="18" y1="32" x2="46" y2="32" stroke="white" stroke-width="4" stroke-linecap="round"/>
+      <rect x="12" y="24" width="7" height="16" rx="3" fill="white"/>
+      <rect x="17" y="21" width="5" height="22" rx="2.5" fill="white" opacity="0.7"/>
+      <rect x="45" y="24" width="7" height="16" rx="3" fill="white"/>
+      <rect x="42" y="21" width="5" height="22" rx="2.5" fill="white" opacity="0.7"/>
+    </svg>
+  </div>
+  <h1>GymMind</h1>
+  <div class="gym-name" id="gymName">Loading...</div>
+  <div id="step1">
+    <label>MEMBER PHONE NUMBER</label>
+    <input type="tel" id="phoneInput" placeholder="07XX XXX XXX" inputmode="numeric" autofocus>
+    <button class="btn" id="sendBtn" onclick="sendOTP()">Send Code →</button>
+    <p class="hint">A 6-digit code will be sent to this number</p>
+  </div>
+  <div id="step1b" style="display:none">
+    <p style="font-size:14px;color:#374151;font-weight:600;margin-bottom:4px">SELECT SERVICE</p>
+    <p class="hint" style="margin-bottom:12px">What will <strong id="memberName"></strong> be attending?</p>
+    <div class="service-grid" id="serviceGrid"></div>
+    <button class="btn" onclick="proceedToOTP()">Continue →</button>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="goBackToPhone()">← Change number</button>
+  </div>
+  <div id="step2" style="display:none">
+    <p class="hint" style="margin-bottom:12px">Enter the 6-digit code sent to <strong id="sentTo"></strong></p>
+    <div class="devcode" id="devCode"></div>
+    <div class="otp-grid" id="otpGrid"></div>
+    <button class="btn" onclick="verifyOTP()">Verify & Check In</button>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="goBack()">← Change number</button>
+  </div>
+  <div id="step3" style="display:none">
+    <div class="result-icon" id="resultIcon"></div>
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-msg" id="resultMsg"></div>
+    <button class="btn btn-secondary" onclick="reset()">Check in another member</button>
+  </div>
+</div>
+<script>
+const slug = location.pathname.split('/').find((s,i) => i > 0 && s && s !== 'checkin') || 'gym';
+let phone = '', selectedService = null, services = [];
+fetch('/api/gyms/public/' + slug).then(r=>r.json()).then(d=>{document.getElementById('gymName').textContent=(d.name||slug).toUpperCase();}).catch(()=>{document.getElementById('gymName').textContent=slug.toUpperCase();});
+fetch('/api/services/public',{headers:{'X-Gym-Slug':slug}}).then(r=>r.json()).then(d=>{services=Array.isArray(d)?d:[];}).catch(()=>{services=[];});
+const grid=document.getElementById('otpGrid');
+for(let i=0;i<6;i++){const inp=document.createElement('input');inp.type='text';inp.maxLength=1;inp.inputMode='numeric';inp.addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'');if(e.target.value&&i<5)grid.children[i+1].focus();});inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!e.target.value&&i>0)grid.children[i-1].focus();});grid.appendChild(inp);}
+function getOTP(){return Array.from(grid.children).map(i=>i.value).join('');}
+function renderServices(){
+  const sg=document.getElementById('serviceGrid');sg.innerHTML='';selectedService=null;
+  services.forEach(s=>{const btn=document.createElement('button');btn.className='service-btn';btn.innerHTML='<div>'+s.name+'</div><div style="font-size:12px;opacity:0.8;margin-top:4px">'+(s.walkin_price?Number(s.walkin_price).toLocaleString()+' RWF':'')+'</div>';btn.onclick=()=>{document.querySelectorAll('.service-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');selectedService=s.id;};sg.appendChild(btn);});
+}
+async function sendOTP(){
+  const raw=document.getElementById('phoneInput').value.replace(/\s/g,'');
+  if(!raw){alert('Please enter your phone number');return;}
+  phone=raw;const btn=document.getElementById('sendBtn');btn.textContent='Sending...';btn.disabled=true;
+  try{const r=await fetch('/api/auth/send-otp',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone})});
+  const d=await r.json();if(!r.ok){alert(d.error||'Failed to send code');btn.textContent='Send Code →';btn.disabled=false;return;}
+  if(d.devCode){const dc=document.getElementById('devCode');dc.textContent='Dev code: '+d.devCode;dc.style.display='block';}
+  document.getElementById('sentTo').textContent=phone;
+  document.getElementById('step1').style.display='none';
+  if(services.length>0){renderServices();document.getElementById('memberName').textContent='member';document.getElementById('step1b').style.display='block';}
+  else{document.getElementById('step2').style.display='block';grid.children[0].focus();}
+  }catch(e){alert('Network error. Please try again.');}
+  btn.textContent='Send Code →';btn.disabled=false;
+}
+function proceedToOTP(){document.getElementById('step1b').style.display='none';document.getElementById('step2').style.display='block';grid.children[0].focus();}
+function goBackToPhone(){document.getElementById('step1b').style.display='none';document.getElementById('step1').style.display='block';}
+async function verifyOTP(){
+  const otp=getOTP();if(otp.length!==6){alert('Please enter all 6 digits');return;}
+  try{const r=await fetch('/api/checkin',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone,otp,...(selectedService?{serviceId:selectedService}:{})})});
+  const d=await r.json();
+  document.getElementById('step2').style.display='none';document.getElementById('step3').style.display='block';
+  if(d.allowed){document.getElementById('resultIcon').textContent='✅';document.getElementById('resultTitle').textContent='Welcome, '+(d.user?.name||'Member')+'!';document.getElementById('resultTitle').style.color='#065f46';
+  let msg='';if(d.checkin_type==='institutional')msg='Corporate Member ✓';else if(d.membership?.remaining_sessions!=null)msg=d.membership.remaining_sessions+' sessions remaining';else if(d.membership?.end_date)msg='Valid until '+d.membership.end_date;
+  document.getElementById('resultMsg').textContent=msg;}
+  else{const already=d.reason==='already_checked_in';document.getElementById('resultIcon').textContent=already?'✅':'❌';document.getElementById('resultTitle').textContent=already?'Already Checked In':'Access Denied';document.getElementById('resultTitle').style.color=already?'#065f46':'#991b1b';
+  const msgs={no_membership:'No active membership. Please visit reception.',membership_expired:'Your membership has expired. Please renew.',no_sessions:'No sessions remaining. Please renew.',user_suspended:'Account suspended. Please see reception.',user_not_found:'Phone number not found. Please register at reception.',already_checked_in:d.message||'Already checked in for this service today.',service_not_covered:'Your company does not cover this service.'};
+  document.getElementById('resultMsg').textContent=msgs[d.reason]||(d.message||'Please see reception.');}
+  setTimeout(reset,15000);}catch(e){alert('Network error. Please try again.');}
+}
+function goBack(){document.getElementById('step2').style.display='none';document.getElementById('step1').style.display='block';document.getElementById('devCode').style.display='none';Array.from(grid.children).forEach(i=>i.value='');phone='';}
+function reset(){document.getElementById('step3').style.display='none';document.getElementById('step1').style.display='block';document.getElementById('phoneInput').value='';document.getElementById('devCode').style.display='none';Array.from(grid.children).forEach(i=>i.value='');phone='';selectedService=null;}
+document.getElementById('phoneInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendOTP();});
+</script>
+</body>
+</html>
