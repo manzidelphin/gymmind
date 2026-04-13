@@ -1,3 +1,4 @@
+import HRBillingReport from '../components/HRBillingReport';
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { hrApi, publicApi } from '../api/api';
@@ -12,7 +13,7 @@ import {
 import s from './HRDashboard.module.css';
 
 // ── Types ─────────────────────────────────────────────────────────
-type Tab = 'overview' | 'employees' | 'gyms' | 'attendance' | 'invoices' | 'settings';
+type Tab = 'overview' | 'employees' | 'gyms' | 'attendance' | 'invoices' | 'reports' | 'settings';
 
 interface GymEntry {
   gymId:           number;
@@ -681,6 +682,7 @@ export default function HRDashboard() {
     { id: 'gyms',       icon: '🏋️', label: 'Gyms' },
     { id: 'attendance', icon: '📅', label: 'Attendance' },
     { id: 'invoices',   icon: '📄', label: 'Invoices' },
+    { id: 'reports',    icon: '📊', label: 'Reports' },
     { id: 'settings',   icon: '⚙️', label: 'Settings' },
   ];
 
@@ -757,7 +759,7 @@ export default function HRDashboard() {
           <div>
             <h1 className={s.pageTitle}>
               {{ overview: 'Overview', employees: 'Employees', gyms: 'Partner Gyms',
-                 attendance: 'Attendance', invoices: 'Invoices', settings: 'Settings' }[tab]}
+                 attendance: 'Attendance', invoices: 'Invoices', reports: 'Reports', settings: 'Settings' }[tab]}
             </h1>
             {month && <div className={s.pageMonth}>{fmtMonth(month)}</div>}
           </div>
@@ -1246,6 +1248,11 @@ export default function HRDashboard() {
           )}
 
           {/* ══ SETTINGS ══ */}
+          
+          {tab === 'reports' && entry && (() => {
+            return <HRBillingReport entry={entry} hrApi={hrApi} />;
+          })()}
+
           {tab === 'settings' && entry && (
             <div className={s.settingsGrid}>
               <div className={s.panel}>
