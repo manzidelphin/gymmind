@@ -65,6 +65,8 @@ interface AttendanceRecord {
   id:               number;
   checked_in_at:    string;
   checkin_type:     string;
+  service_name:     string | null;
+  parent_name:      string | null;
   employee_id:      number;
   employee_name:    string;
   employee_phone:   string | null;
@@ -1129,8 +1131,8 @@ export default function HRDashboard() {
                             <th>Gym</th>
                             <th>Date</th>
                             <th>Time</th>
-                            <th>Type</th>
-                            <th>Status</th>
+                            <th>Service</th>
+                            <th>Role</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1152,8 +1154,13 @@ export default function HRDashboard() {
                               <td className={s.tdMuted}>{rec.gym_name}</td>
                               <td className={s.tdDate}>{dayjs(rec.checked_in_at).format('ddd, DD MMM YYYY')}</td>
                               <td className={s.tdTime}>{dayjs(rec.checked_in_at).format('hh:mm A')}</td>
-                              <td><CheckinTypeBadge type={rec.checkin_type} /></td>
-                              <td><span className={s.verifiedBadge}>✓ Verified</span></td>
+                              <td className={s.tdMuted}>{rec.service_name ?? '—'}</td>
+                              <td>
+                                {rec.parent_name
+                                  ? <span style={{background:'#fef3c7',color:'#92400e',padding:'2px 8px',borderRadius:'99px',fontSize:'12px',fontWeight:600}}>Dep. of {rec.parent_name}</span>
+                                  : <span style={{background:'#eff6ff',color:'#1d4ed8',padding:'2px 8px',borderRadius:'99px',fontSize:'12px',fontWeight:600}}>Employee</span>
+                                }
+                              </td>
                             </tr>
                           ))}
                         </tbody>
