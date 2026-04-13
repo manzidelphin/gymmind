@@ -96,7 +96,7 @@ export default function HRBillingReport({ entry, hrApi }: Props) {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
             <thead>
               <tr style={{ background: '#f8fafc' }}>
-                {['MEMBER', 'PRIMARY MEMBER', 'VISITS', 'AMOUNT (RWF)', 'VISIT DATES'].map(h => (
+                {['MEMBER', 'ROLE', 'PRIMARY MEMBER', 'VISITS', 'AMOUNT (RWF)', 'VISIT DATES'].map(h => (
                   <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 600, color: '#64748b', letterSpacing: '0.5px' }}>{h}</th>
                 ))}
               </tr>
@@ -106,6 +106,11 @@ export default function HRBillingReport({ entry, hrApi }: Props) {
                 <>
                   <tr key={m.id} style={{ borderTop: '1px solid #f1f5f9' }}>
                     <td style={{ padding: '14px 16px', fontWeight: 600, color: '#0f172a' }}>{m.name}</td>
+                    <td style={{ padding: '14px 16px' }}>
+                      {m.parent_name
+                        ? <span style={{ background: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: '99px', fontSize: '12px', fontWeight: 600 }}>Dependent</span>
+                        : <span style={{ background: '#eff6ff', color: '#1d4ed8', padding: '2px 8px', borderRadius: '99px', fontSize: '12px', fontWeight: 600 }}>Employee</span>}
+                    </td>
                     <td style={{ padding: '14px 16px' }}>
                       {m.parent_name
                         ? <span style={{ color: '#64748b' }}>{m.parent_name}</span>
@@ -126,7 +131,7 @@ export default function HRBillingReport({ entry, hrApi }: Props) {
                   </tr>
                   {expanded.has(m.id) && (
                     <tr key={`${m.id}-dates`}>
-                      <td colSpan={5} style={{ padding: '0 16px 14px 16px', background: '#f8fafc' }}>
+                      <td colSpan={6} style={{ padding: '0 16px 14px 16px', background: '#f8fafc' }}>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', paddingTop: '8px' }}>
                           {m.visit_dates.map((d, i) => (
                             <span key={i} style={{ background: '#dcfce7', color: '#166534', padding: '3px 10px', borderRadius: '99px', fontSize: '12px', fontWeight: 500 }}>
