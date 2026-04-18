@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/api';
 import s from './ReportsTab.module.css';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface MembershipSummary { active: number; expired: number; expiring_soon: number; no_membership: number; }
 
@@ -455,16 +457,28 @@ export default function ReportsTab() {
             <div className={s.attendFooter}>
               <span className={s.attendTotal}>{memberData.length} member{memberData.length!==1?'s':''} with subscriptions</span>
               <button type="button" className={s.downloadBtn} onClick={() => {
-                const rows: (string|number)[][] = [['Member','Phone','Plan','Type','Sessions Left','Expiry','Check-ins','Status'],
-                  ...memberData.map(m=>[m.name,m.phone??'',m.plan_name??'',m.plan_type??'',
+                const doc = new jsPDF();
+                doc.setFontSize(16);
+                doc.text('Member Subscriptions Report', 14, 18);
+                doc.setFontSize(10);
+                doc.text('Period: '+memberFrom+' to '+memberTo, 14, 26);
+                doc.text('Total members with plans: '+memberData.length, 14, 32);
+                autoTable(doc, {
+                  startY: 38,
+                  head: [['Member','Phone','Plan','Type','Sessions Left','Expiry','Check-ins','Status']],
+                  body: memberData.map(m=>[
+                    m.name, m.phone??'-', m.plan_name??'-',
+                    m.plan_type==='session_based'?'Session':m.plan_type==='time_based'?'Time-based':'-',
                     m.plan_type==='session_based'?(m.remaining_sessions??0):'Unlimited',
-                    m.end_date?new Date(m.end_date).toLocaleDateString('en-GB'):'',
-                    m.checkins_this_period,m.membership_status??''])];
-                const csv=rows.map(r=>r.join(',')).join('\n');
-                const a=document.createElement('a');
-                a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-                a.download='subscriptions-'+memberFrom+'-'+memberTo+'.csv';a.click();
-              }}>Download Report CSV</button>
+                    m.end_date?new Date(m.end_date).toLocaleDateString('en-GB'):'-',
+                    m.checkins_this_period,
+                    m.membership_status==='active'?'Active':'Expired'
+                  ]),
+                  styles:{fontSize:9},
+                  headStyles:{fillColor:[15,110,86]}
+                });
+                doc.save('subscriptions-'+memberFrom+'-'+memberTo+'.pdf');
+              }}>Download Report PDF</button>
             </div>
           </div>
         )}
