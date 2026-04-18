@@ -1432,9 +1432,4 @@ function Empty({ icon, title, sub }: { icon: string; title: string; sub: string 
   );
 }
 
-// function CheckinTypeBadge({ type }: { type: string }) {
-  if (type === 'institutional') return <span className={`${s.badge} ${s.bTypeInst}`}>Institutional</span>;
-  if (type === 'dependent')     return <span className={`${s.badge} ${s.bTypeDep}`}>Dependent</span>;
-  if (type === 'walkin')        return <span className={`${s.badge} ${s.bTypeWalk}`}>Walk-in</span>;
-  return <span className={`${s.badge} ${s.bTypeInd}`}>Individual</span>;
-}
+/* CheckinTypeBadge removed - unused */
