@@ -7,276 +7,449 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0f172a;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:16px}
-.card{background:#fff;border-radius:24px;padding:40px 32px;width:100%;max-width:420px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.4)}
-.logo{width:68px;height:68px;background:#0F6E56;border-radius:16px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center}
-h1{font-size:28px;font-weight:700;color:#0f172a;margin-bottom:4px}
-.gym-name{color:#64748b;font-size:13px;text-transform:uppercase;letter-spacing:1px;margin-bottom:28px}
-label{display:block;text-align:left;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;letter-spacing:0.5px}
-input[type=tel],input[type=text]{width:100%;padding:16px;border:2px solid #e5e7eb;border-radius:12px;font-size:18px;outline:none;color:#0f172a;transition:border-color 0.2s}
+.card{background:#fff;border-radius:24px;padding:32px 28px;width:100%;max-width:420px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.4)}
+.logo{width:64px;height:64px;background:#0F6E56;border-radius:16px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center}
+h1{font-size:26px;font-weight:700;color:#0f172a;margin-bottom:2px}
+.gym-name{color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:24px}
+label{display:block;text-align:left;font-size:11px;font-weight:700;color:#374151;margin-bottom:5px;letter-spacing:0.5px;text-transform:uppercase}
+input[type=tel],input[type=text]{width:100%;padding:14px;border:2px solid #e5e7eb;border-radius:12px;font-size:18px;outline:none;color:#0f172a;transition:border-color 0.2s;font-family:inherit}
 input:focus{border-color:#0F6E56}
-.btn{display:block;width:100%;padding:16px;background:#0F6E56;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;margin-top:16px;transition:background 0.2s}
+.btn{display:block;width:100%;padding:15px;background:#0F6E56;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-top:12px;transition:all 0.2s;font-family:inherit}
 .btn:hover{background:#0a5a47}
 .btn:disabled{background:#d1fae5;cursor:not-allowed;color:#6b7280}
-.btn-secondary{background:#f8fafc;color:#374151;border:2px solid #e5e7eb}
-.btn-secondary:hover{background:#f1f5f9}
-.otp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin:12px 0}
-.otp-grid input{padding:8px 2px;font-size:16px;font-weight:700;text-align:center;border:2px solid #e5e7eb;border-radius:8px;outline:none;color:#0f172a;min-width:0;width:100%}
+.btn-outline{background:#fff;color:#0F6E56;border:2px solid #0F6E56}
+.btn-outline:hover{background:#f0fdf4}
+.btn-gray{background:#f8fafc;color:#374151;border:2px solid #e5e7eb}
+.btn-gray:hover{background:#f1f5f9}
+.otp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:10px 0}
+.otp-grid input{padding:10px 2px;font-size:18px;font-weight:700;text-align:center;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#0f172a;min-width:0;width:100%}
 .otp-grid input:focus{border-color:#0F6E56}
-.devcode{background:#fef9c3;color:#854d0e;padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none}
-.hint{color:#64748b;font-size:13px;margin-top:8px}
-.result-icon{font-size:72px;margin-bottom:16px}
-.result-title{font-size:24px;font-weight:700;margin-bottom:8px}
-.result-msg{color:#64748b;font-size:15px;margin-bottom:24px}
-.service-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
-.service-btn{padding:14px 10px;border:2px solid #e5e7eb;border-radius:12px;background:#f8fafc;cursor:pointer;font-size:14px;font-weight:600;color:#374151;transition:all 0.2s;text-align:center}
-.service-btn:hover,.service-btn.selected{border-color:#0F6E56;background:#0F6E56;color:#fff}
-.member-card{border:2px solid #e5e7eb;border-radius:12px;padding:14px 16px;margin:8px 0;cursor:pointer;text-align:left;transition:all 0.2s;background:#fff}
-.member-card:hover,.member-card.selected{border-color:#0F6E56;background:#f0fdf4}
-.member-card .name{font-weight:700;color:#0f172a;font-size:15px}
-.member-card .meta{color:#64748b;font-size:12px;margin-top:2px}
-.section-title{font-size:14px;font-weight:700;color:#0f172a;margin-bottom:4px}
-.section-hint{color:#64748b;font-size:13px;margin-bottom:16px}
+.devcode{background:#fef9c3;color:#854d0e;padding:8px;border-radius:8px;font-size:12px;margin:8px 0;display:none}
+.hint{color:#64748b;font-size:13px;margin-top:6px;line-height:1.4}
+.result-icon{font-size:64px;margin-bottom:12px}
+.result-title{font-size:22px;font-weight:700;margin-bottom:6px}
+.result-msg{color:#64748b;font-size:14px;margin-bottom:20px;line-height:1.4}
+.type-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:16px 0}
+.type-btn{padding:16px 8px;border:2px solid #e5e7eb;border-radius:14px;background:#f8fafc;cursor:pointer;font-size:13px;font-weight:600;color:#374151;transition:all 0.2s;text-align:center}
+.type-btn:hover{border-color:#0F6E56;background:#f0fdf4;color:#0F6E56}
+.type-btn .icon{font-size:24px;margin-bottom:4px}
+.service-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.service-btn{padding:12px 8px;border:2px solid #e5e7eb;border-radius:12px;background:#f8fafc;cursor:pointer;font-size:13px;font-weight:600;color:#374151;transition:all 0.2s;text-align:center}
+.service-btn:hover,.service-btn.active{border-color:#0F6E56;background:#0F6E56;color:#fff}
+.inst-btn{padding:14px;border:2px solid #e5e7eb;border-radius:12px;background:#f8fafc;cursor:pointer;font-size:14px;font-weight:600;color:#374151;transition:all 0.2s;text-align:left;width:100%;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.inst-btn:hover{border-color:#0F6E56;background:#f0fdf4}
+.member-card{border:2px solid #e5e7eb;border-radius:12px;padding:12px 14px;margin:6px 0;cursor:pointer;text-align:left;transition:all 0.2s}
+.member-card:hover,.member-card.active{border-color:#0F6E56;background:#f0fdf4}
+.member-card .mname{font-weight:700;color:#0f172a;font-size:14px}
+.member-card .mmeta{color:#64748b;font-size:12px;margin-top:2px}
+.search-box{position:relative;margin:10px 0}
+.no-results{color:#94a3b8;font-size:13px;padding:12px;text-align:center}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-inst{background:#dbeafe;color:#1e40af}
+.badge-dep{background:#fef3c7;color:#92400e}
+.section-label{font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px}
+.section-sub{color:#64748b;font-size:12px;margin-bottom:14px}
 </style>
 </head>
 <body>
 <div class="card">
   <div class="logo">
-    <svg width="40" height="40" viewBox="0 0 64 64" fill="none">
+    <svg width="36" height="36" viewBox="0 0 64 64" fill="none">
       <line x1="18" y1="32" x2="46" y2="32" stroke="white" stroke-width="4" stroke-linecap="round"/>
       <rect x="12" y="24" width="7" height="16" rx="3" fill="white"/>
-      <rect x="17" y="21" width="5" height="22" rx="2.5" fill="white" opacity="0.7"/>
       <rect x="45" y="24" width="7" height="16" rx="3" fill="white"/>
-      <rect x="42" y="21" width="5" height="22" rx="2.5" fill="white" opacity="0.7"/>
     </svg>
   </div>
   <h1>GymMind</h1>
   <div class="gym-name" id="gymName">Loading...</div>
 
-  <!-- Step 1: Enter phone -->
-  <div id="step1">
-    <label>MEMBER PHONE NUMBER</label>
+  <!-- STEP 1: Phone number -->
+  <div id="s1">
+    <label>Member Phone Number</label>
     <input type="tel" id="phoneInput" placeholder="07XX XXX XXX" inputmode="numeric" autofocus>
     <button class="btn" id="sendBtn" onclick="sendOTP()">Send Code →</button>
-    <p class="hint">A 6-digit code will be sent to this number</p>
+    <p class="hint">A 6-digit code will be sent to verify identity</p>
   </div>
 
-  <!-- Step 1b: Select service -->
-  <div id="step1b" style="display:none">
-    <p class="section-title">SELECT SERVICE</p>
-    <p class="section-hint">What will <strong id="memberName"></strong> be attending?</p>
-    <div class="service-grid" id="serviceGrid"></div>
-    <button class="btn" onclick="proceedToOTP()">Continue →</button>
-    <button class="btn btn-secondary" style="margin-top:8px" onclick="goBackToPhone()">← Change number</button>
-  </div>
-
-  <!-- Step 2: OTP -->
-  <div id="step2" style="display:none">
-    <p class="hint" style="margin-bottom:12px">Enter the 6-digit code sent to <strong id="sentTo"></strong></p>
+  <!-- STEP 2: OTP verification -->
+  <div id="s2" style="display:none">
+    <p class="hint" style="margin-bottom:10px">Code sent to <strong id="sentTo"></strong></p>
     <div class="devcode" id="devCode"></div>
     <div class="otp-grid" id="otpGrid"></div>
-    <button class="btn" onclick="verifyOTP()">Verify & Check In</button>
-    <button class="btn btn-secondary" style="margin-top:8px" onclick="goBack()">← Change number</button>
+    <button class="btn" onclick="verifyAndContinue()">Verify →</button>
+    <button class="btn btn-gray" style="margin-top:8px" onclick="goTo('s1')">← Back</button>
   </div>
 
-  <!-- Step CLAIM: Phone not found, search by name -->
-  <div id="stepClaim" style="display:none">
-    <div style="font-size:40px;margin-bottom:12px">👤</div>
-    <p class="section-title">First time here?</p>
-    <p class="section-hint">Phone not found. Search your name to claim your account.</p>
-    <label>YOUR NAME</label>
-    <input type="text" id="claimSearch" placeholder="Enter your name..." oninput="searchName()">
-    <div id="claimResults" style="margin-top:12px;max-height:200px;overflow-y:auto"></div>
-    <button class="btn btn-secondary" style="margin-top:12px" onclick="goBackToPhone()">← Back</button>
+  <!-- STEP NEW-USER: Phone not found — choose check-in type -->
+  <div id="sType" style="display:none">
+    <div style="font-size:36px;margin-bottom:8px">👋</div>
+    <p class="section-label">Welcome! How will you check in?</p>
+    <p class="section-sub">Your phone isn't registered. Choose your check-in type:</p>
+    <div class="type-grid">
+      <div class="type-btn" onclick="chooseType('institution')">
+        <div class="icon">🏢</div>Institution
+      </div>
+      <div class="type-btn" onclick="chooseType('individual')">
+        <div class="icon">👤</div>Individual
+      </div>
+      <div class="type-btn" onclick="chooseType('walkin')">
+        <div class="icon">🚶</div>Walk-in
+      </div>
+    </div>
+    <button class="btn btn-gray" onclick="goTo('s1')">← Change number</button>
   </div>
 
-  <!-- Step CLAIM OTP: Verify phone for unclaimed account -->
-  <div id="stepClaimOTP" style="display:none">
-    <div style="font-size:40px;margin-bottom:12px">📱</div>
-    <p class="section-title">Verify your phone</p>
-    <p class="section-hint">Enter your phone number to claim <strong id="claimName"></strong></p>
-    <label>YOUR PHONE NUMBER</label>
+  <!-- STEP INST: Choose institution -->
+  <div id="sInst" style="display:none">
+    <p class="section-label">Select Your Institution</p>
+    <p class="section-sub">Which company are you from?</p>
+    <div id="instList"></div>
+    <button class="btn btn-gray" onclick="goTo('sType')">← Back</button>
+  </div>
+
+  <!-- STEP SEARCH: Search name (for institution or individual claim) -->
+  <div id="sSearch" style="display:none">
+    <p class="section-label" id="searchTitle">Find Your Account</p>
+    <p class="section-sub" id="searchSub">Type your name to find your record</p>
+    <label>Your Name</label>
+    <input type="text" id="nameSearch" placeholder="e.g. Manzi Delphin" oninput="doSearch()">
+    <div id="searchResults" style="margin-top:10px;max-height:220px;overflow-y:auto"></div>
+    <button class="btn btn-gray" style="margin-top:10px" id="searchBack" onclick="backFromSearch()">← Back</button>
+  </div>
+
+  <!-- STEP CLAIM: Claim account — enter phone + OTP -->
+  <div id="sClaim" style="display:none">
+    <div style="font-size:36px;margin-bottom:8px">📱</div>
+    <p class="section-label">Claim Your Account</p>
+    <p class="section-sub">Hi <strong id="claimName"></strong>! Enter your phone to verify and activate your account.</p>
+    <label>Your Phone Number</label>
     <input type="tel" id="claimPhone" placeholder="07XX XXX XXX" inputmode="numeric">
     <button class="btn" id="claimSendBtn" onclick="sendClaimOTP()">Send Code →</button>
-    <div class="devcode" id="claimDevCode" style="margin-top:12px"></div>
-    <div id="claimOTPSection" style="display:none">
-      <div class="otp-grid" id="claimOtpGrid" style="margin-top:12px"></div>
-      <button class="btn" onclick="verifyClaimOTP()">Claim & Check In</button>
+    <div class="devcode" id="claimDevCode"></div>
+    <div id="claimOTPArea" style="display:none">
+      <div class="otp-grid" id="claimOtpGrid" style="margin-top:10px"></div>
+      <button class="btn" onclick="doClaimAccount()">Claim & Check In ✓</button>
     </div>
-    <button class="btn btn-secondary" style="margin-top:8px" onclick="backToClaim()">← Back</button>
+    <button class="btn btn-gray" style="margin-top:8px" onclick="goTo('sSearch')">← Back</button>
   </div>
 
-  <!-- Step 3: Result -->
-  <div id="step3" style="display:none">
+  <!-- STEP SERVICE: Select service -->
+  <div id="sService" style="display:none">
+    <p class="section-label">Select Service</p>
+    <p class="section-sub">What will <strong id="memberNameDisplay"></strong> be attending?</p>
+    <div class="service-grid" id="serviceGrid"></div>
+    <button class="btn" onclick="doCheckin()">Check In ✓</button>
+    <button class="btn btn-gray" style="margin-top:8px" onclick="goTo('s1')">← Cancel</button>
+  </div>
+
+  <!-- STEP WALKIN: Walk-in service + payment -->
+  <div id="sWalkin" style="display:none">
+    <p class="section-label">Walk-in Check-in</p>
+    <p class="section-sub">Select service for walk-in access:</p>
+    <div class="service-grid" id="walkinServiceGrid"></div>
+    <button class="btn" onclick="doWalkinCheckin()">Check In ✓</button>
+    <button class="btn btn-gray" style="margin-top:8px" onclick="goTo('sType')">← Back</button>
+  </div>
+
+  <!-- STEP RESULT -->
+  <div id="sResult" style="display:none">
     <div class="result-icon" id="resultIcon"></div>
     <div class="result-title" id="resultTitle"></div>
     <div class="result-msg" id="resultMsg"></div>
-    <button class="btn btn-secondary" onclick="reset()">Check in another member</button>
+    <button class="btn btn-gray" onclick="reset()">Check in another →</button>
   </div>
 </div>
+
 <script>
-const slug=location.pathname.split('/').find((s,i)=>i>0&&s&&s!=='checkin')||'gym';
-let phone='',selectedService=null,services=[],claimUserId=null,claimSearchTimer=null;
+// ── State ──────────────────────────────────────────────────────
+const slug = location.pathname.split('/').find((s,i)=>i>0&&s&&s!=='checkin')||'gym';
+let phone='', otp='', selectedService=null, selectedInst=null, claimUserId=null;
+let checkinType='', services=[], institutions=[], searchTimer=null;
 
-fetch('/api/gyms/public/'+slug).then(r=>r.json()).then(d=>{document.getElementById('gymName').textContent=(d.name||slug).toUpperCase();}).catch(()=>{document.getElementById('gymName').textContent=slug.toUpperCase();});
-fetch('/api/services/public',{headers:{'X-Gym-Slug':slug}}).then(r=>r.json()).then(d=>{services=Array.isArray(d)?d:[];}).catch(()=>{services=[];});
+// ── Init ───────────────────────────────────────────────────────
+fetch('/api/gyms/public/'+slug).then(r=>r.json()).then(d=>{
+  document.getElementById('gymName').textContent=(d.name||slug).toUpperCase();
+}).catch(()=>document.getElementById('gymName').textContent=slug.toUpperCase());
 
-// Build OTP grids
-function buildOTPGrid(id){
-  const grid=document.getElementById(id);
+fetch('/api/services/public',{headers:{'X-Gym-Slug':slug}}).then(r=>r.json()).then(d=>{
+  services=Array.isArray(d)?d:[];
+}).catch(()=>services=[]);
+
+fetch('/api/institutions',{headers:{'X-Gym-Slug':slug}}).then(r=>r.json()).then(d=>{
+  institutions=Array.isArray(d)?d:(d.institutions||d.data||[]);
+}).catch(()=>institutions=[]);
+
+// ── OTP Grids ──────────────────────────────────────────────────
+function buildGrid(id){
+  const g=document.getElementById(id);
   for(let i=0;i<6;i++){
     const inp=document.createElement('input');inp.type='text';inp.maxLength=1;inp.inputMode='numeric';
-    inp.addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'');if(e.target.value&&i<5)grid.children[i+1].focus();});
-    inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!e.target.value&&i>0)grid.children[i-1].focus();});
-    grid.appendChild(inp);
+    inp.addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'');if(e.target.value&&i<5)g.children[i+1].focus();if(e.target.value&&i===5)document.activeElement.blur();});
+    inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!e.target.value&&i>0)g.children[i-1].focus();});
+    g.appendChild(inp);
   }
 }
-buildOTPGrid('otpGrid');
-buildOTPGrid('claimOtpGrid');
+buildGrid('otpGrid');buildGrid('claimOtpGrid');
 function getOTP(id){return Array.from(document.getElementById(id).children).map(i=>i.value).join('');}
 function clearOTP(id){Array.from(document.getElementById(id).children).forEach(i=>i.value='');}
 
-function show(id){['step1','step1b','step2','step3','stepClaim','stepClaimOTP'].forEach(s=>document.getElementById(s).style.display='none');document.getElementById(id).style.display='block';}
-
-function renderServices(){
-  const sg=document.getElementById('serviceGrid');sg.innerHTML='';selectedService=null;
-  services.forEach(s=>{const btn=document.createElement('button');btn.className='service-btn';
-  btn.innerHTML='<div>'+s.name+'</div><div style="font-size:12px;opacity:0.8;margin-top:4px">'+(s.walkin_price?Number(s.walkin_price).toLocaleString()+' RWF':'')+'</div>';
-  btn.onclick=()=>{document.querySelectorAll('.service-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');selectedService=s.id;};
-  sg.appendChild(btn);});
+// ── Navigation ─────────────────────────────────────────────────
+function goTo(id){
+  ['s1','s2','sType','sInst','sSearch','sClaim','sService','sWalkin','sResult'].forEach(s=>{
+    const el=document.getElementById(s);if(el)el.style.display='none';
+  });
+  document.getElementById(id).style.display='block';
 }
 
+// ── Step 1: Send OTP ───────────────────────────────────────────
 async function sendOTP(){
   const raw=document.getElementById('phoneInput').value.replace(/\s/g,'');
-  if(!raw){alert('Please enter your phone number');return;}
-  phone=raw;const btn=document.getElementById('sendBtn');btn.textContent='Sending...';btn.disabled=true;
+  if(!raw){alert('Please enter a phone number');return;}
+  phone=raw;
+  const btn=document.getElementById('sendBtn');btn.disabled=true;btn.textContent='Sending...';
   try{
     const r=await fetch('/api/auth/send-otp',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone})});
     const d=await r.json();
-    if(!r.ok){
-      // Phone not found → go to claim flow
-      if(d.error&&(d.error.toLowerCase().includes('not found')||d.error.toLowerCase().includes('no account')||r.status===404)){
-        show('stepClaim');btn.textContent='Send Code →';btn.disabled=false;return;
-      }
-      alert(d.error||'Failed to send code');btn.textContent='Send Code →';btn.disabled=false;return;
-    }
-    if(d.devCode){const dc=document.getElementById('devCode');dc.textContent='Dev code: '+d.devCode;dc.style.display='block';}
+    if(!r.ok){alert(d.error||'Failed to send code');btn.disabled=false;btn.textContent='Send Code →';return;}
+    if(d.devCode){const dc=document.getElementById('devCode');dc.textContent='Dev: '+d.devCode;dc.style.display='block';}
     document.getElementById('sentTo').textContent=phone;
-    if(services.length>0){renderServices();document.getElementById('memberName').textContent='member';show('step1b');}
-    else{show('step2');document.getElementById('otpGrid').children[0].focus();}
-  }catch(e){alert('Network error. Please try again.');}
-  btn.textContent='Send Code →';btn.disabled=false;
+    goTo('s2');document.getElementById('otpGrid').children[0].focus();
+  }catch(e){alert('Network error');}
+  btn.disabled=false;btn.textContent='Send Code →';
 }
 
-function proceedToOTP(){show('step2');document.getElementById('otpGrid').children[0].focus();}
-function goBackToPhone(){show('step1');}
-function goBack(){show('step1');document.getElementById('devCode').style.display='none';clearOTP('otpGrid');phone='';}
-function backToClaim(){show('stepClaim');}
-
-async function verifyOTP(){
-  const otp=getOTP('otpGrid');if(otp.length!==6){alert('Please enter all 6 digits');return;}
+// ── Step 2: Verify OTP then peek ──────────────────────────────
+async function verifyAndContinue(){
+  otp=getOTP('otpGrid');
+  if(otp.length!==6){alert('Enter all 6 digits');return;}
+  // Peek to check if user exists
   try{
-    const r=await fetch('/api/checkin',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone,otp,...(selectedService?{serviceId:selectedService}:{})})});
+    const r=await fetch('/api/checkin/peek',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone,otp})});
     const d=await r.json();
-    show('step3');
-    if(d.allowed){
-      document.getElementById('resultIcon').textContent='✅';
-      document.getElementById('resultTitle').textContent='Welcome, '+(d.user?.name||'Member')+'!';
-      document.getElementById('resultTitle').style.color='#065f46';
-      let msg='';if(d.checkin_type==='institutional')msg='Corporate Member ✓';
-      else if(d.membership?.remaining_sessions!=null)msg=d.membership.remaining_sessions+' sessions remaining';
-      else if(d.membership?.end_date)msg='Valid until '+d.membership.end_date;
-      document.getElementById('resultMsg').textContent=msg;
-    } else {
-      const already=d.reason==='already_checked_in';
-      document.getElementById('resultIcon').textContent=already?'✅':'❌';
-      document.getElementById('resultTitle').textContent=already?'Already Checked In':'Access Denied';
-      document.getElementById('resultTitle').style.color=already?'#065f46':'#991b1b';
-      // If user_not_found from checkin → go to claim
-      if(d.reason==='user_not_found'){show('stepClaim');return;}
-      const msgs={no_membership:'No active membership. Please visit reception.',membership_expired:'Your membership has expired. Please renew.',no_sessions:'No sessions remaining. Please renew.',user_suspended:'Account suspended. Please see reception.',user_not_found:'Phone number not found.',already_checked_in:d.message||'Already checked in today.',service_not_covered:'Your company does not cover this service.'};
-      document.getElementById('resultMsg').textContent=msgs[d.reason]||(d.message||'Please see reception.');
+    if(r.status===401){alert('Invalid or expired code');return;}
+    // User exists (peek succeeded) — go to service selection
+    if(r.ok && d.hasMembership!==undefined){
+      // User found — show service selection
+      showServiceSelection('member');
+      return;
     }
-    setTimeout(reset,15000);
-  }catch(e){alert('Network error. Please try again.');}
+    // User not found — show type selection
+    goTo('sType');
+  }catch(e){alert('Network error');}
 }
 
-// ── CLAIM FLOW ──
-let searchTimeout=null;
-function searchName(){
-  const q=document.getElementById('claimSearch').value.trim();
-  clearTimeout(searchTimeout);
-  if(q.length<2){document.getElementById('claimResults').innerHTML='';return;}
-  searchTimeout=setTimeout(async()=>{
+// ── Choose check-in type ───────────────────────────────────────
+function chooseType(type){
+  checkinType=type;
+  if(type==='institution'){
+    loadInstitutions();
+  } else if(type==='individual'){
+    document.getElementById('searchTitle').textContent='Find Your Account';
+    document.getElementById('searchSub').textContent='Search your name to claim your account';
+    document.getElementById('nameSearch').value='';
+    document.getElementById('searchResults').innerHTML='';
+    document.getElementById('searchBack').onclick=()=>goTo('sType');
+    goTo('sSearch');
+  } else if(type==='walkin'){
+    loadWalkinServices();
+  }
+}
+
+// ── Institution flow ───────────────────────────────────────────
+function loadInstitutions(){
+  const list=document.getElementById('instList');list.innerHTML='';
+  if(!institutions.length){
+    // Fallback: fetch from API
+    fetch('/api/institutions',{headers:{'X-Gym-Slug':slug}}).then(r=>r.json()).then(d=>{
+      institutions=Array.isArray(d)?d:(d.institutions||d.data||[]);
+      renderInstitutions();
+    });
+  } else renderInstitutions();
+  goTo('sInst');
+}
+
+function renderInstitutions(){
+  const list=document.getElementById('instList');list.innerHTML='';
+  if(!institutions.length){list.innerHTML='<p class="no-results">No institutions found</p>';return;}
+  institutions.forEach(inst=>{
+    const btn=document.createElement('button');btn.className='inst-btn';
+    btn.innerHTML='<span style="font-size:24px">🏢</span><div><div style="font-weight:700">'+inst.name+'</div><div style="font-size:12px;color:#64748b">'+(inst.rate_per_session?Number(inst.rate_per_session).toLocaleString()+' RWF/session':'')+'</div></div>';
+    btn.onclick=()=>{selectedInst=inst;showInstSearch(inst);};
+    list.appendChild(btn);
+  });
+}
+
+function showInstSearch(inst){
+  document.getElementById('searchTitle').textContent=inst.name+' Members';
+  document.getElementById('searchSub').textContent='Search your name — employees and dependents';
+  document.getElementById('nameSearch').value='';
+  document.getElementById('searchResults').innerHTML='';
+  document.getElementById('searchBack').onclick=()=>goTo('sInst');
+  goTo('sSearch');
+}
+
+// ── Name Search ────────────────────────────────────────────────
+function doSearch(){
+  clearTimeout(searchTimer);
+  const q=document.getElementById('nameSearch').value.trim();
+  if(q.length<2){document.getElementById('searchResults').innerHTML='';return;}
+  searchTimer=setTimeout(async()=>{
     try{
-      const r=await fetch('/api/auth/claim-search?name='+encodeURIComponent(q),{headers:{'X-Gym-Slug':slug}});
-      const d=await r.json();
-      const results=Array.isArray(d)?d:(d.users||d.members||[]);
-      const container=document.getElementById('claimResults');
-      if(!results.length){container.innerHTML='<p class="hint">No unclaimed accounts found. Please visit reception.</p>';return;}
-      container.innerHTML='<p class="hint" style="margin-bottom:8px">Select your name:</p>';
-      results.forEach(u=>{
-        const card=document.createElement('div');card.className='member-card';
-        card.innerHTML='<div class="name">'+u.name+'</div><div class="meta">'+(u.institution_name||u.role||'Member')+(u.parent_name?' · Dep. of '+u.parent_name:'')+'</div>';
-        card.onclick=()=>{
-          document.querySelectorAll('.member-card').forEach(c=>c.classList.remove('selected'));
-          card.classList.add('selected');claimUserId=u.id;
-          document.getElementById('claimName').textContent=u.name;
-          show('stepClaimOTP');
-        };
-        container.appendChild(card);
-      });
-    }catch(e){document.getElementById('claimResults').innerHTML='<p class="hint">Search failed. Try again.</p>';}
-  },400);
+      let url='/api/auth/claim-search?name='+encodeURIComponent(q);
+      const r=await fetch(url,{headers:{'X-Gym-Slug':slug}});
+      const rows=await r.json();
+      renderSearchResults(Array.isArray(rows)?rows:[]);
+    }catch(e){document.getElementById('searchResults').innerHTML='<p class="no-results">Search failed</p>';}
+  },350);
 }
 
+function renderSearchResults(rows){
+  const container=document.getElementById('searchResults');container.innerHTML='';
+  if(!rows.length){container.innerHTML='<p class="no-results">No records found. Try a different name or visit reception.</p>';return;}
+  // Filter by institution if in institution flow
+  let filtered=rows;
+  if(checkinType==='institution'&&selectedInst){
+    filtered=rows.filter(r=>r.institution_name===selectedInst.name||(r.institution_id&&r.institution_id===selectedInst.id));
+    if(!filtered.length)filtered=rows; // show all if no match
+  }
+  filtered.forEach(u=>{
+    const card=document.createElement('div');card.className='member-card';
+    const badge=u.parent_name
+      ?'<span class="badge badge-dep">Dep. of '+u.parent_name+'</span>'
+      :'<span class="badge badge-inst">'+(u.institution_name||'Member')+'</span>';
+    card.innerHTML='<div class="mname">'+u.name+'</div><div class="mmeta">'+badge+'</div>';
+    card.onclick=()=>{
+      document.querySelectorAll('.member-card').forEach(c=>c.classList.remove('active'));
+      card.classList.add('active');
+      claimUserId=u.id;
+      document.getElementById('claimName').textContent=u.name;
+      document.getElementById('claimPhone').value='';
+      document.getElementById('claimOTPArea').style.display='none';
+      document.getElementById('claimDevCode').style.display='none';
+      clearOTP('claimOtpGrid');
+      goTo('sClaim');
+    };
+    container.appendChild(card);
+  });
+}
+
+function backFromSearch(){
+  if(checkinType==='institution')goTo('sInst');
+  else goTo('sType');
+}
+
+// ── Claim account ──────────────────────────────────────────────
 async function sendClaimOTP(){
-  const claimPhone=document.getElementById('claimPhone').value.replace(/\s/g,'');
-  if(!claimPhone){alert('Please enter your phone number');return;}
-  const btn=document.getElementById('claimSendBtn');btn.textContent='Sending...';btn.disabled=true;
+  const cp=document.getElementById('claimPhone').value.replace(/\s/g,'');
+  if(!cp){alert('Enter your phone number');return;}
+  const btn=document.getElementById('claimSendBtn');btn.disabled=true;btn.textContent='Sending...';
   try{
-    // Use claim-account endpoint with OTP send
-    const r=await fetch('/api/auth/send-otp',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone:claimPhone,allowNew:true})});
+    const r=await fetch('/api/auth/send-otp',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone:cp})});
     const d=await r.json();
-    if(d.devCode){const dc=document.getElementById('claimDevCode');dc.textContent='Dev code: '+d.devCode;dc.style.display='block';}
-    document.getElementById('claimOTPSection').style.display='block';
+    if(d.devCode){const dc=document.getElementById('claimDevCode');dc.textContent='Dev: '+d.devCode;dc.style.display='block';}
+    document.getElementById('claimOTPArea').style.display='block';
     document.getElementById('claimOtpGrid').children[0].focus();
-  }catch(e){alert('Network error. Please try again.');}
-  btn.textContent='Send Code →';btn.disabled=false;
+  }catch(e){alert('Network error');}
+  btn.disabled=false;btn.textContent='Send Code →';
 }
 
-async function verifyClaimOTP(){
-  const claimPhone=document.getElementById('claimPhone').value.replace(/\s/g,'');
-  const otp=getOTP('claimOtpGrid');
-  if(otp.length!==6){alert('Please enter all 6 digits');return;}
-  if(!claimUserId){alert('Please select your name first');return;}
+async function doClaimAccount(){
+  const cp=document.getElementById('claimPhone').value.replace(/\s/g,'');
+  const code=getOTP('claimOtpGrid');
+  if(code.length!==6){alert('Enter all 6 digits');return;}
+  if(!claimUserId){alert('No account selected');return;}
   try{
-    // Claim the account
-    const r=await fetch('/api/auth/claim-account',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({userId:claimUserId,phone:claimPhone,otp})});
+    const r=await fetch('/api/auth/claim-account',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({userId:claimUserId,phone:cp,code})});
     const d=await r.json();
     if(!r.ok){alert(d.error||'Failed to claim account');return;}
-    // Now check in with the new phone
-    phone=claimPhone;
-    // Send new OTP for checkin
+    // Account claimed! Now check in with new phone
+    phone=cp;
     const r2=await fetch('/api/auth/send-otp',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone})});
     const d2=await r2.json();
-    if(d2.devCode){document.getElementById('devCode').textContent='Dev code: '+d2.devCode;document.getElementById('devCode').style.display='block';}
-    document.getElementById('sentTo').textContent=phone;
-    if(services.length>0){renderServices();document.getElementById('memberName').textContent=d.name||'member';show('step1b');}
-    else{clearOTP('otpGrid');show('step2');document.getElementById('otpGrid').children[0].focus();}
-  }catch(e){alert('Network error. Please try again.');}
+    otp=d2.devCode||'';
+    if(d2.devCode){document.getElementById('devCode').textContent='Dev: '+d2.devCode;document.getElementById('devCode').style.display='block';}
+    // Show service selection
+    showServiceSelection(d.user?.name||'member');
+  }catch(e){alert('Network error');}
 }
 
+// ── Service selection ──────────────────────────────────────────
+function showServiceSelection(name){
+  document.getElementById('memberNameDisplay').textContent=name;
+  const grid=document.getElementById('serviceGrid');grid.innerHTML='';selectedService=null;
+  services.forEach(s=>{
+    const btn=document.createElement('button');btn.className='service-btn';
+    btn.innerHTML='<div>'+s.name+'</div>'+(s.walkin_price?'<div style="font-size:11px;margin-top:3px;opacity:0.8">'+Number(s.walkin_price).toLocaleString()+' RWF</div>':'');
+    btn.onclick=()=>{document.querySelectorAll('#serviceGrid .service-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedService=s.id;};
+    grid.appendChild(btn);
+  });
+  goTo('sService');
+}
+
+function loadWalkinServices(){
+  const grid=document.getElementById('walkinServiceGrid');grid.innerHTML='';selectedService=null;
+  services.forEach(s=>{
+    const btn=document.createElement('button');btn.className='service-btn';
+    btn.innerHTML='<div>'+s.name+'</div>'+(s.walkin_price?'<div style="font-size:11px;margin-top:3px;opacity:0.8">'+Number(s.walkin_price).toLocaleString()+' RWF</div>':'');
+    btn.onclick=()=>{document.querySelectorAll('#walkinServiceGrid .service-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedService=s.id;};
+    grid.appendChild(btn);
+  });
+  goTo('sWalkin');
+}
+
+// ── Do Checkin ─────────────────────────────────────────────────
+async function doCheckin(){
+  if(!selectedService){alert('Please select a service');return;}
+  try{
+    // If otp was from devCode after claim, use it; otherwise use original otp
+    const r=await fetch('/api/checkin',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone,otp,serviceId:selectedService})});
+    const d=await r.json();showResult(d);
+  }catch(e){alert('Network error');}
+}
+
+async function doWalkinCheckin(){
+  if(!selectedService){alert('Please select a service');return;}
+  try{
+    const r=await fetch('/api/checkin',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone,otp,serviceId:selectedService})});
+    const d=await r.json();showResult(d);
+  }catch(e){alert('Network error');}
+}
+
+// ── Show Result ────────────────────────────────────────────────
+function showResult(d){
+  goTo('sResult');
+  if(d.allowed){
+    document.getElementById('resultIcon').textContent='✅';
+    document.getElementById('resultTitle').textContent='Welcome, '+(d.user?.name||'Member')+'!';
+    document.getElementById('resultTitle').style.color='#065f46';
+    let msg='Check-in successful!';
+    if(d.checkin_type==='institutional')msg='Corporate member ✓';
+    else if(d.membership?.remaining)msg=d.membership.remaining;
+    if(d.service_name)msg+=' · '+d.service_name;
+    document.getElementById('resultMsg').textContent=msg;
+  } else {
+    const already=d.reason==='already_checked_in';
+    document.getElementById('resultIcon').textContent=already?'✅':'❌';
+    document.getElementById('resultTitle').textContent=already?'Already Checked In':'Access Denied';
+    document.getElementById('resultTitle').style.color=already?'#065f46':'#991b1b';
+    const msgs={no_membership:'No active membership. Please visit reception.',membership_expired:'Your membership has expired. Please renew.',no_sessions:'No sessions remaining. Please renew.',user_suspended:'Account suspended. Please see reception.',user_not_found:'Account not found. Please visit reception.',already_checked_in:d.message||'Already checked in for this service.',service_not_covered:'Your company does not cover this service.',service_not_in_plan:'This service is not included in your plan.'};
+    document.getElementById('resultMsg').textContent=msgs[d.reason]||(d.message||'Please see reception.');
+  }
+  setTimeout(reset,15000);
+}
+
+// ── Reset ──────────────────────────────────────────────────────
 function reset(){
-  show('step1');
+  phone='';otp='';selectedService=null;selectedInst=null;claimUserId=null;checkinType='';
   document.getElementById('phoneInput').value='';
   document.getElementById('devCode').style.display='none';
   document.getElementById('claimDevCode').style.display='none';
-  document.getElementById('claimOTPSection').style.display='none';
-  document.getElementById('claimSearch').value='';
-  document.getElementById('claimResults').innerHTML='';
+  document.getElementById('claimOTPArea').style.display='none';
   document.getElementById('claimPhone').value='';
+  document.getElementById('nameSearch').value='';
+  document.getElementById('searchResults').innerHTML='';
   clearOTP('otpGrid');clearOTP('claimOtpGrid');
-  phone='';selectedService=null;claimUserId=null;
+  goTo('s1');document.getElementById('phoneInput').focus();
 }
 
 document.getElementById('phoneInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendOTP();});
