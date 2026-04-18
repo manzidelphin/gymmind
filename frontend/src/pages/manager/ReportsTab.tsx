@@ -506,3 +506,7 @@ export default function ReportsTab() {
         )}
       </div>
 
+
+    </div>
+  );
+}
