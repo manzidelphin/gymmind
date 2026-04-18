@@ -808,7 +808,7 @@ export default function HRDashboard() {
                         <Tooltip
                           contentStyle={{ background: '#0F172A', border: 'none', borderRadius: 8, color: '#fff', fontSize: 13 }}
                           labelFormatter={d => `Day ${d}`}
-                          formatter={(v: number) => [v.toString(), 'check-ins'] as [string, string]}
+                          formatter={(v: any) => [v, 'check-ins']}
                         />
                         <Bar dataKey="checkins" fill="#10B981" radius={[4, 4, 0, 0]} />
                       </BarChart>

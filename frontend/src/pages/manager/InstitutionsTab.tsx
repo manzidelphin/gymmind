@@ -189,14 +189,6 @@ export default function InstitutionsTab() {
     fetchInstitutions();
   }
 
-  function openInvite(_inst: Institution) {
-    setInviteInst(inst);
-    setInviteName(inst.admin_name ?? '');
-    setInvitePhone(inst.admin_phone ?? '');
-    setInvitePhoneOk(false);
-    setInviteError('');
-    setInviteResult(null);
-  }
 
   async function confirmInvite() {
     if (!inviteInst || !inviteName.trim() || !invitePhoneOk) return;
