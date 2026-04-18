@@ -122,6 +122,12 @@ export default function HRBillingReport({ entry, hrApi }: Props) {
                     <td style={{ padding: '14px 16px', color: m.amount_due > 0 ? '#0f172a' : '#94a3b8' }}>
                       {m.amount_due > 0 ? m.amount_due.toLocaleString() : '—'}
                     </td>
+                    <td style={{ padding: '14px 16px', fontSize: '12px', color: '#475569' }}>
+                      {[...new Set((m.service_names||[]).filter((s:string)=>Boolean(s)&&s!=='Unknown'))].join(', ') || '—'}
+                    </td>
+                    <td style={{ padding: '14px 16px', fontSize: '12px', color: '#475569' }}>
+                      {m.gym_name || '—'}
+                    </td>
                     <td style={{ padding: '14px 16px' }}>
                       {m.visit_count > 0 ? (
                         <button onClick={() => toggleExpanded(m.id)}
@@ -133,7 +139,7 @@ export default function HRBillingReport({ entry, hrApi }: Props) {
                   </tr>
                   {expanded.has(m.id) && (
                     <tr key={`${m.id}-dates`}>
-                      <td colSpan={6} style={{ padding: '0 16px 14px 16px', background: '#f8fafc' }}>
+                      <td colSpan={8} style={{ padding: '0 16px 14px 16px', background: '#f8fafc' }}>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', paddingTop: '8px' }}>
                           {m.visit_dates.map((d, i) => (
                             <span key={i} style={{ background: '#dcfce7', color: '#166534', padding: '3px 10px', borderRadius: '99px', fontSize: '12px', fontWeight: 500 }}>
