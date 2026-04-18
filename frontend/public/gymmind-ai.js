@@ -76,8 +76,8 @@
         var res=await fetch('/api/hr/ai-chat',{
           method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('hr_token')},
           body:JSON.stringify({systemPrompt:(location.pathname.indexOf('/manager')>-1
-          ? 'You are GymMind AI, a business analyst for gym '+(window.__gymName||'FitLife Kigali')+'. LIVE DATA:'+JSON.stringify(ctx)+'. Provide business insights on revenue, members, billing. Be concise, use **bold** for numbers, format RWF with commas.'
-          : (location.pathname.indexOf('/manager')>-1?'You are GymMind AI, a business analyst for '+(window.__gymName||'the gym')+'. LIVE DATA:'+JSON.stringify(ctx)+'. Provide business insights on revenue, members, billing. Be concise, use **bold** for numbers, format RWF with commas.':'You are GymMind AI, HR assistant for '+(window.__hrInstName||'MMI')+'. LIVE DATA:'+JSON.stringify(ctx)+'. Be concise, use **bold** for key numbers, format RWF with commas.')),
+          ? 'You are GymMind AI for gym '+(window.__gymName||'FitLife Kigali')+'. IMPORTANT: Answer ONLY using the LIVE DATA provided. NEVER invent numbers. If data is missing or shows error, say so. LIVE DATA:'+JSON.stringify(ctx)+'. If asked about active members, use memberships.active. If asked about billing, use billing.institutions. Be concise, use **bold** for real numbers only.'
+          : ('You are GymMind AI, HR assistant for '+(window.__hrInstName||'MMI')+'. IMPORTANT: Answer ONLY using the LIVE DATA provided. NEVER invent numbers. LIVE DATA:'+JSON.stringify(ctx)+'. Be concise, use **bold** for real numbers only.')),
             messages:bubs.slice(-6).concat([{role:'user',content:t}])})
         });
         var dd=await res.json();
