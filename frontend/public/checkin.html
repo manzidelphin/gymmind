@@ -218,24 +218,27 @@ async function sendOTP(){
   btn.disabled=false;btn.textContent='Send Code →';
 }
 
-// ── Step 2: Verify OTP then peek ──────────────────────────────
+// ── Step 2: Verify OTP then attempt checkin ───────────────────
 async function verifyAndContinue(){
   otp=getOTP('otpGrid');
   if(otp.length!==6){alert('Enter all 6 digits');return;}
-  // Peek to check if user exists
   try{
-    const r=await fetch('/api/checkin/peek',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone,otp})});
+    // Try checkin to detect if user exists (no serviceId = will fail gracefully)
+    const r=await fetch('/api/checkin',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone,otp})});
     const d=await r.json();
-    if(r.status===401){alert('Invalid or expired code');return;}
-    // User exists (peek succeeded) — go to service selection
-    if(r.ok && d.hasMembership!==undefined){
-      // User found — show service selection
-      showServiceSelection('member');
-      return;
-    }
-    // User not found — show type selection
-    goTo('sType');
-  }catch(e){alert('Network error');}
+    if(r.status===401){alert('Invalid or expired code. Please try again.');return;}
+    // User not found — show Institution/Individual/Walkin choice
+    if(d.reason==='user_not_found'){goTo('sType');return;}
+    // Already checked in or access denied with known user
+    if(d.reason==='already_checked_in'){showResult(d);return;}
+    // User found and checked in (no service required)
+    if(d.allowed){showResult(d);return;}
+    // User found but needs service — get fresh OTP and show service selection
+    const r2=await fetch('/api/auth/send-otp',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone})});
+    const d2=await r2.json();
+    if(d2.devCode){otp=d2.devCode;}
+    showServiceSelection(d.user?.name||'member');
+  }catch(e){alert('Network error. Please try again.');}
 }
 
 // ── Choose check-in type ───────────────────────────────────────
