@@ -64,6 +64,9 @@ export default function ReportsTab() {
   const [membershipLoad,   setMembershipLoad]   = useState(false);
   const [membershipSearch, setMembershipSearch] = useState('');
   const [walkinFrom,   setWalkinFrom]   = useState(() => new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10));
+  const [memberData,   setMemberData]   = useState<MembershipDetail[] | null>(null);
+  const [memberLoad,   setMemberLoad]   = useState(false);
+  const [memberSearch, setMemberSearch] = useState('');
   const [walkinTo,     setWalkinTo]     = useState(() => new Date().toISOString().slice(0, 10));
   const [walkinData,   setWalkinData]   = useState<WalkInReport | null>(null);
   const [walkinLoad,   setWalkinLoad]   = useState(false);
@@ -147,6 +150,15 @@ export default function ReportsTab() {
     { num: data.expired,       label: 'Expired',            sub: 'Past end date',               cls: s.cardRed    },
     { num: data.no_membership, label: 'No Plan',            sub: 'Members with no active plan', cls: s.cardPurple },
   ] : [];
+
+  async function fetchMemberships() {
+    setMemberLoad(true);
+    try {
+      const { data } = await api.get<{ members: MembershipDetail[] }>('/reports/membership-detail');
+      setMemberData(data.members);
+    } catch { /* ignore */ }
+    finally { setMemberLoad(false); }
+  }
 
   return (
     <>
@@ -402,6 +414,66 @@ export default function ReportsTab() {
               <div style={{ textAlign:'center', padding:'32px', color:'#94a3b8' }}>No members found</div>
             )}
           </div>
+        )}
+      </div>
+
+      {/* ── Membership / Subscription Report ── */}
+      <div className={s.sectionCard}>
+        <div className={s.cardHeader}>
+          <h3 className={s.cardTitle}>Membership & Subscription Report</h3>
+          <button className={s.generateBtn} disabled={memberLoad} onClick={fetchMemberships}>
+            {memberLoad ? 'Loading…' : 'Generate →'}
+          </button>
+        </div>
+        {memberData && (
+          <>
+            <input
+              type="text" placeholder="Search member..." value={memberSearch}
+              onChange={e => setMemberSearch(e.target.value)}
+              style={{ width:'100%', padding:'10px 14px', border:'1px solid #e2e8f0', borderRadius:'8px', fontSize:'14px', marginBottom:'16px', outline:'none' }}
+            />
+            <div style={{ overflowX:'auto' }}>
+              <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'14px' }}>
+                <thead>
+                  <tr style={{ background:'#f8fafc' }}>
+                    {['MEMBER','PHONE','PLAN','TYPE','STATUS','SESSIONS LEFT','EXPIRES','CHECK-INS THIS MONTH'].map(h => (
+                      <th key={h} style={{ padding:'10px 14px', textAlign:'left', fontSize:'11px', fontWeight:600, color:'#64748b', letterSpacing:'0.5px', whiteSpace:'nowrap' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {memberData.filter(m => !memberSearch || m.name.toLowerCase().includes(memberSearch.toLowerCase()) || (m.phone||'').includes(memberSearch)).map(m => (
+                    <tr key={m.id} style={{ borderTop:'1px solid #f1f5f9' }}>
+                      <td style={{ padding:'12px 14px', fontWeight:600, color:'#0f172a' }}>{m.name}</td>
+                      <td style={{ padding:'12px 14px', color:'#64748b', fontSize:'13px' }}>{m.phone || '—'}</td>
+                      <td style={{ padding:'12px 14px' }}>{m.plan_name ? <span style={{ background:'#dbeafe', color:'#1e40af', padding:'2px 10px', borderRadius:'99px', fontSize:'12px', fontWeight:600 }}>{m.plan_name}</span> : <span style={{ color:'#94a3b8', fontSize:'13px' }}>No plan</span>}</td>
+                      <td style={{ padding:'12px 14px', color:'#64748b', fontSize:'13px', textTransform:'capitalize' }}>{m.plan_type?.replace('_',' ') || '—'}</td>
+                      <td style={{ padding:'12px 14px' }}>
+                        <span style={{ padding:'2px 10px', borderRadius:'99px', fontSize:'12px', fontWeight:600, background: m.membership_status==='active'?'#dcfce7':m.membership_status==='expired'?'#fee2e2':'#f1f5f9', color: m.membership_status==='active'?'#166534':m.membership_status==='expired'?'#991b1b':'#64748b' }}>
+                          {m.membership_status || 'No plan'}
+                        </span>
+                      </td>
+                      <td style={{ padding:'12px 14px', fontWeight:700, color: (m.remaining_sessions??0)>0?'#0F6E56':'#94a3b8' }}>
+                        {m.plan_type==='session_based' ? (m.remaining_sessions??0) : m.plan_type==='time_based' ? '∞' : '—'}
+                      </td>
+                      <td style={{ padding:'12px 14px', color:'#64748b', fontSize:'13px' }}>
+                        {m.end_date ? new Date(m.end_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—'}
+                      </td>
+                      <td style={{ padding:'12px 14px', fontWeight:700, color:'#0F6E56', textAlign:'center' }}>{m.checkins_this_month}</td>
+                    </tr>
+                  ))}
+                  {memberData.filter(m => !memberSearch || m.name.toLowerCase().includes(memberSearch.toLowerCase())).length === 0 && (
+                    <tr><td colSpan={8} style={{ padding:'32px', textAlign:'center', color:'#94a3b8' }}>No members found</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <div style={{ marginTop:'16px', padding:'12px 16px', background:'#f8fafc', borderRadius:'10px', display:'flex', gap:'24px', fontSize:'13px', color:'#64748b' }}>
+              <span>Total members: <strong style={{color:'#0f172a'}}>{memberData.length}</strong></span>
+              <span>Active plans: <strong style={{color:'#0F6E56'}}>{memberData.filter(m=>m.membership_status==='active').length}</strong></span>
+              <span>No plan: <strong style={{color:'#94a3b8'}}>{memberData.filter(m=>!m.plan_name).length}</strong></span>
+            </div>
+          </>
         )}
       </div>
 
