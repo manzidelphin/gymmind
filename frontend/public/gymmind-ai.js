@@ -49,11 +49,13 @@
         var to=new Date().toISOString().slice(0,10);
         if(isM){
           var tok=localStorage.getItem('token');
-          var h={'Authorization':'Bearer '+tok,'Content-Type':'application/json'};
+          var gymSlug=location.pathname.split('/')[1]||'';
+          var h={'Authorization':'Bearer '+tok,'Content-Type':'application/json','X-Gym-Slug':gymSlug};
           var rs=await Promise.all([
-            fetch('/api/billing/institutions?month='+new Date().toISOString().slice(0,7),{headers:h}).then(function(x){return x.json();}).catch(function(){return null;})
+            fetch('/api/billing/institutions?month='+new Date().toISOString().slice(0,7),{headers:h}).then(function(x){return x.json();}).catch(function(){return null;}),
+            fetch('/api/reports/memberships',{headers:h}).then(function(x){return x.json();}).catch(function(){return null;})
           ]);
-          ctx={billing:rs[0]};
+          ctx={billing:rs[0],memberships:rs[1]};
         } else {
           var tok=localStorage.getItem('hr_token');
           var h={'Authorization':'Bearer '+tok,'Content-Type':'application/json'};
