@@ -189,7 +189,7 @@ export default function InstitutionsTab() {
     fetchInstitutions();
   }
 
-  function _openInvite(inst: Institution) {
+  function openInvite(_inst: Institution) {
     setInviteInst(inst);
     setInviteName(inst.admin_name ?? '');
     setInvitePhone(inst.admin_phone ?? '');
