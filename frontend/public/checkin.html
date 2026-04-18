@@ -175,8 +175,8 @@ fetch('/api/services/public',{headers:{'X-Gym-Slug':slug}}).then(r=>r.json()).th
   services=Array.isArray(d)?d:[];
 }).catch(()=>services=[]);
 
-fetch('/api/institutions',{headers:{'X-Gym-Slug':slug}}).then(r=>r.json()).then(d=>{
-  institutions=Array.isArray(d)?d:(d.institutions||d.data||[]);
+fetch('/api/institutions/public',{headers:{'X-Gym-Slug':slug}}).then(r=>r.json()).then(d=>{
+  institutions=Array.isArray(d)?d:[];
 }).catch(()=>institutions=[]);
 
 // ── OTP Grids ──────────────────────────────────────────────────
@@ -263,8 +263,8 @@ function loadInstitutions(){
   const list=document.getElementById('instList');list.innerHTML='';
   if(!institutions.length){
     // Fallback: fetch from API
-    fetch('/api/institutions',{headers:{'X-Gym-Slug':slug}}).then(r=>r.json()).then(d=>{
-      institutions=Array.isArray(d)?d:(d.institutions||d.data||[]);
+    fetch('/api/institutions/public',{headers:{'X-Gym-Slug':slug}}).then(r=>r.json()).then(d=>{
+      institutions=Array.isArray(d)?d:[];
       renderInstitutions();
     });
   } else renderInstitutions();
@@ -298,10 +298,19 @@ function doSearch(){
   if(q.length<2){document.getElementById('searchResults').innerHTML='';return;}
   searchTimer=setTimeout(async()=>{
     try{
-      let url='/api/auth/claim-search?name='+encodeURIComponent(q);
-      const r=await fetch(url,{headers:{'X-Gym-Slug':slug}});
-      const rows=await r.json();
-      renderSearchResults(Array.isArray(rows)?rows:[]);
+      let rows=[];
+      if(checkinType==='institution'&&selectedInst){
+        // Use institution-specific unclaimed members endpoint
+        const r=await fetch('/api/institutions/'+selectedInst.id+'/members/unclaimed',{headers:{'X-Gym-Slug':slug}});
+        const all=await r.json();
+        // Filter by name query
+        rows=(Array.isArray(all)?all:[]).filter(u=>u.name.toLowerCase().includes(q.toLowerCase()));
+      } else {
+        // Individual claim search
+        const r=await fetch('/api/auth/claim-search?name='+encodeURIComponent(q),{headers:{'X-Gym-Slug':slug}});
+        rows=await r.json();rows=Array.isArray(rows)?rows:[];
+      }
+      renderSearchResults(rows);
     }catch(e){document.getElementById('searchResults').innerHTML='<p class="no-results">Search failed</p>';}
   },350);
 }
