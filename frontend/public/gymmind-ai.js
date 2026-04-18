@@ -4,8 +4,8 @@
     window.__gmDone=1;
     var btn=document.createElement('button');
     btn.id='gm-ai-btn';
-    btn.style.cssText='position:fixed;bottom:28px;right:28px;width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#0F6E56,#1a9b7a);border:none;cursor:pointer;z-index:9999;box-shadow:0 8px 32px rgba(15,110,86,0.4);font-size:24px;display:flex;align-items:center;justify-content:center;transition:all 0.3s';
-    btn.innerHTML='🤖';
+    btn.style.cssText='position:fixed;bottom:28px;right:28px;height:52px;padding:0 20px 0 14px;border-radius:50px;background:linear-gradient(135deg,#0F6E56,#1a9b7a);border:none;cursor:pointer;z-index:9999;box-shadow:0 8px 32px rgba(15,110,86,0.45);font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.3s;animation:gmPulseBtn 3s ease-in-out infinite;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-weight:700;color:white;letter-spacing:0.3px';
+    btn.innerHTML='<span style="font-size:22px">🤖</span><span id="gm-btn-label">Talk to us</span>';
     var panel=document.createElement('div');
     panel.id='gm-ai-panel';
     panel.style.cssText='position:fixed;bottom:104px;right:28px;width:420px;height:560px;background:#fff;border-radius:24px;box-shadow:0 24px 80px rgba(0,0,0,0.18);display:none;flex-direction:column;z-index:9998;overflow:hidden';
@@ -16,7 +16,7 @@
     btn.onclick=function(){
       open=!open;
       panel.style.display=open?'flex':'none';
-      btn.innerHTML=open?'&#10005;':'🤖';
+      btn.innerHTML=open?'<span style="font-size:18px">✕</span>':'<span style="font-size:22px">🤖</span><span id="gm-btn-label">Talk to us</span>';
       if(open&&!document.getElementById('gm-msgs').children.length){
         var n=window.__hrInstName||'your institution';
         document.getElementById('gm-sub').textContent='HR Assistant · '+n;
