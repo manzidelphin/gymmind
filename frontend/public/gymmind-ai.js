@@ -18,9 +18,11 @@
       panel.style.display=open?'flex':'none';
       btn.innerHTML=open?'<span style="font-size:18px">✕</span>':'<span style="font-size:22px">🤖</span><span id="gm-btn-label">Talk to us</span>';
       if(open&&!document.getElementById('gm-msgs').children.length){
+        var isManager=location.pathname.indexOf('/manager')>-1;
         var n=window.__hrInstName||'your institution';
-        document.getElementById('gm-sub').textContent='HR Assistant · '+n;
-        addmsg('assistant','Hi! I am your GymMind AI for **'+n+'**.\n\nI can explain your billing, attendance, and employee visits. What would you like to know?');
+        var gn=window.__gymName||'your gym';
+        document.getElementById('gm-sub').textContent=isManager?('Business Analyst · '+gn):('HR Assistant · '+n);
+        addmsg('assistant',isManager?('Hi! I am your **GymMind AI** business analyst for **'+gn+'**.\n\nI can analyze revenue, member activity, billing, and service performance. Ask me anything!'):('Hi! I am your **GymMind AI** for **'+n+'**.\n\nI can explain your billing, attendance, and employee visits. What would you like to know?'));
       }
       if(open)setTimeout(function(){document.getElementById('gm-inp').focus();},100);
     };
