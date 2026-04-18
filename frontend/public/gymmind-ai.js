@@ -44,16 +44,26 @@
       addmsg('user',t);var lb=addmsg('assistant','',true);
       var ctx={};
       try{
-        var tok=localStorage.getItem('hr_token');
-        var h={'Authorization':'Bearer '+tok,'Content-Type':'application/json'};
+        var isM=location.pathname.indexOf('/manager')>-1;
         var fr=new Date(Date.now()-30*86400000).toISOString().slice(0,10);
         var to=new Date().toISOString().slice(0,10);
-        var id=window.__hrInstitutionId;
-        var rs=await Promise.all([
-          fetch('/api/hr/attendance?from='+fr+'&to='+to,{headers:h}).then(function(x){return x.json();}).catch(function(){return null;}),
-          id?fetch('/api/hr/'+id+'/billing-report?from='+fr+'&to='+to,{headers:h}).then(function(x){return x.json();}).catch(function(){return null;}):Promise.resolve(null)
-        ]);
-        ctx={attendance:rs[0],billing:rs[1]};
+        if(isM){
+          var tok=localStorage.getItem('token');
+          var h={'Authorization':'Bearer '+tok,'Content-Type':'application/json'};
+          var rs=await Promise.all([
+            fetch('/api/billing/institutions?month='+new Date().toISOString().slice(0,7),{headers:h}).then(function(x){return x.json();}).catch(function(){return null;})
+          ]);
+          ctx={billing:rs[0]};
+        } else {
+          var tok=localStorage.getItem('hr_token');
+          var h={'Authorization':'Bearer '+tok,'Content-Type':'application/json'};
+          var id=window.__hrInstitutionId;
+          var rs=await Promise.all([
+            fetch('/api/hr/attendance?from='+fr+'&to='+to,{headers:h}).then(function(x){return x.json();}).catch(function(){return null;}),
+            id?fetch('/api/hr/'+id+'/billing-report?from='+fr+'&to='+to,{headers:h}).then(function(x){return x.json();}).catch(function(){return null;}):Promise.resolve(null)
+          ]);
+          ctx={attendance:rs[0],billing:rs[1]};
+        }
       }catch(e){}
       try{
         var bubs=Array.from(document.getElementById('gm-msgs').children).slice(0,-1).map(function(d){
@@ -65,7 +75,7 @@
           method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('hr_token')},
           body:JSON.stringify({systemPrompt:(location.pathname.indexOf('/manager')>-1
           ? 'You are GymMind AI, a business analyst for gym '+(window.__gymName||'FitLife Kigali')+'. LIVE DATA:'+JSON.stringify(ctx)+'. Provide business insights on revenue, members, billing. Be concise, use **bold** for numbers, format RWF with commas.'
-          : 'You are GymMind AI, HR assistant for '+(window.__hrInstName||'MMI')+'. LIVE DATA:'+JSON.stringify(ctx)+'. Be concise, use **bold** for key numbers, format RWF with commas.'),
+          : (location.pathname.indexOf('/manager')>-1?'You are GymMind AI, a business analyst for '+(window.__gymName||'the gym')+'. LIVE DATA:'+JSON.stringify(ctx)+'. Provide business insights on revenue, members, billing. Be concise, use **bold** for numbers, format RWF with commas.':'You are GymMind AI, HR assistant for '+(window.__hrInstName||'MMI')+'. LIVE DATA:'+JSON.stringify(ctx)+'. Be concise, use **bold** for key numbers, format RWF with commas.')),
             messages:bubs.slice(-6).concat([{role:'user',content:t}])})
         });
         var dd=await res.json();
