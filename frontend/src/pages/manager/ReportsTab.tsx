@@ -407,58 +407,102 @@ export default function ReportsTab() {
           <input type="date" className={s.control} value={memberTo}
             onChange={e => setMemberTo(e.target.value)} />
         </div>
-        {memberData && (() => {
-          const filtered = memberData;
-          const active   = filtered.filter(m => m.membership_status === 'active');
-          const inactive = filtered.filter(m => !m.membership_status);
-          return (
-            <div>
-              <div className={s.walkinStats} style={{marginBottom:'16px'}}>
-                <div className={s.stat}><span className={s.statNum}>{filtered.length}</span><span className={s.statLbl}>Total Members</span></div>
-                <div className={s.stat}><span className={s.statNum} style={{color:'#0F6E56'}}>{active.length}</span><span className={s.statLbl}>Active Plans</span></div>
-                <div className={s.stat}><span className={s.statNum} style={{color:'#94a3b8'}}>{inactive.length}</span><span className={s.statLbl}>No Plan</span></div>
+        {memberData && (
+          <div className={s.billingReport}>
+            <div className={s.billingReportHeader}>
+              <div>
+                <p className={s.billingInstName}>Active Subscriptions</p>
+                <p className={s.billingPeriod}>{memberFrom} → {memberTo}</p>
               </div>
-              <div style={{overflowX:'auto'}}>
-                <table className={s.table}>
-                  <thead><tr>
-                    {['MEMBER','PHONE','PLAN','TYPE','SESSIONS LEFT','EXPIRY','CHECK-INS THIS MONTH','STATUS'].map(h=>(
-                      <th key={h} className={s.th}>{h}</th>
-                    ))}
-                  </tr></thead>
+              <div className={s.billingTotals}>
+                <div className={s.billingTotal}>
+                  <span className={s.billingTotalNum}>{memberData.length}</span>
+                  <span className={s.billingTotalLabel}>Members with Plans</span>
+                </div>
+                <div className={s.billingTotal}>
+                  <span className={s.billingTotalNum}>{memberData.filter(m => m.membership_status === 'active').length}</span>
+                  <span className={s.billingTotalLabel}>Active</span>
+                </div>
+              </div>
+            </div>
+            {memberData.length === 0 ? (
+              <p className={s.empty}>No members with active subscriptions found.</p>
+            ) : (
+              <>
+                <table className={s.billingTable}>
+                  <thead>
+                    <tr>
+                      <th className={s.bTh}>Member</th>
+                      <th className={s.bTh}>Phone</th>
+                      <th className={s.bTh}>Plan</th>
+                      <th className={s.bTh}>Type</th>
+                      <th className={s.bTh}>Sessions Left</th>
+                      <th className={s.bTh}>Expiry Date</th>
+                      <th className={s.bTh}>Check-ins</th>
+                      <th className={s.bTh}>Status</th>
+                    </tr>
+                  </thead>
                   <tbody>
-                    {filtered.map(m => (
-                      <tr key={m.id} className={s.tr}>
-                        <td className={s.td} style={{fontWeight:600}}>{m.name}</td>
-                        <td className={s.td}>{m.phone || '—'}</td>
-                        <td className={s.td}>{m.plan_name || <span style={{color:'#94a3b8'}}>No plan</span>}</td>
-                        <td className={s.td}>{m.plan_type === 'session_based' ? '🎫 Session' : m.plan_type === 'time_based' ? '📅 Time' : '—'}</td>
-                        <td className={s.td}>
-                          {m.plan_type === 'session_based'
-                            ? <span style={{fontWeight:700,color: (m.remaining_sessions??0) > 3 ? '#0F6E56' : '#ef4444'}}>{m.remaining_sessions ?? 0}</span>
-                            : m.plan_type === 'time_based' && m.end_date
-                            ? <span style={{color:'#64748b'}}>Time-based</span>
-                            : '—'}
+                    {memberData.map(m => (
+                      <tr key={m.id} className={s.bTr}>
+                        <td className={s.bTd}><span className={s.memberName}>{m.name}</span></td>
+                        <td className={s.bTd}>{m.phone ?? '—'}</td>
+                        <td className={s.bTd}>{m.plan_name ?? '—'}</td>
+                        <td className={s.bTd}>
+                          {m.plan_type === 'session_based' ? '🎟 Session' : m.plan_type === 'time_based' ? '📅 Time' : '—'}
                         </td>
-                        <td className={s.td}>
-                          {m.end_date ? new Date(m.end_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—'}
+                        <td className={s.bTd}>
+                          {m.plan_type === 'session_based' ? (m.remaining_sessions ?? 0) : '∞'}
                         </td>
-                        <td className={s.td} style={{textAlign:'center',fontWeight:700,color:m.checkins_this_period>0?'#0F6E56':'#94a3b8'}}>
-                          {m.checkins_this_period}
+                        <td className={s.bTd}>
+                          {m.end_date ? new Date(m.end_date).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}) : '—'}
                         </td>
-                        <td className={s.td}>
-                          {m.membership_status === 'active'
-                            ? <span style={{background:'#dcfce7',color:'#166534',padding:'3px 10px',borderRadius:'99px',fontSize:'12px',fontWeight:600}}>Active</span>
-                            : <span style={{background:'#f1f5f9',color:'#94a3b8',padding:'3px 10px',borderRadius:'99px',fontSize:'12px',fontWeight:600}}>No Plan</span>}
+                        <td className={s.bTd}>{m.checkins_this_period}</td>
+                        <td className={s.bTd}>
+                          <span style={{
+                            padding: '3px 10px', borderRadius: '99px', fontSize: '12px', fontWeight: 600,
+                            background: m.membership_status === 'active' ? '#dcfce7' : '#fee2e2',
+                            color: m.membership_status === 'active' ? '#166534' : '#991b1b'
+                          }}>
+                            {m.membership_status === 'active' ? 'Active' : 'Expired'}
+                          </span>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-              </div>
-            </div>
-          );
-        })()}
+                <div className={s.attendFooter}>
+                  <span className={s.attendTotal}>
+                    {memberData.length} member{memberData.length !== 1 ? 's' : ''} with subscriptions
+                  </span>
+                  <button
+                    type="button"
+                    className={s.downloadBtn}
+                    onClick={() => {
+                      const rows = [
+                        ['Member','Phone','Plan','Type','Sessions Left','Expiry','Check-ins','Status'],
+                        ...memberData.map(m => [
+                          m.name, m.phone??'', m.plan_name??'',
+                          m.plan_type??'',
+                          m.plan_type==='session_based'?(m.remaining_sessions??0):'∞',
+                          m.end_date?new Date(m.end_date).toLocaleDateString('en-GB'):'',
+                          m.checkins_this_period,
+                          m.membership_status??''
+                        ])
+                      ];
+                      const csv = rows.map(r=>r.join(',')).join('\n');
+                      const a = document.createElement('a');
+                      a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+                      a.download = `subscriptions-${memberFrom}-${memberTo}.csv`;
+                      a.click();
+                    }}
+                  >
+                    ↓ Download Report CSV
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
-    </>
-  );
-}
+
