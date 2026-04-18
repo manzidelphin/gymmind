@@ -4,6 +4,19 @@ import s from './ReportsTab.module.css';
 
 interface MembershipSummary { active: number; expired: number; expiring_soon: number; no_membership: number; }
 
+interface MembershipDetail {
+  id: number;
+  name: string;
+  phone: string | null;
+  plan_name: string | null;
+  plan_type: string | null;
+  membership_status: string | null;
+  remaining_sessions: number | null;
+  end_date: string | null;
+  start_date: string | null;
+  checkins_this_month: number;
+}
+
 interface WalkInReport {
   from: string; to: string;
   total_payments: number; total_revenue: number; active_days: number;
@@ -51,6 +64,9 @@ export default function ReportsTab() {
   const [walkinTo,     setWalkinTo]     = useState(() => new Date().toISOString().slice(0, 10));
   const [walkinData,   setWalkinData]   = useState<WalkInReport | null>(null);
   const [walkinLoad,   setWalkinLoad]   = useState(false);
+  const [membershipData, setMembershipData] = useState<MembershipDetail[] | null>(null);
+  const [membershipLoad, setMembershipLoad] = useState(false);
+  const [membershipSearch, setMembershipSearch] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -90,6 +106,15 @@ export default function ReportsTab() {
     a.download = `${inst.name.replace(/\s+/g, '-')}-attendance-${month.replace('/', '-')}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  async function fetchMembershipReport() {
+    setMembershipLoad(true);
+    try {
+      const { data } = await api.get<{ members: MembershipDetail[] }>('/reports/membership-detail');
+      setMembershipData(data.members);
+    } catch { /* ignore */ }
+    finally { setMembershipLoad(false); }
   }
 
   async function fetchWalkin(from: string, to: string) {
