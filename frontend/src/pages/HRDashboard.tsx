@@ -1,7 +1,7 @@
 import HRBillingReport from '../components/HRBillingReport';
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { hrApi, publicApi } from '../api/api';
+import { hrApi } from '../api/api';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -808,7 +808,7 @@ export default function HRDashboard() {
                         <Tooltip
                           contentStyle={{ background: '#0F172A', border: 'none', borderRadius: 8, color: '#fff', fontSize: 13 }}
                           labelFormatter={d => `Day ${d}`}
-                          formatter={(v: number) => [v, 'check-ins']}
+                          formatter={(v: unknown) => [v, 'check-ins']}
                         />
                         <Bar dataKey="checkins" fill="#10B981" radius={[4, 4, 0, 0]} />
                       </BarChart>
@@ -1432,7 +1432,7 @@ function Empty({ icon, title, sub }: { icon: string; title: string; sub: string 
   );
 }
 
-function CheckinTypeBadge({ type }: { type: string }) {
+// function CheckinTypeBadge({ type }: { type: string }) {
   if (type === 'institutional') return <span className={`${s.badge} ${s.bTypeInst}`}>Institutional</span>;
   if (type === 'dependent')     return <span className={`${s.badge} ${s.bTypeDep}`}>Dependent</span>;
   if (type === 'walkin')        return <span className={`${s.badge} ${s.bTypeWalk}`}>Walk-in</span>;

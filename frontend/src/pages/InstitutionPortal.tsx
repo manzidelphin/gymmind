@@ -57,7 +57,7 @@ function formatMonth(ym: string) {
 }
 
 export default function InstitutionPortal() {
-  const { institutionSlug } = useParams<{ institutionSlug: string }>();
+  const { institutionSlug: _institutionSlug } = useParams<{ institutionSlug: string }>();
   const navigate = useNavigate();
   const toast = useToast();
 

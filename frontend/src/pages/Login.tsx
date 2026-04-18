@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { publicApi } from '../api/api';
-import PhoneInput, { isPhoneValid } from '../components/PhoneInput';
+import PhoneInput from '../components/PhoneInput';
 import GymMindLogo from '../components/GymMindLogo';
 import { useToast } from '../context/ToastContext';
 import s from './Login.module.css';
@@ -13,7 +13,7 @@ export default function Login() {
   const [step,       setStep]       = useState<'phone' | 'otp'>('phone');
   const [phone,      setPhone]      = useState('');
   const [phoneValid, setPhoneValid] = useState(false);
-  const [gymSlug,    setGymSlug]    = useState('');
+  const [_gymSlug,    setGymSlug]    = useState('');
   const [gymName,    setGymName]    = useState('');
   const [devCode,    setDevCode]    = useState<string | null>(null);
   const [otp,        setOtp]        = useState(['', '', '', '', '', '']);

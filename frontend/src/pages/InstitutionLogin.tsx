@@ -13,7 +13,7 @@ export default function InstitutionLogin() {
   const [otp,        setOtp]        = useState(['', '', '', '', '', '']);
   const [devCode,    setDevCode]    = useState<string | null>(null);
   const [instName,   setInstName]   = useState('');
-  const [instSlug,   setInstSlug]   = useState('');
+  const [_instSlug,   setInstSlug]   = useState('');
   const [gymName,    setGymName]    = useState('');
   const [loading,    setLoading]    = useState(false);
   const [error,      setError]      = useState('');
