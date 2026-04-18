@@ -55,11 +55,11 @@ export default function ReportsTab() {
   const [attendLoad,  setAttendLoad]  = useState(false);
 
   // Walk-in revenue
+  const [memberFrom, setMemberFrom] = useState(() => new Date(Date.now()-30*86400000).toISOString().slice(0,10));
+  const [memberTo, setMemberTo] = useState(() => new Date().toISOString().slice(0,10));
+  const [memberData, setMemberData] = useState<MembershipDetail[]|null>(null);
+  const [memberLoad, setMemberLoad] = useState(false);
   const [walkinFrom,   setWalkinFrom]   = useState(() => new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10));
-  const [memberData,   setMemberData]   = useState<MembershipDetail[] | null>(null);
-  const [memberLoad,   setMemberLoad]   = useState(false);
-  const [memberFrom, setMemberFrom] = useState(() => new Date(Date.now() - 30*86400000).toISOString().slice(0,10));
-  const [memberTo,   setMemberTo]   = useState(() => new Date().toISOString().slice(0,10));
   const [walkinTo,     setWalkinTo]     = useState(() => new Date().toISOString().slice(0, 10));
   const [walkinData,   setWalkinData]   = useState<WalkInReport | null>(null);
   const [walkinLoad,   setWalkinLoad]   = useState(false);
@@ -104,6 +104,13 @@ export default function ReportsTab() {
     URL.revokeObjectURL(url);
   }
 
+  async function fetchMembers() {
+    setMemberLoad(true);
+    try {
+      const { data } = await api.get<{members: MembershipDetail[]}>('/reports/membership-detail?from='+memberFrom+'&to='+memberTo);
+      setMemberData(data.members ?? []);
+    } catch { /* ignore */ } finally { setMemberLoad(false); }
+  }
   async function fetchWalkin(from: string, to: string) {
     setWalkinLoad(true);
     try {
@@ -130,15 +137,6 @@ export default function ReportsTab() {
     { num: data.expired,       label: 'Expired',            sub: 'Past end date',               cls: s.cardRed    },
     { num: data.no_membership, label: 'No Plan',            sub: 'Members with no active plan', cls: s.cardPurple },
   ] : [];
-
-  async function fetchMembers() {
-    setMemberLoad(true);
-    try {
-      const { data } = await api.get<{ members: MembershipDetail[] }>('/reports/membership-detail');
-      setMemberData(data.members);
-    } catch { /* ignore */ }
-    finally { setMemberLoad(false); }
-  }
 
   return (
     <>
@@ -386,33 +384,24 @@ export default function ReportsTab() {
           </>
         )}
       </div>
-
-      {/* ── Membership / Subscription Report ── */}
       <div className={s.sectionCard}>
         <div className={s.cardHeader}>
           <h3 className={s.cardTitle}>Member Subscriptions Report</h3>
-          <button
-            type="button"
-            className={s.actionBtn}
-            disabled={memberLoad}
-            onClick={fetchMembers}
-          >
-            {memberLoad ? 'Loading…' : 'Generate →'}
+          <button type="button" className={s.actionBtn} disabled={memberLoad} onClick={fetchMembers}>
+            {memberLoad ? 'Loading...' : 'Generate ->'}
           </button>
         </div>
         <div className={s.dateRange}>
-          <input type="date" className={s.control} value={memberFrom}
-            onChange={e => setMemberFrom(e.target.value)} />
+          <input type="date" className={s.control} value={memberFrom} onChange={e => setMemberFrom(e.target.value)} />
           <span className={s.dateSep}>to</span>
-          <input type="date" className={s.control} value={memberTo}
-            onChange={e => setMemberTo(e.target.value)} />
+          <input type="date" className={s.control} value={memberTo} onChange={e => setMemberTo(e.target.value)} />
         </div>
         {memberData && (
           <div className={s.billingReport}>
             <div className={s.billingReportHeader}>
               <div>
                 <p className={s.billingInstName}>Active Subscriptions</p>
-                <p className={s.billingPeriod}>{memberFrom} → {memberTo}</p>
+                <p className={s.billingPeriod}>{memberFrom} to {memberTo}</p>
               </div>
               <div className={s.billingTotals}>
                 <div className={s.billingTotal}>
@@ -428,85 +417,58 @@ export default function ReportsTab() {
             {memberData.length === 0 ? (
               <p className={s.empty}>No members with active subscriptions found.</p>
             ) : (
-              <>
-                <table className={s.billingTable}>
-                  <thead>
-                    <tr>
-                      <th className={s.bTh}>Member</th>
-                      <th className={s.bTh}>Phone</th>
-                      <th className={s.bTh}>Plan</th>
-                      <th className={s.bTh}>Type</th>
-                      <th className={s.bTh}>Sessions Left</th>
-                      <th className={s.bTh}>Expiry Date</th>
-                      <th className={s.bTh}>Check-ins</th>
-                      <th className={s.bTh}>Status</th>
+              <table className={s.billingTable}>
+                <thead>
+                  <tr>
+                    <th className={s.bTh}>Member</th>
+                    <th className={s.bTh}>Phone</th>
+                    <th className={s.bTh}>Plan</th>
+                    <th className={s.bTh}>Type</th>
+                    <th className={s.bTh}>Sessions Left</th>
+                    <th className={s.bTh}>Expiry</th>
+                    <th className={s.bTh}>Check-ins</th>
+                    <th className={s.bTh}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {memberData.map(m => (
+                    <tr key={m.id} className={s.bTr}>
+                      <td className={s.bTd}><span className={s.memberName}>{m.name}</span></td>
+                      <td className={s.bTd}>{m.phone ?? '-'}</td>
+                      <td className={s.bTd}>{m.plan_name ?? '-'}</td>
+                      <td className={s.bTd}>{m.plan_type === 'session_based' ? 'Session' : m.plan_type === 'time_based' ? 'Time-based' : '-'}</td>
+                      <td className={s.bTd}>{m.plan_type === 'session_based' ? (m.remaining_sessions ?? 0) : 'Unlimited'}</td>
+                      <td className={s.bTd}>{m.end_date ? new Date(m.end_date).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) : '-'}</td>
+                      <td className={s.bTd}>{m.checkins_this_period}</td>
+                      <td className={s.bTd}>
+                        <span style={{padding:'3px 10px',borderRadius:'99px',fontSize:'12px',fontWeight:600,
+                          background:m.membership_status==='active'?'#dcfce7':'#fee2e2',
+                          color:m.membership_status==='active'?'#166534':'#991b1b'}}>
+                          {m.membership_status==='active'?'Active':'Expired'}
+                        </span>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {memberData.map(m => (
-                      <tr key={m.id} className={s.bTr}>
-                        <td className={s.bTd}><span className={s.memberName}>{m.name}</span></td>
-                        <td className={s.bTd}>{m.phone ?? '—'}</td>
-                        <td className={s.bTd}>{m.plan_name ?? '—'}</td>
-                        <td className={s.bTd}>
-                          {m.plan_type === 'session_based' ? '🎟 Session' : m.plan_type === 'time_based' ? '📅 Time' : '—'}
-                        </td>
-                        <td className={s.bTd}>
-                          {m.plan_type === 'session_based' ? (m.remaining_sessions ?? 0) : '∞'}
-                        </td>
-                        <td className={s.bTd}>
-                          {m.end_date ? new Date(m.end_date).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}) : '—'}
-                        </td>
-                        <td className={s.bTd}>{m.checkins_this_period}</td>
-                        <td className={s.bTd}>
-                          <span style={{
-                            padding: '3px 10px', borderRadius: '99px', fontSize: '12px', fontWeight: 600,
-                            background: m.membership_status === 'active' ? '#dcfce7' : '#fee2e2',
-                            color: m.membership_status === 'active' ? '#166534' : '#991b1b'
-                          }}>
-                            {m.membership_status === 'active' ? 'Active' : 'Expired'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <div className={s.attendFooter}>
-                  <span className={s.attendTotal}>
-                    {memberData.length} member{memberData.length !== 1 ? 's' : ''} with subscriptions
-                  </span>
-                  <button
-                    type="button"
-                    className={s.downloadBtn}
-                    onClick={() => {
-                      const rows = [
-                        ['Member','Phone','Plan','Type','Sessions Left','Expiry','Check-ins','Status'],
-                        ...memberData.map(m => [
-                          m.name, m.phone??'', m.plan_name??'',
-                          m.plan_type??'',
-                          m.plan_type==='session_based'?(m.remaining_sessions??0):'∞',
-                          m.end_date?new Date(m.end_date).toLocaleDateString('en-GB'):'',
-                          m.checkins_this_period,
-                          m.membership_status??''
-                        ])
-                      ];
-                      const csv = rows.map(r=>r.join(',')).join('\n');
-                      const a = document.createElement('a');
-                      a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-                      a.download = `subscriptions-${memberFrom}-${memberTo}.csv`;
-                      a.click();
-                    }}
-                  >
-                    ↓ Download Report CSV
-                  </button>
-                </div>
-              </>
+                  ))}
+                </tbody>
+              </table>
             )}
+            <div className={s.attendFooter}>
+              <span className={s.attendTotal}>{memberData.length} member{memberData.length!==1?'s':''} with subscriptions</span>
+              <button type="button" className={s.downloadBtn} onClick={() => {
+                const rows: (string|number)[][] = [['Member','Phone','Plan','Type','Sessions Left','Expiry','Check-ins','Status'],
+                  ...memberData.map(m=>[m.name,m.phone??'',m.plan_name??'',m.plan_type??'',
+                    m.plan_type==='session_based'?(m.remaining_sessions??0):'Unlimited',
+                    m.end_date?new Date(m.end_date).toLocaleDateString('en-GB'):'',
+                    m.checkins_this_period,m.membership_status??''])];
+                const csv=rows.map(r=>r.join(',')).join('\n');
+                const a=document.createElement('a');
+                a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+                a.download='subscriptions-'+memberFrom+'-'+memberTo+'.csv';a.click();
+              }}>Download Report CSV</button>
+            </div>
           </div>
         )}
       </div>
-
-
-    </div>
+    </>
   );
 }
