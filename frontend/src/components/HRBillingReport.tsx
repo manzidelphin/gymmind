@@ -8,6 +8,8 @@ interface Member {
   visit_count: number;
   amount_due: number;
   visit_dates: string[];
+  service_names: string[];
+  gym_name: string;
 }
 
 interface ReportData {
@@ -96,7 +98,7 @@ export default function HRBillingReport({ entry, hrApi }: Props) {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
             <thead>
               <tr style={{ background: '#f8fafc' }}>
-                {['MEMBER', 'ROLE', 'PRIMARY MEMBER', 'VISITS', 'AMOUNT (RWF)', 'VISIT DATES'].map(h => (
+                {['MEMBER', 'ROLE', 'PRIMARY MEMBER', 'VISITS', 'AMOUNT (RWF)', 'SERVICES', 'GYM', 'VISIT DATES'].map(h => (
                   <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 600, color: '#64748b', letterSpacing: '0.5px' }}>{h}</th>
                 ))}
               </tr>
@@ -147,7 +149,7 @@ export default function HRBillingReport({ entry, hrApi }: Props) {
             </tbody>
             <tfoot>
               <tr style={{ borderTop: '2px solid #e2e8f0', background: '#f8fafc' }}>
-                <td colSpan={2} style={{ padding: '14px 16px', fontWeight: 700 }}>TOTAL</td>
+                <td colSpan={4} style={{ padding: '14px 16px', fontWeight: 700 }}>TOTAL</td>
                 <td style={{ padding: '14px 16px', fontWeight: 700, color: '#0F6E56' }}>{report.total_visits}</td>
                 <td style={{ padding: '14px 16px', fontWeight: 700 }}>{report.total_amount.toLocaleString()} RWF</td>
                 <td></td>
