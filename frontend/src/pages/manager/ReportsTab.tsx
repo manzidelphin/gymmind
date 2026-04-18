@@ -60,13 +60,14 @@ export default function ReportsTab() {
   const [attendLoad,  setAttendLoad]  = useState(false);
 
   // Walk-in revenue
+  const [membershipData, setMembershipData] = useState<MembershipDetail[] | null>(null);
+  const [membershipLoad,   setMembershipLoad]   = useState(false);
+  const [membershipSearch, setMembershipSearch] = useState('');
   const [walkinFrom,   setWalkinFrom]   = useState(() => new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10));
   const [walkinTo,     setWalkinTo]     = useState(() => new Date().toISOString().slice(0, 10));
   const [walkinData,   setWalkinData]   = useState<WalkInReport | null>(null);
   const [walkinLoad,   setWalkinLoad]   = useState(false);
-  const [membershipData, setMembershipData] = useState<MembershipDetail[] | null>(null);
   const [membershipLoad, setMembershipLoad] = useState(false);
-  const [membershipSearch, setMembershipSearch] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -106,6 +107,10 @@ export default function ReportsTab() {
     a.download = `${inst.name.replace(/\s+/g, '-')}-attendance-${month.replace('/', '-')}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  }>('/reports/membership-detail');
+      setMembershipData(data.members);
+    } catch { /* ignore */ }
+    finally { setMembershipLoad(false); }
   }
 
   async function fetchMembershipReport() {
@@ -116,7 +121,6 @@ export default function ReportsTab() {
     } catch { /* ignore */ }
     finally { setMembershipLoad(false); }
   }
-
   async function fetchWalkin(from: string, to: string) {
     setWalkinLoad(true);
     try {
@@ -319,6 +323,84 @@ export default function ReportsTab() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Membership & Subscriptions Report ── */}
+      <div className={s.sectionCard}>
+        <div className={s.cardHeader}>
+          <h3 className={s.cardTitle}>Membership &amp; Subscriptions</h3>
+          <div style={{ display:'flex', gap:'8px', alignItems:'center' }}>
+            <input
+              type="text" placeholder="Search member..." className={s.control}
+              value={membershipSearch} onChange={e => setMembershipSearch(e.target.value)}
+              style={{ width:'180px' }}
+            />
+            <button className={s.btnGenerate} disabled={membershipLoad} onClick={fetchMembershipReport}>
+              {membershipLoad ? 'Loading…' : 'Generate →'}
+            </button>
+          </div>
+        </div>
+        {membershipData && (
+          <div style={{ overflowX:'auto', marginTop:'16px' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'13px' }}>
+              <thead>
+                <tr style={{ background:'#f8fafc' }}>
+                  {['MEMBER','PHONE','PLAN','TYPE','STATUS','SESSIONS LEFT','EXPIRY','CHECK-INS THIS MONTH'].map(h=>(
+                    <th key={h} style={{ padding:'10px 14px', textAlign:'left', fontSize:'11px', fontWeight:600, color:'#64748b', letterSpacing:'0.5px', borderBottom:'1px solid #e2e8f0' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {membershipData
+                  .filter(m => !membershipSearch || m.name.toLowerCase().includes(membershipSearch.toLowerCase()))
+                  .map(m => (
+                  <tr key={m.id} style={{ borderBottom:'1px solid #f1f5f9' }}>
+                    <td style={{ padding:'12px 14px', fontWeight:600, color:'#0f172a' }}>{m.name}</td>
+                    <td style={{ padding:'12px 14px', color:'#64748b' }}>{m.phone || '—'}</td>
+                    <td style={{ padding:'12px 14px', color:'#0f172a' }}>{m.plan_name || <span style={{ color:'#94a3b8' }}>No Plan</span>}</td>
+                    <td style={{ padding:'12px 14px' }}>
+                      {m.plan_type === 'session_based'
+                        ? <span style={{ background:'#dbeafe', color:'#1e40af', padding:'2px 8px', borderRadius:'99px', fontSize:'11px', fontWeight:600 }}>Session</span>
+                        : m.plan_type === 'time_based'
+                        ? <span style={{ background:'#dcfce7', color:'#166534', padding:'2px 8px', borderRadius:'99px', fontSize:'11px', fontWeight:600 }}>Time</span>
+                        : <span style={{ color:'#94a3b8', fontSize:'12px' }}>—</span>}
+                    </td>
+                    <td style={{ padding:'12px 14px' }}>
+                      {m.membership_status === 'active'
+                        ? <span style={{ background:'#dcfce7', color:'#166534', padding:'2px 8px', borderRadius:'99px', fontSize:'11px', fontWeight:600 }}>Active</span>
+                        : m.membership_status === 'expired'
+                        ? <span style={{ background:'#fee2e2', color:'#991b1b', padding:'2px 8px', borderRadius:'99px', fontSize:'11px', fontWeight:600 }}>Expired</span>
+                        : <span style={{ color:'#94a3b8', fontSize:'12px' }}>No Plan</span>}
+                    </td>
+                    <td style={{ padding:'12px 14px', fontWeight:700, color: m.remaining_sessions != null ? '#0F6E56' : '#94a3b8' }}>
+                      {m.remaining_sessions != null ? m.remaining_sessions : m.plan_type === 'time_based' ? '∞' : '—'}
+                    </td>
+                    <td style={{ padding:'12px 14px', color:'#64748b', fontSize:'12px' }}>
+                      {m.end_date ? new Date(m.end_date).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—'}
+                    </td>
+                    <td style={{ padding:'12px 14px', fontWeight:700, color: Number(m.checkins_this_month) > 0 ? '#0F6E56' : '#94a3b8' }}>
+                      {m.checkins_this_month ?? 0}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr style={{ background:'#f8fafc', fontWeight:700 }}>
+                  <td colSpan={5} style={{ padding:'12px 14px' }}>TOTAL</td>
+                  <td style={{ padding:'12px 14px', color:'#0F6E56' }}>
+                    {membershipData.filter(m=>m.membership_status==='active').length} active
+                  </td>
+                  <td colSpan={2} style={{ padding:'12px 14px', color:'#64748b' }}>
+                    {membershipData.filter(m=>m.membership_status==='active' && m.plan_type==='session_based').reduce((s,m)=>s+(m.remaining_sessions??0),0)} sessions remaining
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+            {membershipData.filter(m => !membershipSearch || m.name.toLowerCase().includes(membershipSearch.toLowerCase())).length === 0 && (
+              <div style={{ textAlign:'center', padding:'32px', color:'#94a3b8' }}>No members found</div>
+            )}
           </div>
         )}
       </div>
