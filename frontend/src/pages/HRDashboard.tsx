@@ -25,7 +25,7 @@ interface GymEntry {
   employeeCount:   number;
   thisMonthVisits: number;
   invoiceAmount:   number;
-  invoiceStatus:   'pending' | 'paid' | 'overdue' | null;
+  invoiceStatus:   'pending' | 'paid' | 'overdue' | 'sent' | null;
   invoiceToken:    string | null;
   invoiceId:       number | null;
   month:           string;
@@ -100,7 +100,9 @@ function timeAgo(iso: string | null): string {
 }
 
 function effStatus(e: GymEntry) {
-  return e.invoiceStatus ?? (e.invoiceAmount > 0 ? 'pending' : null);
+  const s = e.invoiceStatus;
+  if (s === 'sent') return 'pending';
+  return s ?? (e.invoiceAmount > 0 ? 'pending' : null);
 }
 
 function daysInMonth(ym: string): number {
@@ -172,7 +174,8 @@ function downloadInvoicePdf(e: GymEntry) {
   const total       = subtotal + vat;
 
   const statusLabel = e.invoiceStatus === 'paid' ? 'PAID'
-    : e.invoiceStatus === 'overdue' ? 'OVERDUE' : 'PENDING';
+    : e.invoiceStatus === 'overdue' ? 'OVERDUE'
+    : (e.invoiceStatus === 'sent' || e.invoiceStatus === 'pending') ? 'PENDING' : 'PENDING';
 
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const PW  = 210;
