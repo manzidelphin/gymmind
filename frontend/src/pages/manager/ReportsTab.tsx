@@ -10,7 +10,7 @@ interface MembershipDetail {
   membership_status: string | null;
   remaining_sessions: number | null;
   end_date: string | null; start_date: string | null;
-  checkins_this_month: number;
+  checkins_this_period: number;
 }
 interface WalkInReport {
   from: string; to: string;
@@ -58,7 +58,8 @@ export default function ReportsTab() {
   const [walkinFrom,   setWalkinFrom]   = useState(() => new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10));
   const [memberData,   setMemberData]   = useState<MembershipDetail[] | null>(null);
   const [memberLoad,   setMemberLoad]   = useState(false);
-  const [memberSearch, setMemberSearch] = useState('');
+  const [memberFrom, setMemberFrom] = useState(() => new Date(Date.now() - 30*86400000).toISOString().slice(0,10));
+  const [memberTo,   setMemberTo]   = useState(() => new Date().toISOString().slice(0,10));
   const [walkinTo,     setWalkinTo]     = useState(() => new Date().toISOString().slice(0, 10));
   const [walkinData,   setWalkinData]   = useState<WalkInReport | null>(null);
   const [walkinLoad,   setWalkinLoad]   = useState(false);
@@ -400,14 +401,14 @@ export default function ReportsTab() {
           </button>
         </div>
         <div className={s.dateRange}>
-          <input type="text" className={s.control} placeholder="Search member..."
-            value={memberSearch} onChange={e => setMemberSearch(e.target.value)}
-            style={{width:'200px'}} />
+          <input type="date" className={s.control} value={memberFrom}
+            onChange={e => setMemberFrom(e.target.value)} />
+          <span className={s.dateSep}>to</span>
+          <input type="date" className={s.control} value={memberTo}
+            onChange={e => setMemberTo(e.target.value)} />
         </div>
         {memberData && (() => {
-          const filtered = memberData.filter(m =>
-            !memberSearch || m.name.toLowerCase().includes(memberSearch.toLowerCase())
-          );
+          const filtered = memberData;
           const active   = filtered.filter(m => m.membership_status === 'active');
           const inactive = filtered.filter(m => !m.membership_status);
           return (
@@ -441,8 +442,8 @@ export default function ReportsTab() {
                         <td className={s.td}>
                           {m.end_date ? new Date(m.end_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—'}
                         </td>
-                        <td className={s.td} style={{textAlign:'center',fontWeight:700,color:m.checkins_this_month>0?'#0F6E56':'#94a3b8'}}>
-                          {m.checkins_this_month}
+                        <td className={s.td} style={{textAlign:'center',fontWeight:700,color:m.checkins_this_period>0?'#0F6E56':'#94a3b8'}}>
+                          {m.checkins_this_period}
                         </td>
                         <td className={s.td}>
                           {m.membership_status === 'active'
