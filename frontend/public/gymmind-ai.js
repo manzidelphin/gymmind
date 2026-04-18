@@ -61,7 +61,9 @@
         });
         var res=await fetch('/api/hr/ai-chat',{
           method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('hr_token')},
-          body:JSON.stringify({systemPrompt:'You are GymMind AI, HR assistant for '+(window.__hrInstName||'MMI')+'. LIVE DATA:'+JSON.stringify(ctx)+'. Be concise, use **bold** for key numbers, format RWF with commas.',
+          body:JSON.stringify({systemPrompt:(location.pathname.indexOf('/manager')>-1
+          ? 'You are GymMind AI, a business analyst for gym '+(window.__gymName||'FitLife Kigali')+'. LIVE DATA:'+JSON.stringify(ctx)+'. Provide business insights on revenue, members, billing. Be concise, use **bold** for numbers, format RWF with commas.'
+          : 'You are GymMind AI, HR assistant for '+(window.__hrInstName||'MMI')+'. LIVE DATA:'+JSON.stringify(ctx)+'. Be concise, use **bold** for key numbers, format RWF with commas.'),
             messages:bubs.slice(-6).concat([{role:'user',content:t}])})
         });
         var dd=await res.json();
