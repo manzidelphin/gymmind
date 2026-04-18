@@ -387,22 +387,22 @@ export default function ReportsTab() {
       </div>
 
       {/* ── Membership / Subscription Report ── */}
-      <div className={s.section}>
-        <div className={s.sectionHead}>
-          <div>
-            <h2 className={s.sectionTitle}>Membership Report</h2>
-            <p className={s.sectionSub}>Members with active subscription plans</p>
-          </div>
-          <div style={{display:'flex',gap:'8px',alignItems:'center'}}>
-            <input
-              type="text" placeholder="Search member..."
-              value={memberSearch} onChange={e => setMemberSearch(e.target.value)}
-              className={s.control} style={{width:'180px'}}
-            />
-            <button className={s.btn} onClick={fetchMembers} disabled={memberLoad}>
-              {memberLoad ? 'Loading…' : 'Generate →'}
-            </button>
-          </div>
+      <div className={s.sectionCard}>
+        <div className={s.cardHeader}>
+          <h3 className={s.cardTitle}>Member Subscriptions Report</h3>
+          <button
+            type="button"
+            className={s.actionBtn}
+            disabled={memberLoad}
+            onClick={fetchMembers}
+          >
+            {memberLoad ? 'Loading…' : 'Generate →'}
+          </button>
+        </div>
+        <div className={s.dateRange}>
+          <input type="text" className={s.control} placeholder="Search member..."
+            value={memberSearch} onChange={e => setMemberSearch(e.target.value)}
+            style={{width:'200px'}} />
         </div>
         {memberData && (() => {
           const filtered = memberData.filter(m =>
