@@ -84,4 +84,6 @@ open('/var/www/gymmind/backend/dist/routes/institutionalBilling.js','w').write(c
 print('All backend patches done!')
 PYEOF
 
-echo "Post-build patches complete!"
+# DB migration: ensure sent status exists
+mysql gymmind -e "ALTER TABLE institutional_payments MODIFY status ENUM('pending','paid','overdue','sent') DEFAULT 'pending';" 2>/dev/null || true
+echo "Post-build patches complete!" 
