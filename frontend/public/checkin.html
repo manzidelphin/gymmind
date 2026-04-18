@@ -300,11 +300,11 @@ function doSearch(){
     try{
       let rows=[];
       if(checkinType==='institution'&&selectedInst){
-        // Use institution-specific unclaimed members endpoint
-        const r=await fetch('/api/institutions/'+selectedInst.id+'/members/unclaimed',{headers:{'X-Gym-Slug':slug}});
-        const all=await r.json();
-        // Filter by name query
-        rows=(Array.isArray(all)?all:[]).filter(u=>u.name.toLowerCase().includes(q.toLowerCase()));
+        // Use claim-search which returns all unclaimed members matching name
+        const r=await fetch('/api/auth/claim-search?name='+encodeURIComponent(q),{headers:{'X-Gym-Slug':slug}});
+        rows=await r.json();rows=Array.isArray(rows)?rows:[];
+        // Filter to this institution only
+        rows=rows.filter(u=>!u.institution_name||u.institution_name===selectedInst.name);
       } else {
         // Individual claim search
         const r=await fetch('/api/auth/claim-search?name='+encodeURIComponent(q),{headers:{'X-Gym-Slug':slug}});
