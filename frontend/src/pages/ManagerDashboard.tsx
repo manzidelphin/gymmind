@@ -365,6 +365,13 @@ export default function ManagerDashboard() {
   const [pinVal, setPinVal] = React.useState('');
   const [pinErr, setPinErr] = React.useState('');
   const PIN_KEY = 'gm_pin';
+  const [resetStep, setResetStep] = React.useState<'idle'|'otp'|'newpin'>('idle');
+  const [resetOtp, setResetOtp] = React.useState('');
+  const [resetOtpSent, setResetOtpSent] = React.useState('');
+  const [newPin, setNewPin] = React.useState('');
+  const [confirmPin, setConfirmPin] = React.useState('');
+  const [resetErr, setResetErr] = React.useState('');
+  const [resetLoading, setResetLoading] = React.useState(false);
   const getPin = () => localStorage.getItem(PIN_KEY) || '';
   const onTabClick = (key: Tab) => {
     if (PROTECTED.includes(key)) { setPinTab(key); setPinVal(''); setPinErr(''); }
@@ -506,17 +513,77 @@ export default function ManagerDashboard() {
             <button onClick={() => setPinTab(null)} style={{width:'100%',padding:'8px',background:'transparent',color:'#94a3b8',border:'none',cursor:'pointer',fontSize:'13px'}}>
               Cancel
             </button>
-            {getPin() && (
-              <button onClick={() => {
-                const confirm = window.prompt('To reset your PIN, type RESET and press OK:');
-                if(confirm === 'RESET') {
-                  localStorage.removeItem(PIN_KEY);
-                  setPinVal(''); setPinErr('');
-                  alert('PIN cleared! You can now set a new PIN.');
-                }
+            {getPin() && resetStep === 'idle' && (
+              <button onClick={async () => {
+                setResetLoading(true); setResetErr('');
+                try {
+                  const phone = localStorage.getItem('gm_mgr_phone') || '';
+                  const r = await fetch('/api/auth/send-otp', {method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':location.pathname.split('/')[1]||''},body:JSON.stringify({phone})});
+                  const d = await r.json();
+                  if(d.devCode) setResetOtpSent(d.devCode);
+                  setResetStep('otp'); setResetOtp(''); setResetErr('');
+                } catch(e) { setResetErr('Failed to send OTP'); }
+                setResetLoading(false);
               }} style={{width:'100%',padding:'6px',background:'transparent',color:'#cbd5e1',border:'none',cursor:'pointer',fontSize:'11px',marginTop:'4px'}}>
-                Forgot PIN? Reset it
+                {resetLoading ? 'Sending...' : 'Forgot PIN? Reset it'}
               </button>
+            )}
+            {resetStep === 'otp' && (
+              <div style={{marginTop:'12px',borderTop:'1px solid #f1f5f9',paddingTop:'12px'}}>
+                <p style={{fontSize:'12px',color:'#64748b',marginBottom:'8px'}}>Enter the OTP sent to your phone</p>
+                {resetOtpSent && <p style={{fontSize:'11px',color:'#f59e0b',marginBottom:'6px'}}>Dev OTP: {resetOtpSent}</p>}
+                <input type="text" inputMode="numeric" maxLength={6} placeholder="6-digit OTP"
+                  value={resetOtp} onChange={e => { setResetOtp(e.target.value.replace(/\D/g,'')); setResetErr(''); }}
+                  style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'16px',textAlign:'center',outline:'none',letterSpacing:'4px',marginBottom:'6px'}}
+                />
+                {resetErr && <p style={{color:'#ef4444',fontSize:'11px',marginBottom:'6px'}}>{resetErr}</p>}
+                <button onClick={async () => {
+                  setResetLoading(true);
+                  try {
+                    const phone = localStorage.getItem('gm_mgr_phone') || '';
+                    const slug = location.pathname.split('/')[1] || '';
+                    const r = await fetch('/api/auth/verify-otp', {method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone,code:resetOtp})});
+                    const d = await r.json();
+                    if(d.token) { setResetStep('newpin'); setNewPin(''); setConfirmPin(''); setResetErr(''); }
+                    else setResetErr('Invalid OTP. Try again.');
+                  } catch(e) { setResetErr('Verification failed'); }
+                  setResetLoading(false);
+                }} style={{width:'100%',padding:'10px',background:'#0F6E56',color:'#fff',border:'none',borderRadius:'8px',fontSize:'13px',fontWeight:600,cursor:'pointer',marginBottom:'6px'}}>
+                  {resetLoading ? 'Verifying...' : 'Verify OTP'}
+                </button>
+                <button onClick={() => { setResetStep('idle'); setResetOtp(''); setResetErr(''); }}
+                  style={{width:'100%',padding:'6px',background:'transparent',color:'#94a3b8',border:'none',cursor:'pointer',fontSize:'11px'}}>
+                  Back
+                </button>
+              </div>
+            )}
+            {resetStep === 'newpin' && (
+              <div style={{marginTop:'12px',borderTop:'1px solid #f1f5f9',paddingTop:'12px'}}>
+                <p style={{fontSize:'12px',color:'#64748b',marginBottom:'8px'}}>Set your new PIN</p>
+                <input type="password" inputMode="numeric" placeholder="New PIN (4+ digits)"
+                  value={newPin} onChange={e => { setNewPin(e.target.value.replace(/\D/g,'')); setResetErr(''); }}
+                  style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'16px',textAlign:'center',outline:'none',letterSpacing:'4px',marginBottom:'6px'}}
+                />
+                <input type="password" inputMode="numeric" placeholder="Confirm PIN"
+                  value={confirmPin} onChange={e => { setConfirmPin(e.target.value.replace(/\D/g,'')); setResetErr(''); }}
+                  style={{width:'100%',padding:'10px',border:'1px solid #e5e7eb',borderRadius:'8px',fontSize:'16px',textAlign:'center',outline:'none',letterSpacing:'4px',marginBottom:'6px'}}
+                />
+                {resetErr && <p style={{color:'#ef4444',fontSize:'11px',marginBottom:'6px'}}>{resetErr}</p>}
+                <button onClick={() => {
+                  if(newPin.length < 4) { setResetErr('PIN must be at least 4 digits'); return; }
+                  if(newPin !== confirmPin) { setResetErr('PINs do not match'); return; }
+                  localStorage.setItem(PIN_KEY, newPin);
+                  setResetStep('idle'); setNewPin(''); setConfirmPin('');
+                  setPinTab(null); setPinVal(''); setPinErr('');
+                  alert('PIN reset successfully!');
+                }} style={{width:'100%',padding:'10px',background:'#0F6E56',color:'#fff',border:'none',borderRadius:'8px',fontSize:'13px',fontWeight:600,cursor:'pointer',marginBottom:'6px'}}>
+                  Reset PIN
+                </button>
+                <button onClick={() => { setResetStep('idle'); setResetErr(''); }}
+                  style={{width:'100%',padding:'6px',background:'transparent',color:'#94a3b8',border:'none',cursor:'pointer',fontSize:'11px'}}>
+                  Back
+                </button>
+              </div>
             )}
           </div>
         </div>
