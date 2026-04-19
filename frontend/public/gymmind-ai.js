@@ -1,6 +1,11 @@
 (function(){
   function init(){
     if(window.__gmDone||!document.body)return;
+    // Only show on manager or HR dashboard pages
+    var path = location.pathname;
+    var isManager = path.indexOf('/manager') > -1;
+    var isHR = path.indexOf('/hr/') > -1 || path === '/hr/dashboard';
+    if(!isManager && !isHR) return;
     window.__gmDone=1;
     var btn=document.createElement('button');
     btn.id='gm-ai-btn';
