@@ -43,7 +43,7 @@ export default function Signup() {
   const [slug, setSlug]                   = useState('');
   const [slugState, setSlugState]         = useState<SlugState>('idle');
   const [city, setCity]                   = useState('');
-  const [subscriptionPlan, setSubscriptionPlan] = useState('trial');
+  const [subscriptionPlan] = useState('trial');
   const slugDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Step 2 — owner info
