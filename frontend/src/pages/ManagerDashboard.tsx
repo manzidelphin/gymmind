@@ -506,6 +506,18 @@ export default function ManagerDashboard() {
             <button onClick={() => setPinTab(null)} style={{width:'100%',padding:'8px',background:'transparent',color:'#94a3b8',border:'none',cursor:'pointer',fontSize:'13px'}}>
               Cancel
             </button>
+            {getPin() && (
+              <button onClick={() => {
+                const confirm = window.prompt('To reset your PIN, type RESET and press OK:');
+                if(confirm === 'RESET') {
+                  localStorage.removeItem(PIN_KEY);
+                  setPinVal(''); setPinErr('');
+                  alert('PIN cleared! You can now set a new PIN.');
+                }
+              }} style={{width:'100%',padding:'6px',background:'transparent',color:'#cbd5e1',border:'none',cursor:'pointer',fontSize:'11px',marginTop:'4px'}}>
+                Forgot PIN? Reset it
+              </button>
+            )}
           </div>
         </div>
       )}
