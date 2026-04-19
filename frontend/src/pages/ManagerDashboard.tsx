@@ -517,7 +517,7 @@ export default function ManagerDashboard() {
               <button onClick={async () => {
                 setResetLoading(true); setResetErr('');
                 try {
-                  const phone = localStorage.getItem('gm_mgr_phone') || '';
+                  const phone = JSON.parse(localStorage.getItem('user')||'{}').phone || '';
                   const r = await fetch('/api/auth/send-otp', {method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':location.pathname.split('/')[1]||''},body:JSON.stringify({phone})});
                   const d = await r.json();
                   if(d.devCode) setResetOtpSent(d.devCode);
@@ -540,7 +540,7 @@ export default function ManagerDashboard() {
                 <button onClick={async () => {
                   setResetLoading(true);
                   try {
-                    const phone = localStorage.getItem('gm_mgr_phone') || '';
+                    const phone = JSON.parse(localStorage.getItem('user')||'{}').phone || '';
                     const slug = location.pathname.split('/')[1] || '';
                     const r = await fetch('/api/auth/verify-otp', {method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone,code:resetOtp})});
                     const d = await r.json();
