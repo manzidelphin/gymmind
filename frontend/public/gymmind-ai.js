@@ -65,31 +65,31 @@
       var t=inp.value.trim();if(!t||busy)return;
       inp.value='';busy=true;document.getElementById('gm-go').disabled=true;
       addmsg('user',t);var lb=addmsg('assistant','',true);
-      var ctx={};
-      try{
-        var isM=location.pathname.indexOf('/manager')>-1;
-        var fr=new Date(Date.now()-30*86400000).toISOString().slice(0,10);
-        var to=new Date().toISOString().slice(0,10);
-        if(isM){
-          var tok=localStorage.getItem('token');
-          var gymSlug=location.pathname.split('/')[1]||'';
-          var h={'Authorization':'Bearer '+tok,'Content-Type':'application/json','X-Gym-Slug':gymSlug};
-          var rs=await Promise.all([
-            fetch('/api/billing/institutions?month='+new Date().toISOString().slice(0,7),{headers:h}).then(function(x){return x.json();}).catch(function(){return null;}),
-            fetch('/api/reports/memberships',{headers:h}).then(function(x){return x.json();}).catch(function(){return null;})
-          ]);
-          ctx={billing:rs[0],memberships:rs[1]};
-        } else {
-          var tok=localStorage.getItem('hr_token');
-          var h={'Authorization':'Bearer '+tok,'Content-Type':'application/json'};
-          var id=window.__hrInstitutionId;
-          var rs=await Promise.all([
-            fetch('/api/hr/attendance?from='+fr+'&to='+to,{headers:h}).then(function(x){return x.json();}).catch(function(){return null;}),
-            id?fetch('/api/hr/'+id+'/billing-report?from='+fr+'&to='+to,{headers:h}).then(function(x){return x.json();}).catch(function(){return null;}):Promise.resolve(null)
-          ]);
-          ctx={attendance:rs[0],billing:rs[1]};
-        }
-      }catch(e){}
+       var ctx=window.__gmCtx||{};
+       if(!ctx.memberships&&!ctx.billing){
+         var isM=location.pathname.indexOf('/manager')>-1;
+         var tok3=isM?localStorage.getItem('token'):localStorage.getItem('hr_token');
+         var slug3=location.pathname.split('/')[1]||'';
+         var h3={'Authorization':'Bearer '+tok3,'Content-Type':'application/json','X-Gym-Slug':slug3};
+         if(isM){
+           var fr3=new Date(Date.now()-30*86400000).toISOString().slice(0,10);
+           var to3=new Date().toISOString().slice(0,10);
+           var rs3=await Promise.all([
+             fetch('/api/billing/institutions?month='+new Date().toISOString().slice(0,7),{headers:h3}).then(function(x){return x.json();}).catch(function(){return null;}),
+             fetch('/api/reports/memberships',{headers:h3}).then(function(x){return x.json();}).catch(function(){return null;})
+           ]);
+           ctx={billing:rs3[0],memberships:rs3[1]};window.__gmCtx=ctx;
+         } else {
+           var id3=window.__hrInstitutionId;
+           var fr3=new Date(Date.now()-30*86400000).toISOString().slice(0,10);
+           var to3=new Date().toISOString().slice(0,10);
+           var rs3=await Promise.all([
+             fetch('/api/hr/attendance?from='+fr3+'&to='+to3,{headers:h3}).then(function(x){return x.json();}).catch(function(){return null;}),
+             id3?fetch('/api/hr/'+id3+'/billing-report?from='+fr3+'&to='+to3,{headers:h3}).then(function(x){return x.json();}).catch(function(){return null;}):Promise.resolve(null)
+           ]);
+           ctx={attendance:rs3[0],billing:rs3[1]};window.__gmCtx=ctx;
+         }
+       }
       try{
         var bubs=Array.from(document.getElementById('gm-msgs').children).slice(0,-1).map(function(d){
           var b=d.querySelector('div');
