@@ -149,6 +149,52 @@ function LoginGate({ onAuth }: { onAuth: (user: any, token: string) => void }) {
         </>}
       </div>
     </div>
+
+      {/* PIN Modal */}
+      {pinModalTab && (
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.7)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center',backdropFilter:'blur(4px)'}}>
+          <div style={{background:'#fff',borderRadius:'24px',padding:'40px 36px',width:'100%',maxWidth:'380px',textAlign:'center',boxShadow:'0 24px 80px rgba(0,0,0,0.3)'}}>
+            <div style={{fontSize:'48px',marginBottom:'16px'}}>🔒</div>
+            <h2 style={{fontSize:'22px',fontWeight:700,color:'#0f172a',marginBottom:'8px'}}>
+              {getStoredPin() ? 'Manager Access Required' : 'Set Manager PIN'}
+            </h2>
+            <p style={{fontSize:'14px',color:'#64748b',marginBottom:'24px',lineHeight:'1.5'}}>
+              {getStoredPin()
+                ? 'Enter your PIN to access this section.'
+                : 'Create a PIN to protect restricted tabs. Only you will know this PIN.'}
+            </p>
+            <input
+              type="password"
+              inputMode="numeric"
+              placeholder={getStoredPin() ? 'Enter PIN' : 'Create PIN (min 4 digits)'}
+              value={pinInput}
+              onChange={e => { setPinInput(e.target.value.replace(/\D/g,'')); setPinError(''); }}
+              onKeyDown={e => { if(e.key==='Enter') handlePinSubmit(); }}
+              autoFocus
+              style={{width:'100%',padding:'14px',border:'2px solid '+(pinError?'#ef4444':'#e5e7eb'),borderRadius:'12px',fontSize:'20px',textAlign:'center',outline:'none',letterSpacing:'6px',marginBottom:'8px',fontFamily:'monospace'}}
+            />
+            {pinError && <p style={{color:'#ef4444',fontSize:'13px',marginBottom:'12px'}}>{pinError}</p>}
+            <button
+              onClick={handlePinSubmit}
+              style={{width:'100%',padding:'14px',background:'#0F6E56',color:'#fff',border:'none',borderRadius:'12px',fontSize:'15px',fontWeight:600,cursor:'pointer',marginTop:'8px'}}
+            >
+              {getStoredPin() ? 'Unlock →' : 'Set PIN & Continue →'}
+            </button>
+            <button
+              onClick={() => { setPinModalTab(null); setPinInput(''); setPinError(''); }}
+              style={{width:'100%',padding:'12px',background:'transparent',color:'#64748b',border:'none',borderRadius:'12px',fontSize:'14px',cursor:'pointer',marginTop:'8px'}}
+            >
+              Cancel
+            </button>
+            {getStoredPin() && (
+              <p style={{fontSize:'11px',color:'#94a3b8',marginTop:'16px'}}>
+                Forgot PIN? Clear browser data or contact system admin.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -289,6 +335,52 @@ function ApprovalsTab({ onCountChange }: { onCountChange: (n: number) => void })
         </table>
       )}
     </div>
+
+      {/* PIN Modal */}
+      {pinModalTab && (
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.7)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center',backdropFilter:'blur(4px)'}}>
+          <div style={{background:'#fff',borderRadius:'24px',padding:'40px 36px',width:'100%',maxWidth:'380px',textAlign:'center',boxShadow:'0 24px 80px rgba(0,0,0,0.3)'}}>
+            <div style={{fontSize:'48px',marginBottom:'16px'}}>🔒</div>
+            <h2 style={{fontSize:'22px',fontWeight:700,color:'#0f172a',marginBottom:'8px'}}>
+              {getStoredPin() ? 'Manager Access Required' : 'Set Manager PIN'}
+            </h2>
+            <p style={{fontSize:'14px',color:'#64748b',marginBottom:'24px',lineHeight:'1.5'}}>
+              {getStoredPin()
+                ? 'Enter your PIN to access this section.'
+                : 'Create a PIN to protect restricted tabs. Only you will know this PIN.'}
+            </p>
+            <input
+              type="password"
+              inputMode="numeric"
+              placeholder={getStoredPin() ? 'Enter PIN' : 'Create PIN (min 4 digits)'}
+              value={pinInput}
+              onChange={e => { setPinInput(e.target.value.replace(/\D/g,'')); setPinError(''); }}
+              onKeyDown={e => { if(e.key==='Enter') handlePinSubmit(); }}
+              autoFocus
+              style={{width:'100%',padding:'14px',border:'2px solid '+(pinError?'#ef4444':'#e5e7eb'),borderRadius:'12px',fontSize:'20px',textAlign:'center',outline:'none',letterSpacing:'6px',marginBottom:'8px',fontFamily:'monospace'}}
+            />
+            {pinError && <p style={{color:'#ef4444',fontSize:'13px',marginBottom:'12px'}}>{pinError}</p>}
+            <button
+              onClick={handlePinSubmit}
+              style={{width:'100%',padding:'14px',background:'#0F6E56',color:'#fff',border:'none',borderRadius:'12px',fontSize:'15px',fontWeight:600,cursor:'pointer',marginTop:'8px'}}
+            >
+              {getStoredPin() ? 'Unlock →' : 'Set PIN & Continue →'}
+            </button>
+            <button
+              onClick={() => { setPinModalTab(null); setPinInput(''); setPinError(''); }}
+              style={{width:'100%',padding:'12px',background:'transparent',color:'#64748b',border:'none',borderRadius:'12px',fontSize:'14px',cursor:'pointer',marginTop:'8px'}}
+            >
+              Cancel
+            </button>
+            {getStoredPin() && (
+              <p style={{fontSize:'11px',color:'#94a3b8',marginTop:'16px'}}>
+                Forgot PIN? Clear browser data or contact system admin.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -360,6 +452,57 @@ export default function ManagerDashboard() {
     setSidebarOpen(false);
   }
 
+  // Receptionist PIN protection
+  const PROTECTED_TABS: Tab[] = ['approvals','plans','services','institutions','reports','import','payments','billing','settings'];
+  const [pinModalTab, setPinModalTab] = useState<Tab|null>(null);
+  const [pinInput, setPinInput] = useState('');
+  const [pinError, setPinError] = useState('');
+  const [pinLoading, setPinLoading] = useState(false);
+  const STORAGE_KEY = 'gm_receptionist_pin';
+
+  function getStoredPin(): string { return localStorage.getItem(STORAGE_KEY) || ''; }
+
+  function handleTabClick(key: Tab) {
+    if (PROTECTED_TABS.includes(key)) {
+      const stored = getStoredPin();
+      if (!stored) {
+        // No PIN set yet - manager sets one now
+        setPinModalTab(key);
+        setPinInput('');
+        setPinError('');
+      } else {
+        // PIN exists - ask for it
+        setPinModalTab(key);
+        setPinInput('');
+        setPinError('');
+      }
+    } else {
+      navigate_tab(key);
+    }
+  }
+
+  function handlePinSubmit() {
+    const stored = getStoredPin();
+    if (!stored) {
+      // Setting PIN for first time
+      if (pinInput.length < 4) { setPinError('PIN must be at least 4 digits'); return; }
+      localStorage.setItem(STORAGE_KEY, pinInput);
+      const tab = pinModalTab!;
+      setPinModalTab(null); setPinInput(''); setPinError('');
+      navigate_tab(tab);
+    } else {
+      // Verifying PIN
+      if (pinInput === stored) {
+        const tab = pinModalTab!;
+        setPinModalTab(null); setPinInput(''); setPinError('');
+        navigate_tab(tab);
+      } else {
+        setPinError('Incorrect PIN. Try again.');
+        setPinInput('');
+      }
+    }
+  }
+
   const navItems: { key: Tab; label: string }[] = [
     { key: 'members',      label: 'Members' },
     { key: 'approvals',    label: 'Approvals' },
@@ -417,7 +560,7 @@ export default function ManagerDashboard() {
               key={item.key}
               type="button"
               className={`${s.navItem} ${activeTab === item.key ? s.navItemActive : ''}`}
-              onClick={() => navigate_tab(item.key)}
+              onClick={() => handleTabClick(item.key)}
             >
               <span className={s.navIconWrap}>
                 <NavIcon type={item.key} />
@@ -462,6 +605,52 @@ export default function ManagerDashboard() {
         {activeTab === 'billing'      && <BillingTab />}
         {activeTab === 'settings'     && <SettingsTab />}
       </main>
+    </div>
+
+      {/* PIN Modal */}
+      {pinModalTab && (
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.7)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center',backdropFilter:'blur(4px)'}}>
+          <div style={{background:'#fff',borderRadius:'24px',padding:'40px 36px',width:'100%',maxWidth:'380px',textAlign:'center',boxShadow:'0 24px 80px rgba(0,0,0,0.3)'}}>
+            <div style={{fontSize:'48px',marginBottom:'16px'}}>🔒</div>
+            <h2 style={{fontSize:'22px',fontWeight:700,color:'#0f172a',marginBottom:'8px'}}>
+              {getStoredPin() ? 'Manager Access Required' : 'Set Manager PIN'}
+            </h2>
+            <p style={{fontSize:'14px',color:'#64748b',marginBottom:'24px',lineHeight:'1.5'}}>
+              {getStoredPin()
+                ? 'Enter your PIN to access this section.'
+                : 'Create a PIN to protect restricted tabs. Only you will know this PIN.'}
+            </p>
+            <input
+              type="password"
+              inputMode="numeric"
+              placeholder={getStoredPin() ? 'Enter PIN' : 'Create PIN (min 4 digits)'}
+              value={pinInput}
+              onChange={e => { setPinInput(e.target.value.replace(/\D/g,'')); setPinError(''); }}
+              onKeyDown={e => { if(e.key==='Enter') handlePinSubmit(); }}
+              autoFocus
+              style={{width:'100%',padding:'14px',border:'2px solid '+(pinError?'#ef4444':'#e5e7eb'),borderRadius:'12px',fontSize:'20px',textAlign:'center',outline:'none',letterSpacing:'6px',marginBottom:'8px',fontFamily:'monospace'}}
+            />
+            {pinError && <p style={{color:'#ef4444',fontSize:'13px',marginBottom:'12px'}}>{pinError}</p>}
+            <button
+              onClick={handlePinSubmit}
+              style={{width:'100%',padding:'14px',background:'#0F6E56',color:'#fff',border:'none',borderRadius:'12px',fontSize:'15px',fontWeight:600,cursor:'pointer',marginTop:'8px'}}
+            >
+              {getStoredPin() ? 'Unlock →' : 'Set PIN & Continue →'}
+            </button>
+            <button
+              onClick={() => { setPinModalTab(null); setPinInput(''); setPinError(''); }}
+              style={{width:'100%',padding:'12px',background:'transparent',color:'#64748b',border:'none',borderRadius:'12px',fontSize:'14px',cursor:'pointer',marginTop:'8px'}}
+            >
+              Cancel
+            </button>
+            {getStoredPin() && (
+              <p style={{fontSize:'11px',color:'#94a3b8',marginTop:'16px'}}>
+                Forgot PIN? Clear browser data or contact system admin.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

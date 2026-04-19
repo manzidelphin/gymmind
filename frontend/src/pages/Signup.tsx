@@ -43,7 +43,7 @@ export default function Signup() {
   const [slug, setSlug]                   = useState('');
   const [slugState, setSlugState]         = useState<SlugState>('idle');
   const [city, setCity]                   = useState('');
-  const [subscriptionPlan, setSubscriptionPlan] = useState('');
+  const [subscriptionPlan, setSubscriptionPlan] = useState('trial');
   const slugDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Step 2 — owner info
@@ -195,7 +195,7 @@ export default function Signup() {
     slugState !== 'invalid' &&
     slugState !== 'taken' &&
     city.trim().length >= 2 &&
-    subscriptionPlan !== '';
+    true;
 
   // ── Step 2 validation ──────────────────────────────────────────────────────
 
@@ -274,18 +274,13 @@ export default function Signup() {
               onChange={e => setCity(e.target.value)}
             />
 
-            <label className={s.label}>Subscription Plan</label>
-            <select
-              className={s.input}
-              value={subscriptionPlan}
-              onChange={e => setSubscriptionPlan(e.target.value)}
-            >
-              <option value="">Select a plan…</option>
-              <option value="trial">Starter — 50,000 RWF / month</option>
-              <option value="basic">Basic — 100,000 RWF / month</option>
-              <option value="pro">Pro — 180,000 RWF / month</option>
-              <option value="enterprise">Enterprise — 350,000+ RWF / month</option>
-            </select>
+            <div style={{background:'linear-gradient(135deg,rgba(15,110,86,0.12),rgba(26,155,122,0.08))',border:'1px solid rgba(15,110,86,0.25)',borderRadius:'12px',padding:'16px 20px',marginBottom:'8px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'6px'}}>
+                <span style={{fontSize:'20px'}}>🎉</span>
+                <span style={{fontWeight:700,color:'#0F6E56',fontSize:'15px'}}>Free Trial — 3 Months</span>
+              </div>
+              <p style={{fontSize:'13px',color:'#64748b',lineHeight:'1.5'}}>Start completely free for 3 months. No credit card required. Full access to all features.</p>
+            </div>
 
             <button
               className={s.btnPrimary}
