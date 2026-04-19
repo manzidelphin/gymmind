@@ -17,6 +17,29 @@
       open=!open;
       panel.style.display=open?'flex':'none';
       btn.innerHTML=open?'<span style="font-size:18px">✕</span>':'<span style="font-size:22px">🤖</span><span id="gm-btn-label">Talk to us</span>';
+      if(open&&!window.__gmCtxLoaded){
+        window.__gmCtxLoaded=true;
+        var isM2=location.pathname.indexOf('/manager')>-1;
+        var fr2=new Date(Date.now()-30*86400000).toISOString().slice(0,10);
+        var to2=new Date().toISOString().slice(0,10);
+        if(isM2){
+          var tok2=localStorage.getItem('token');
+          var slug2=location.pathname.split('/')[1]||'';
+          var h2={'Authorization':'Bearer '+tok2,'Content-Type':'application/json','X-Gym-Slug':slug2};
+          Promise.all([
+            fetch('/api/billing/institutions?month='+new Date().toISOString().slice(0,7),{headers:h2}).then(function(x){return x.json();}).catch(function(){return null;}),
+            fetch('/api/reports/memberships',{headers:h2}).then(function(x){return x.json();}).catch(function(){return null;})
+          ]).then(function(rs){window.__gmCtx={billing:rs[0],memberships:rs[1],gymSlug:slug2};});
+        } else {
+          var tok2=localStorage.getItem('hr_token');
+          var h2={'Authorization':'Bearer '+tok2,'Content-Type':'application/json'};
+          var id2=window.__hrInstitutionId;
+          Promise.all([
+            fetch('/api/hr/attendance?from='+fr2+'&to='+to2,{headers:h2}).then(function(x){return x.json();}).catch(function(){return null;}),
+            id2?fetch('/api/hr/'+id2+'/billing-report?from='+fr2+'&to='+to2,{headers:h2}).then(function(x){return x.json();}).catch(function(){return null;}):Promise.resolve(null)
+          ]).then(function(rs){window.__gmCtx={attendance:rs[0],billing:rs[1]};});
+        }
+      }
       if(open&&!document.getElementById('gm-msgs').children.length){
         var isManager=location.pathname.indexOf('/manager')>-1;
         var n=window.__hrInstName||'your institution';
