@@ -364,7 +364,8 @@ export default function ManagerDashboard() {
   const [pinTab, setPinTab] = React.useState<Tab|null>(null);
   const [pinVal, setPinVal] = React.useState('');
   const [pinErr, setPinErr] = React.useState('');
-  const PIN_KEY = 'gm_pin';
+  const gymSlugKey = localStorage.getItem('gymSlug') || 'default';
+  const PIN_KEY = 'gm_pin_' + gymSlugKey;
   const [resetStep, setResetStep] = React.useState<'idle'|'otp'|'newpin'>('idle');
   const [resetOtp, setResetOtp] = React.useState('');
   const [resetOtpSent, setResetOtpSent] = React.useState('');
