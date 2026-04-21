@@ -439,6 +439,9 @@ export default function Signup() {
             <Link to="/login">Sign in</Link>
           </div>
         )}
+        <div className={s.footerLink} style={{marginTop:'8px',fontSize:'12px',color:'#94a3b8'}}>
+          Need help? <a href="mailto:support@gymmind.rw">support@gymmind.rw</a>
+        </div>
 
       </div>
     </div>

@@ -34,7 +34,7 @@ export default function Landing() {
         </button>
 
         {/* Footer */}
-        <div className={s.footer}>GymMind · Made for Rwanda</div>
+        <div className={s.footer}>GymMind · Made for Rwanda 🇷🇼 · <a href='mailto:info@gymmind.rw' style={{color:'inherit'}}>info@gymmind.rw</a> · <a href='mailto:support@gymmind.rw' style={{color:'inherit'}}>support@gymmind.rw</a></div>
 
       </div>
     </div>
