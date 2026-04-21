@@ -35,6 +35,7 @@ export default function MembersTab() {
 
   // Add member modal
   const [showAdd,       setShowAdd]       = useState(false);
+  const [selectedInstitution, setSelectedInstitution] = useState<number|null>(null);
   const [institutions,  setInstitutions]  = useState<Institution[]>([]);
   const [newName,       setNewName]       = useState('');
   const [newPhone,      setNewPhone]      = useState('');
@@ -49,6 +50,11 @@ export default function MembersTab() {
   const [importLoading, setImportLoading] = useState(false);
   const [importResult,  setImportResult]  = useState<{created:number; skipped:number; errors:string[]} | null>(null);
 
+  // Load institutions on mount
+  useEffect(() => {
+    api.get<Institution[]>('/institutions').then(r => setInstitutions(r.data)).catch(()=>{});
+  }, []);
+
   const fetchMembers = useCallback(async () => {
     setLoading(true);
     try {
@@ -56,17 +62,18 @@ export default function MembersTab() {
       if (search) params.set('search', search);
       if (statusFilter && !['institutional','walkin'].includes(statusFilter)) params.set('status', statusFilter);
       if (['institutional','walkin'].includes(statusFilter)) params.set('limit', '200');
+      if (selectedInstitution) params.set('institutionId', String(selectedInstitution));
       const { data } = await api.get(`/users?${params}`);
       setMembers(data.data);
       setTotal(data.total);
     } catch { /* handled by error boundary */ }
     finally { setLoading(false); }
-  }, [page, search, statusFilter]);
+  }, [page, search, statusFilter, selectedInstitution]);
 
   useEffect(() => { fetchMembers(); }, [fetchMembers]);
 
   // Debounce search
-  useEffect(() => { setPage(1); }, [search, statusFilter]);
+  useEffect(() => { setPage(1); }, [search, statusFilter, selectedInstitution]);
 
   async function openAssign(member: Member) {
     setAssignTarget(member);
@@ -228,19 +235,46 @@ async function openAddModal() {
       {/* ── Summary Cards ── */}
       <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'16px',marginBottom:'20px'}}>
         {[
-          {label:'Total Members',value:total,color:'#0F6E56',bg:'#f0fdf4',icon:'👥'},
-          {label:'With Plans',value:members.filter(m=>m.active_plan_name&&m.status==='active').length,color:'#1d4ed8',bg:'#eff6ff',icon:'📋'},
-          {label:'Institutional',value:members.filter(m=>m.institution_name).length,color:'#7c3aed',bg:'#f5f3ff',icon:'🏢'},
-          {label:'Walk-ins',value:members.filter(m=>!m.active_plan_name&&!m.institution_name&&m.status==='active').length,color:'#d97706',bg:'#fffbeb',icon:'🚶'},
+          {label:'Total Members',value:total,color:'#0F6E56',bg:'#f0fdf4',icon:'👥',filter:'',inst:null},
+          {label:'With Plans',value:members.filter(m=>m.active_plan_name&&m.status==='active').length,color:'#1d4ed8',bg:'#eff6ff',icon:'📋',filter:'active',inst:null},
+          {label:'Institutional',value:members.filter(m=>m.institution_name).length,color:'#7c3aed',bg:'#f5f3ff',icon:'🏢',filter:'institutional',inst:null},
+          {label:'Walk-ins',value:members.filter(m=>!m.active_plan_name&&!m.institution_name&&m.status==='active').length,color:'#d97706',bg:'#fffbeb',icon:'🚶',filter:'walkin',inst:null},
         ].map(card=>(
-          <div key={card.label} style={{background:card.bg,border:`1px solid ${card.color}22`,borderRadius:'16px',padding:'20px',cursor:'pointer'}}
-            onClick={()=>setStatusFilter(card.label==='With Plans'?'active':card.label==='Institutional'?'institutional':card.label==='Walk-ins'?'walkin':'')}>
+          <div key={card.label} style={{background:card.bg,border:`2px solid ${statusFilter===card.filter&&!selectedInstitution?card.color:card.color+'22'}`,borderRadius:'16px',padding:'20px',cursor:'pointer',transition:'all 0.2s'}}
+            onClick={()=>{setStatusFilter(card.filter);setSelectedInstitution(null);}}>
             <div style={{fontSize:'28px',marginBottom:'8px'}}>{card.icon}</div>
             <div style={{fontSize:'28px',fontWeight:700,color:card.color,lineHeight:1}}>{card.value}</div>
             <div style={{fontSize:'13px',color:'#64748b',marginTop:'4px'}}>{card.label}</div>
           </div>
         ))}
       </div>
+      {/* ── Institution Cards ── */}
+      {institutions.length > 0 && (
+        <div style={{marginBottom:'16px'}}>
+          <div style={{fontSize:'12px',fontWeight:600,color:'#94a3b8',letterSpacing:'1px',textTransform:'uppercase',marginBottom:'10px'}}>Institutions</div>
+          <div style={{display:'flex',gap:'10px',flexWrap:'wrap'}}>
+            {institutions.map(inst=>(
+              <div key={inst.id}
+                onClick={()=>{setSelectedInstitution(selectedInstitution===inst.id?null:inst.id);setStatusFilter('');}}
+                style={{background:selectedInstitution===inst.id?'#0F6E56':'#fff',
+                  border:`1px solid ${selectedInstitution===inst.id?'#0F6E56':'#e2e8f0'}`,
+                  borderRadius:'12px',padding:'12px 20px',cursor:'pointer',transition:'all 0.2s',
+                  display:'flex',alignItems:'center',gap:'10px'}}>
+                <div style={{width:'36px',height:'36px',borderRadius:'10px',
+                  background:selectedInstitution===inst.id?'rgba(255,255,255,0.2)':'#f0fdf4',
+                  display:'flex',alignItems:'center',justifyContent:'center',
+                  fontSize:'14px',fontWeight:700,color:selectedInstitution===inst.id?'#fff':'#0F6E56'}}>
+                  {inst.name.slice(0,2).toUpperCase()}
+                </div>
+                <div>
+                  <div style={{fontWeight:600,fontSize:'14px',color:selectedInstitution===inst.id?'#fff':'#1e293b'}}>{inst.name}</div>
+                  <div style={{fontSize:'11px',color:selectedInstitution===inst.id?'rgba(255,255,255,0.7)':'#94a3b8'}}>Corporate</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {/* ── Filter Pills ── */}
       <div style={{display:'flex',gap:'8px',marginBottom:'16px',flexWrap:'wrap'}}>
         {[
