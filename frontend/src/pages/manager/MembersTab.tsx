@@ -53,8 +53,9 @@ export default function MembersTab() {
     setLoading(true);
     try {
       const params = new URLSearchParams({ page: String(page), limit: String(limit) });
-      if (search)       params.set('search', search);
-      if (statusFilter) params.set('status', statusFilter);
+      if (search) params.set('search', search);
+      if (statusFilter && !['institutional','walkin'].includes(statusFilter)) params.set('status', statusFilter);
+      if (['institutional','walkin'].includes(statusFilter)) params.set('limit', '200');
       const { data } = await api.get(`/users?${params}`);
       setMembers(data.data);
       setTotal(data.total);
