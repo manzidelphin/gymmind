@@ -231,9 +231,8 @@ async function verifyAndContinue(){
     if(d.reason==='user_not_found'){goTo('sType');return;}
     // Already checked in or access denied with known user
     if(d.reason==='already_checked_in'){showResult(d);return;}
-    // User found and checked in (no service required)
-    if(d.allowed){showResult(d);return;}
-    // User found but needs service — get fresh OTP and show service selection
+    // User found — always show service selection first (even if already checked in)
+    // Get fresh OTP for actual checkin
     const r2=await fetch('/api/auth/send-otp',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone})});
     const d2=await r2.json();
     if(d2.devCode){otp=d2.devCode;}
@@ -391,7 +390,7 @@ function showServiceSelection(name){
   const grid=document.getElementById('serviceGrid');grid.innerHTML='';selectedService=null;
   services.forEach(s=>{
     const btn=document.createElement('button');btn.className='service-btn';
-    btn.innerHTML='<div>'+s.name+'</div>'+(s.walkin_price?'<div style="font-size:11px;margin-top:3px;opacity:0.8">'+Number(s.walkin_price).toLocaleString()+' RWF</div>':'');
+    btn.innerHTML='<div>'+s.name+'</div>';
     btn.onclick=()=>{document.querySelectorAll('#serviceGrid .service-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedService=s.id;};
     grid.appendChild(btn);
   });

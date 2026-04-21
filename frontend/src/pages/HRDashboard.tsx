@@ -1001,6 +1001,7 @@ export default function HRDashboard() {
                         </div>
                         <div className={s.gymCardFoot}>
                           {e.invoiceToken && <a href={`/hr/${e.invoiceToken}`} className={s.btnSecondary}>View Invoice</a>}
+                          <button className={s.btnSecondary} onClick={() => { setTab('employees'); }}>↑ Upload Members</button>
                           {(effStatus(e) === 'pending' || effStatus(e) === 'overdue') && (
                             <button className={s.btnPrimary} onClick={() => openMomo(e)}>Pay Now</button>
                           )}
