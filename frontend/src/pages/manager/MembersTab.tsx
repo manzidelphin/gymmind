@@ -291,11 +291,11 @@ async function openAddModal() {
 
       {loading && <p className={s.loadingMsg}>Loading…</p>}
 
-      {!loading && members.length === 0 && (
+      {!loading && filteredMembers.length === 0 && (
         <div className={s.empty}>No members found.</div>
       )}
 
-      {!loading && members.length > 0 && (
+      {!loading && filteredMembers.length > 0 && (
         <table className={s.table}>
           <thead>
             <tr>
@@ -345,7 +345,7 @@ async function openAddModal() {
       )}
 
       <div className={s.pagination}>
-        <span>Showing {members.length} of {total}</span>
+        <span>Showing {filteredMembers.length} of {total}</span>
         <div className={s.pageGroup}>
           <button
             type="button"
