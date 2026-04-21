@@ -97,6 +97,24 @@ export default function MembersTab() {
     fetchMembers();
   }
 
+  // Summary stats derived from members
+  const stats = {
+    total: total,
+    active: members.filter(m => m.active_plan_name && m.status === 'active').length,
+    institutional: members.filter(m => m.institution_name).length,
+    walkin: members.filter(m => !m.active_plan_name && !m.institution_name && m.status === 'active').length,
+    expired: members.filter(m => m.status === 'expired' || (!m.active_plan_name && m.status === 'active' && !m.institution_name) ? false : m.status === 'expired').length,
+  };
+
+  // Summary stats derived from members
+  const stats = {
+    total: total,
+    active: members.filter(m => m.active_plan_name && m.status === 'active').length,
+    institutional: members.filter(m => m.institution_name).length,
+    walkin: members.filter(m => !m.active_plan_name && !m.institution_name && m.status === 'active').length,
+    expired: members.filter(m => m.status === 'expired' || (!m.active_plan_name && m.status === 'active' && !m.institution_name) ? false : m.status === 'expired').length,
+  };
+
   async function openAddModal() {
     setNewName(''); setNewPhone(''); setNewInstId(''); setAddError('');
     if (institutions.length === 0) {
@@ -216,6 +234,42 @@ export default function MembersTab() {
 
   return (
     <>
+      {/* ── Summary Cards ── */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'16px',marginBottom:'20px'}}>
+        {[
+          {label:'Total Members',value:total,color:'#0F6E56',bg:'#f0fdf4',icon:'👥'},
+          {label:'With Plans',value:members.filter(m=>m.active_plan_name&&m.status==='active').length,color:'#1d4ed8',bg:'#eff6ff',icon:'📋'},
+          {label:'Institutional',value:members.filter(m=>m.institution_name).length,color:'#7c3aed',bg:'#f5f3ff',icon:'🏢'},
+          {label:'Walk-ins',value:members.filter(m=>!m.active_plan_name&&!m.institution_name&&m.status==='active').length,color:'#d97706',bg:'#fffbeb',icon:'🚶'},
+        ].map(card=>(
+          <div key={card.label} style={{background:card.bg,border:`1px solid ${card.color}22`,borderRadius:'16px',padding:'20px',cursor:'pointer'}}
+            onClick={()=>setStatusFilter(card.label==='With Plans'?'active':card.label==='Institutional'?'institutional':card.label==='Walk-ins'?'walkin':'')}>
+            <div style={{fontSize:'28px',marginBottom:'8px'}}>{card.icon}</div>
+            <div style={{fontSize:'28px',fontWeight:700,color:card.color,lineHeight:1}}>{card.value}</div>
+            <div style={{fontSize:'13px',color:'#64748b',marginTop:'4px'}}>{card.label}</div>
+          </div>
+        ))}
+      </div>
+      {/* ── Filter Pills ── */}
+      <div style={{display:'flex',gap:'8px',marginBottom:'16px',flexWrap:'wrap'}}>
+        {[
+          {label:'All Members',value:''},
+          {label:'Active Plans',value:'active'},
+          {label:'Institutional',value:'institutional'},
+          {label:'Walk-ins',value:'walkin'},
+          {label:'Pending',value:'pending'},
+          {label:'Suspended',value:'suspended'},
+        ].map(f=>(
+          <button key={f.value}
+            onClick={()=>setStatusFilter(f.value)}
+            style={{padding:'6px 16px',borderRadius:'100px',border:'1px solid '+(statusFilter===f.value?'#0F6E56':'#e2e8f0'),
+              background:statusFilter===f.value?'#0F6E56':'#fff',
+              color:statusFilter===f.value?'#fff':'#374151',
+              fontSize:'13px',fontWeight:600,cursor:'pointer',transition:'all 0.2s'}}>
+            {f.label}
+          </button>
+        ))}
+      </div>
       <div className={s.toolbar}>
         <input
           type="search"
