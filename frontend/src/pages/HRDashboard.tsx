@@ -405,6 +405,7 @@ export default function HRDashboard() {
   const [search,        setSearch]        = useState('');
 
   // MoMo modal
+  const [selectedEntry, setSelectedEntry] = useState<GymEntry | null>(null);
   const [momoEntry,   setMomoEntry]   = useState<GymEntry | null>(null);
   const [momoPhone,   setMomoPhone]   = useState('');
   const [momoLoading, setMomoLoading] = useState(false);
@@ -608,7 +609,7 @@ export default function HRDashboard() {
   }
 
   async function submitUpload() {
-    const e = entries[0];
+    const e = selectedEntry || entries[0];
     const valid = uploadPreview.filter(r => r.valid);
     if (!e || !valid.length) return;
     setUploadLoading(true); setUploadError('');
@@ -626,7 +627,7 @@ export default function HRDashboard() {
   }
 
   async function addEmployee() {
-    const e = entries[0];
+    const e = selectedEntry || entries[0];
     if (!e || !addName.trim()) return;
     setAddLoading(true); setAddError('');
     try {
@@ -1001,7 +1002,10 @@ export default function HRDashboard() {
                         </div>
                         <div className={s.gymCardFoot}>
                           {e.invoiceToken && <a href={`/hr/${e.invoiceToken}`} className={s.btnSecondary}>View Invoice</a>}
-                          <button className={s.btnSecondary} onClick={() => { setTab('employees'); }}>↑ Upload Members</button>
+                          <button className={s.btnSecondary} onClick={() => {
+                            setSelectedEntry(e);
+                            setTab('employees');
+                          }}>↑ Upload Members</button>
                           {(effStatus(e) === 'pending' || effStatus(e) === 'overdue') && (
                             <button className={s.btnPrimary} onClick={() => openMomo(e)}>Pay Now</button>
                           )}
