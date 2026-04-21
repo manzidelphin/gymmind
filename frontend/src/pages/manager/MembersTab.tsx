@@ -106,15 +106,6 @@ export default function MembersTab() {
     expired: members.filter(m => m.status === 'expired' || (!m.active_plan_name && m.status === 'active' && !m.institution_name) ? false : m.status === 'expired').length,
   };
 
-  // Summary stats derived from members
-  const stats = {
-    total: total,
-    active: members.filter(m => m.active_plan_name && m.status === 'active').length,
-    institutional: members.filter(m => m.institution_name).length,
-    walkin: members.filter(m => !m.active_plan_name && !m.institution_name && m.status === 'active').length,
-    expired: members.filter(m => m.status === 'expired' || (!m.active_plan_name && m.status === 'active' && !m.institution_name) ? false : m.status === 'expired').length,
-  };
-
   async function openAddModal() {
     setNewName(''); setNewPhone(''); setNewInstId(''); setAddError('');
     if (institutions.length === 0) {
