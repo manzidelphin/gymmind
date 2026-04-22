@@ -354,6 +354,35 @@ export default function ManagerDashboard() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStaff]);
 
+  // Real-time checkin notifications
+  useEffect(() => {
+    async function pollCheckins() {
+      try {
+        const { data } = await api.get<{checkins:{id:number;member_name:string;service_name:string|null;checkin_type:string}[]}>('/reports/today-checkins');
+        const checkins = data.checkins ?? [];
+        if (checkins.length === 0) return;
+        if (lastCheckinId.current === 0) {
+          lastCheckinId.current = checkins[0].id;
+          return;
+        }
+        const newCheckins = checkins.filter(c => c.id > lastCheckinId.current);
+        if (newCheckins.length > 0) {
+          lastCheckinId.current = newCheckins[0].id;
+          newCheckins.reverse().forEach(c => {
+            const icon = c.checkin_type === 'institutional' ? '🏢' : c.checkin_type === 'dependent' ? '👨\u200d👩\u200d👧' : '👤';
+            const svc = c.service_name ? ` — ${c.service_name}` : '';
+            toast.info('New Check-in', `${icon} ${c.member_name}${svc}`);
+          });
+        }
+      } catch { /* ignore */ }
+    }
+    pollCheckins();
+    const t = setInterval(pollCheckins, 15000);
+    return () => clearInterval(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
   if (!isStaff) return <LoginGate onAuth={(u, t) => setAuth(u, t)} />;
 
   function navigate_tab(key: Tab) {
