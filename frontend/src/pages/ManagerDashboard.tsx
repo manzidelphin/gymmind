@@ -169,7 +169,6 @@ interface ApprovalRequest {
 
 function ApprovalsTab({ onCountChange }: { onCountChange: (n: number) => void }) {
   const toast = useToast();
-  const lastCheckinId = React.useRef<number>(0);
   const [requests, setRequests] = useState<ApprovalRequest[]>([]);
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState('');
@@ -331,6 +330,8 @@ function NavIcon({ type }: { type: Tab }) {
 
 // ── Main Dashboard ─────────────────────────────────────────────
 export default function ManagerDashboard() {
+  const toast = useToast();
+  const lastCheckinId = React.useRef<number>(0);
   const { gymSlug, gymName, user, setAuth, clearAuth } = useGym();
   const navigate = useNavigate();
   const [activeTab,    setActiveTab]    = useState<Tab>('members');
