@@ -169,6 +169,7 @@ interface ApprovalRequest {
 
 function ApprovalsTab({ onCountChange }: { onCountChange: (n: number) => void }) {
   const toast = useToast();
+  const lastCheckinId = React.useRef<number>(0);
   const [requests, setRequests] = useState<ApprovalRequest[]>([]);
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState('');
