@@ -168,6 +168,28 @@ input:focus{border-color:#0F6E56}
     <button class="btn btn-gray" style="margin-top:8px" onclick="goTo('sType')">← Back</button>
   </div>
 
+  <!-- STEP MOMO: MoMo payment -->
+  <div id="sMomo" style="display:none">
+    <div style="font-size:36px;margin-bottom:8px">📱</div>
+    <p class="section-label" id="momoTitle">Pay via MTN MoMo</p>
+    <p class="section-sub" id="momoDesc">Enter your MTN MoMo number to pay</p>
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;margin:12px 0;text-align:center">
+      <div style="font-size:28px;font-weight:700;color:#0F6E56" id="momoAmount">0 RWF</div>
+      <div style="font-size:12px;color:#64748b" id="momoServiceName"></div>
+    </div>
+    <label>MTN MoMo Phone Number</label>
+    <input type="tel" id="momoPhone" placeholder="07XX XXX XXX" inputmode="numeric" style="margin-bottom:8px">
+    <button class="btn" id="momoPayBtn" onclick="initiateMomoPayment()">Pay Now →</button>
+    <div id="momoPolling" style="display:none;margin-top:12px">
+      <div style="text-align:center;padding:16px">
+        <div style="font-size:32px;margin-bottom:8px">⏳</div>
+        <p style="font-weight:600;color:#0f172a">Waiting for payment...</p>
+        <p style="font-size:13px;color:#64748b;margin-top:4px">Check your phone and approve the MoMo prompt</p>
+        <div id="momoCountdown" style="font-size:13px;color:#94a3b8;margin-top:8px"></div>
+      </div>
+    </div>
+    <button class="btn btn-gray" style="margin-top:8px" id="momoCancelBtn" onclick="goTo('sWalkin')">← Back</button>
+  </div>
   <!-- STEP RESULT -->
   <div id="sResult" style="display:none">
     <div class="result-icon" id="resultIcon"></div>
@@ -183,6 +205,7 @@ const slug = location.pathname.split('/').find((s,i)=>i>0&&s&&s!=='checkin')||'g
 let phone='', otp='', selectedService=null, selectedInst=null, claimUserId=null;
 let checkinType='', services=[], institutions=[], searchTimer=null;
 let selectedPlanId=null, selectedPlanName='', selectedPlanPrice=0;
+let momoReferenceId=null, momoType='walkin', momoPollingTimer=null;
 
 // ── Init ───────────────────────────────────────────────────────
 fetch('/api/gyms/public/'+slug).then(r=>r.json()).then(d=>{
@@ -213,7 +236,7 @@ function clearOTP(id){Array.from(document.getElementById(id).children).forEach(i
 
 // ── Navigation ─────────────────────────────────────────────────
 function goTo(id){
-  ['s1','s2','sType','sInst','sSearch','sClaim','sService','sWalkin','sPlans','sResult'].forEach(s=>{
+  ['s1','s2','sType','sInst','sSearch','sClaim','sService','sWalkin','sPlans','sMomo','sResult'].forEach(s=>{
     const el=document.getElementById(s);if(el)el.style.display='none';
   });
   document.getElementById(id).style.display='block';
@@ -484,19 +507,79 @@ async function doWalkinCheckin(){
   if(!selectedService){alert('Please select a service');return;}
   const wname=document.getElementById('walkinName').value.trim();
   if(!wname){alert('Please enter your name');return;}
-  const wphone=document.getElementById('walkinPhone').value.trim()||phone||null;
+  // Find service price
+  const svc=services.find(s=>s.id===selectedService);
+  const price=svc?Number(svc.walkin_price||0):0;
+  if(price>0){
+    // Show MoMo payment step
+    momoType='walkin';
+    document.getElementById('momoTitle').textContent='Pay for Walk-in';
+    document.getElementById('momoDesc').textContent='Pay '+price.toLocaleString()+' RWF to check in as walk-in';
+    document.getElementById('momoAmount').textContent=price.toLocaleString()+' RWF';
+    document.getElementById('momoServiceName').textContent=svc?svc.name:'';
+    document.getElementById('momoPhone').value='';
+    document.getElementById('momoPolling').style.display='none';
+    document.getElementById('momoCancelBtn').onclick=()=>goTo('sWalkin');
+    goTo('sMomo');
+  } else {
+    // Free service - checkin directly
+    const wphone=document.getElementById('walkinPhone').value.trim()||phone||null;
+    try{
+      const r=await fetch('/api/checkin/walkin',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({name:wname,phone:wphone,serviceId:selectedService})});
+      const d=await r.json();
+      if(d.allowed){showWalkinResult(wname,d.service_name,0);}
+      else{alert(d.error||'Check-in failed');}
+    }catch(e){alert('Network error');}
+  }
+}
+
+async function initiateMomoPayment(){
+  const mp=document.getElementById('momoPhone').value.trim();
+  if(!mp){alert('Enter your MoMo phone number');return;}
+  const btn=document.getElementById('momoPayBtn');
+  btn.disabled=true;btn.textContent='Sending prompt...';
   try{
-    const r=await fetch('/api/checkin/walkin',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({name:wname,phone:wphone,serviceId:selectedService})});
+    const wname=document.getElementById('walkinName').value.trim();
+    const wphone=document.getElementById('walkinPhone').value.trim()||phone||null;
+    const r=await fetch('/api/checkin/pay-walkin',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},
+      body:JSON.stringify({name:wname,phone:wphone,serviceId:selectedService,momoPhone:mp})});
     const d=await r.json();
-    if(d.allowed){
-      goTo('sResult');
-      document.getElementById('resultIcon').textContent='✅';
-      document.getElementById('resultTitle').textContent='Welcome, '+wname+'!';
-      document.getElementById('resultTitle').style.color='#065f46';
-      document.getElementById('resultMsg').textContent='Walk-in recorded'+(d.service_name?' · '+d.service_name:'')+(d.walkin_price?' · '+Number(d.walkin_price).toLocaleString()+' RWF':'');
-      setTimeout(reset,15000);
-    } else { alert(d.error||'Check-in failed'); }
-  }catch(e){alert('Network error');}
+    if(!r.ok){alert(d.error||'Payment failed');btn.disabled=false;btn.textContent='Pay Now →';return;}
+    momoReferenceId=d.referenceId;
+    document.getElementById('momoPolling').style.display='block';
+    btn.style.display='none';
+    document.getElementById('momoCancelBtn').style.display='none';
+    // Poll for payment status
+    let tries=0;const maxTries=12;
+    momoPollingTimer=setInterval(async()=>{
+      tries++;
+      document.getElementById('momoCountdown').textContent='Checking... ('+tries+'/'+maxTries+')';
+      try{
+        const r2=await fetch('/api/checkin/confirm-walkin',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},
+          body:JSON.stringify({name:wname,phone:wphone,serviceId:selectedService,referenceId:momoReferenceId})});
+        const d2=await r2.json();
+        if(d2.paid){
+          clearInterval(momoPollingTimer);
+          showWalkinResult(wname,d.service_name,Number(document.getElementById('momoAmount').textContent.replace(/[^0-9]/g,'')));
+        } else if(tries>=maxTries){
+          clearInterval(momoPollingTimer);
+          alert('Payment timeout. Please try again or visit reception.');
+          goTo('sWalkin');
+          btn.disabled=false;btn.textContent='Pay Now →';btn.style.display='block';
+          document.getElementById('momoCancelBtn').style.display='block';
+        }
+      }catch(e){}
+    },5000);
+  }catch(e){alert('Network error');btn.disabled=false;btn.textContent='Pay Now →';}
+}
+
+function showWalkinResult(name,serviceName,price){
+  goTo('sResult');
+  document.getElementById('resultIcon').textContent='✅';
+  document.getElementById('resultTitle').textContent='Welcome, '+name+'!';
+  document.getElementById('resultTitle').style.color='#065f46';
+  document.getElementById('resultMsg').textContent='Walk-in recorded'+(serviceName?' · '+serviceName:'')+(price?' · '+price.toLocaleString()+' RWF paid':'');
+  setTimeout(reset,15000);
 }
 
 // ── Show Result ────────────────────────────────────────────────
