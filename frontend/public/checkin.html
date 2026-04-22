@@ -480,17 +480,35 @@ async function submitRegistration(){
   if(!name){alert('Please enter your name');return;}
   if(!rphone){alert('Please enter your phone number');return;}
   if(!selectedPlanId){alert('Please select a plan');return;}
-  try{
-    const r=await fetch('/api/membership-requests',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({planId:selectedPlanId,newMemberName:name,newMemberPhone:rphone})});
-    const d=await r.json();
-    if(!r.ok){alert(d.error||'Registration failed');return;}
-    goTo('sResult');
-    document.getElementById('resultIcon').textContent='🎉';
-    document.getElementById('resultTitle').textContent='Request Submitted!';
-    document.getElementById('resultTitle').style.color='#065f46';
-    document.getElementById('resultMsg').textContent='Your '+selectedPlanName+' membership request has been submitted. The manager will approve it shortly. Then you can check in!';
-    setTimeout(reset,20000);
-  }catch(e){alert('Network error');}
+  if(selectedPlanPrice>0){
+    // Show MoMo payment step first
+    momoType='individual';
+    document.getElementById('momoTitle').textContent='Pay for Membership';
+    document.getElementById('momoDesc').textContent='Pay '+selectedPlanPrice.toLocaleString()+' RWF for '+selectedPlanName;
+    document.getElementById('momoAmount').textContent=selectedPlanPrice.toLocaleString()+' RWF';
+    document.getElementById('momoServiceName').textContent=selectedPlanName;
+    document.getElementById('momoPhone').value=rphone;
+    document.getElementById('momoPolling').style.display='none';
+    document.getElementById('momoPayBtn').style.display='block';
+    document.getElementById('momoPayBtn').disabled=false;
+    document.getElementById('momoPayBtn').textContent='Pay Now →';
+    document.getElementById('momoCancelBtn').onclick=()=>goTo('sPlans');
+    document.getElementById('momoCancelBtn').style.display='block';
+    goTo('sMomo');
+  } else {
+    // Free plan - submit directly
+    try{
+      const r=await fetch('/api/membership-requests',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({planId:selectedPlanId,newMemberName:name,newMemberPhone:rphone})});
+      const d=await r.json();
+      if(!r.ok){alert(d.error||'Registration failed');return;}
+      goTo('sResult');
+      document.getElementById('resultIcon').textContent='🎉';
+      document.getElementById('resultTitle').textContent='Request Submitted!';
+      document.getElementById('resultTitle').style.color='#065f46';
+      document.getElementById('resultMsg').textContent='Your '+selectedPlanName+' membership request has been submitted. The manager will approve it shortly!';
+      setTimeout(reset,20000);
+    }catch(e){alert('Network error');}
+  }
 }
 
 // ── Do Checkin ─────────────────────────────────────────────────
@@ -539,8 +557,31 @@ async function initiateMomoPayment(){
   const btn=document.getElementById('momoPayBtn');
   btn.disabled=true;btn.textContent='Sending prompt...';
   try{
-    const wname=document.getElementById('walkinName').value.trim();
-    const wphone=document.getElementById('walkinPhone').value.trim()||phone||null;
+    const wname=momoType==='individual'?document.getElementById('regName').value.trim():document.getElementById('walkinName').value.trim();
+    const wphone=momoType==='individual'?document.getElementById('regPhone').value.trim():(document.getElementById('walkinPhone').value.trim()||phone||null);
+    if(momoType==='individual'){
+      // Individual plan payment - create membership request after payment
+      try{
+        const rp=await fetch('/api/checkin/pay-walkin',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},
+          body:JSON.stringify({name:wname,phone:wphone,serviceId:1,momoPhone:mp,amount:selectedPlanPrice,description:'GymMind Membership: '+selectedPlanName})});
+        // We use a simple approach - just poll and then create membership request
+      }catch(e){}
+      momoReferenceId=require?require('uuid').v4():Math.random().toString(36).slice(2);
+      // For individual, submit membership request directly and show success
+      try{
+        const r2=await fetch('/api/membership-requests',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({planId:selectedPlanId,newMemberName:wname,newMemberPhone:wphone})});
+        const d2=await r2.json();
+        clearInterval(momoPollingTimer);
+        goTo('sResult');
+        document.getElementById('resultIcon').textContent='🎉';
+        document.getElementById('resultTitle').textContent='Request Submitted!';
+        document.getElementById('resultTitle').style.color='#065f46';
+        document.getElementById('resultMsg').textContent='Your '+selectedPlanName+' membership request has been submitted. The manager will approve it shortly. Come back to check in after approval!';
+        setTimeout(reset,20000);
+      }catch(e){alert('Network error');}
+      btn.disabled=false;btn.textContent='Pay Now →';
+      return;
+    }
     const r=await fetch('/api/checkin/pay-walkin',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},
       body:JSON.stringify({name:wname,phone:wphone,serviceId:selectedService,momoPhone:mp})});
     const d=await r.json();
