@@ -38,12 +38,17 @@ function initials(name: string | null): string {
 
 function formatTime(iso: string): { text: string; cls: string } {
   const diff = Date.now() - new Date(iso).getTime();
+  const secs = Math.floor(diff / 1000);
   const mins = Math.floor(diff / 60000);
-  if (mins < 5)  return { text: 'Just now', cls: s.timeNow };
-  if (mins < 60) return { text: `${mins} min ago`, cls: s.timeAgo };
+  const hours = Math.floor(diff / 3600000);
+  if (secs < 60)  return { text: 'Just now', cls: s.timeNow };
+  if (mins < 60)  return { text: `${mins} min ago`, cls: s.timeAgo };
+  if (hours < 24) return { text: `${hours} hour${hours>1?'s':''} ago`, cls: s.timeAgo };
   const d = new Date(iso);
+  const isYesterday = new Date().getDate() - d.getDate() === 1;
+  if (isYesterday) return { text: 'Yesterday', cls: s.timeHHMM };
   return {
-    text: `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`,
+    text: `${String(d.getDate()).padStart(2,'0')} ${d.toLocaleString('en',{month:'short'})} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`,
     cls: s.timeHHMM,
   };
 }
