@@ -142,10 +142,27 @@ input:focus{border-color:#0F6E56}
     <button class="btn btn-gray" style="margin-top:8px" onclick="goTo('s1')">← Cancel</button>
   </div>
 
+  <!-- STEP PLANS: Individual membership plans -->
+  <div id="sPlans" style="display:none">
+    <div style="font-size:36px;margin-bottom:8px">💪</div>
+    <p class="section-label">Choose a Membership Plan</p>
+    <p class="section-sub">Select a plan and register to get access</p>
+    <div id="planGrid" style="margin:10px 0;max-height:200px;overflow-y:auto"></div>
+    <label style="margin-top:10px">Your Full Name</label>
+    <input type="text" id="regName" placeholder="e.g. Manzi Delphin" style="margin-bottom:8px">
+    <label>Your Phone Number</label>
+    <input type="tel" id="regPhone" placeholder="07XX XXX XXX" inputmode="numeric" style="margin-bottom:8px">
+    <button class="btn" onclick="submitRegistration()">Submit Request →</button>
+    <button class="btn btn-gray" style="margin-top:8px" onclick="goTo('sType')">← Back</button>
+  </div>
   <!-- STEP WALKIN: Walk-in service + payment -->
   <div id="sWalkin" style="display:none">
     <p class="section-label">Walk-in Check-in</p>
-    <p class="section-sub">Select service for walk-in access:</p>
+    <p class="section-sub">Select service and enter your details:</p>
+    <label>Your Name</label>
+    <input type="text" id="walkinName" placeholder="e.g. Manzi Delphin" style="margin-bottom:8px">
+    <label>Phone (optional)</label>
+    <input type="tel" id="walkinPhone" placeholder="07XX XXX XXX" inputmode="numeric" style="margin-bottom:8px">
     <div class="service-grid" id="walkinServiceGrid"></div>
     <button class="btn" onclick="doWalkinCheckin()">Check In ✓</button>
     <button class="btn btn-gray" style="margin-top:8px" onclick="goTo('sType')">← Back</button>
@@ -165,6 +182,7 @@ input:focus{border-color:#0F6E56}
 const slug = location.pathname.split('/').find((s,i)=>i>0&&s&&s!=='checkin')||'gym';
 let phone='', otp='', selectedService=null, selectedInst=null, claimUserId=null;
 let checkinType='', services=[], institutions=[], searchTimer=null;
+let selectedPlanId=null, selectedPlanName='', selectedPlanPrice=0;
 
 // ── Init ───────────────────────────────────────────────────────
 fetch('/api/gyms/public/'+slug).then(r=>r.json()).then(d=>{
@@ -195,7 +213,7 @@ function clearOTP(id){Array.from(document.getElementById(id).children).forEach(i
 
 // ── Navigation ─────────────────────────────────────────────────
 function goTo(id){
-  ['s1','s2','sType','sInst','sSearch','sClaim','sService','sWalkin','sResult'].forEach(s=>{
+  ['s1','s2','sType','sInst','sSearch','sClaim','sService','sWalkin','sPlans','sResult'].forEach(s=>{
     const el=document.getElementById(s);if(el)el.style.display='none';
   });
   document.getElementById(id).style.display='block';
@@ -243,12 +261,7 @@ function chooseType(type){
   if(type==='institution'){
     loadInstitutions();
   } else if(type==='individual'){
-    document.getElementById('searchTitle').textContent='Find Your Account';
-    document.getElementById('searchSub').textContent='Search your name to claim your account';
-    document.getElementById('nameSearch').value='';
-    document.getElementById('searchResults').innerHTML='';
-    document.getElementById('searchBack').onclick=()=>goTo('sType');
-    goTo('sSearch');
+    loadIndividualPlans();
   } else if(type==='walkin'){
     loadWalkinServices();
   }
@@ -402,7 +415,59 @@ function loadWalkinServices(){
     btn.onclick=()=>{document.querySelectorAll('#walkinServiceGrid .service-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedService=s.id;};
     grid.appendChild(btn);
   });
+  document.getElementById('walkinName').value='';
+  document.getElementById('walkinPhone').value='';
   goTo('sWalkin');
+}
+
+// ── Individual Plans ───────────────────────────────────────────
+let plans=[];
+async function loadIndividualPlans(){
+  if(!plans.length){
+    try{
+      const r=await fetch('/api/checkin/plans',{headers:{'X-Gym-Slug':slug}});
+      plans=await r.json();plans=Array.isArray(plans)?plans:[];
+    }catch(e){plans=[];}
+  }
+  const grid=document.getElementById('planGrid');grid.innerHTML='';
+  if(!plans.length){grid.innerHTML='<p class="no-results">No plans available. Please visit reception.</p>';goTo('sPlans');return;}
+  plans.forEach(p=>{
+    const btn=document.createElement('div');btn.className='member-card';
+    const price=p.price?Number(p.price).toLocaleString()+' RWF':'Free';
+    const detail=p.type==='session_based'?(p.sessions+' sessions'):(p.duration_days+' days');
+    btn.innerHTML='<div class="mname">'+p.name+'</div><div class="mmeta"><span class="badge badge-inst">'+price+'</span> <span style="color:#64748b;font-size:12px">'+detail+'</span></div>';
+    btn.onclick=()=>{
+      document.querySelectorAll('#planGrid .member-card').forEach(c=>c.classList.remove('active'));
+      btn.classList.add('active');
+      selectedPlanId=p.id;
+      selectedPlanName=p.name;
+      selectedPlanPrice=Number(p.price||0);
+    };
+    grid.appendChild(btn);
+  });
+  document.getElementById('regName').value='';
+  document.getElementById('regPhone').value='';
+  selectedPlanId=null;
+  goTo('sPlans');
+}
+
+async function submitRegistration(){
+  const name=document.getElementById('regName').value.trim();
+  const rphone=document.getElementById('regPhone').value.trim();
+  if(!name){alert('Please enter your name');return;}
+  if(!rphone){alert('Please enter your phone number');return;}
+  if(!selectedPlanId){alert('Please select a plan');return;}
+  try{
+    const r=await fetch('/api/membership-requests',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({planId:selectedPlanId,newMemberName:name,newMemberPhone:rphone})});
+    const d=await r.json();
+    if(!r.ok){alert(d.error||'Registration failed');return;}
+    goTo('sResult');
+    document.getElementById('resultIcon').textContent='🎉';
+    document.getElementById('resultTitle').textContent='Request Submitted!';
+    document.getElementById('resultTitle').style.color='#065f46';
+    document.getElementById('resultMsg').textContent='Your '+selectedPlanName+' membership request has been submitted. The manager will approve it shortly. Then you can check in!';
+    setTimeout(reset,20000);
+  }catch(e){alert('Network error');}
 }
 
 // ── Do Checkin ─────────────────────────────────────────────────
@@ -417,9 +482,20 @@ async function doCheckin(){
 
 async function doWalkinCheckin(){
   if(!selectedService){alert('Please select a service');return;}
+  const wname=document.getElementById('walkinName').value.trim();
+  if(!wname){alert('Please enter your name');return;}
+  const wphone=document.getElementById('walkinPhone').value.trim()||phone||null;
   try{
-    const r=await fetch('/api/checkin',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone,otp,serviceId:selectedService})});
-    const d=await r.json();showResult(d);
+    const r=await fetch('/api/checkin/walkin',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({name:wname,phone:wphone,serviceId:selectedService})});
+    const d=await r.json();
+    if(d.allowed){
+      goTo('sResult');
+      document.getElementById('resultIcon').textContent='✅';
+      document.getElementById('resultTitle').textContent='Welcome, '+wname+'!';
+      document.getElementById('resultTitle').style.color='#065f46';
+      document.getElementById('resultMsg').textContent='Walk-in recorded'+(d.service_name?' · '+d.service_name:'')+(d.walkin_price?' · '+Number(d.walkin_price).toLocaleString()+' RWF':'');
+      setTimeout(reset,15000);
+    } else { alert(d.error||'Check-in failed'); }
   }catch(e){alert('Network error');}
 }
 
