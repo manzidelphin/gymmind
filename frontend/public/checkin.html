@@ -566,19 +566,16 @@ async function initiateMomoPayment(){
           body:JSON.stringify({name:wname,phone:wphone,serviceId:1,momoPhone:mp,amount:selectedPlanPrice,description:'GymMind Membership: '+selectedPlanName})});
         // We use a simple approach - just poll and then create membership request
       }catch(e){}
-      momoReferenceId=require?require('uuid').v4():Math.random().toString(36).slice(2);
-      // For individual, submit membership request directly and show success
-      try{
-        const r2=await fetch('/api/membership-requests',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({planId:selectedPlanId,newMemberName:wname,newMemberPhone:wphone})});
-        const d2=await r2.json();
-        clearInterval(momoPollingTimer);
-        goTo('sResult');
-        document.getElementById('resultIcon').textContent='🎉';
-        document.getElementById('resultTitle').textContent='Request Submitted!';
-        document.getElementById('resultTitle').style.color='#065f46';
-        document.getElementById('resultMsg').textContent='Your '+selectedPlanName+' membership request has been submitted. The manager will approve it shortly. Come back to check in after approval!';
-        setTimeout(reset,20000);
-      }catch(e){alert('Network error');}
+      // Submit membership request
+      const r2=await fetch('/api/membership-requests',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({planId:selectedPlanId,newMemberName:wname,newMemberPhone:wphone})});
+      const d2=await r2.json();
+      if(!r2.ok){alert(d2.error||'Registration failed');btn.disabled=false;btn.textContent='Pay Now →';return;}
+      goTo('sResult');
+      document.getElementById('resultIcon').textContent='🎉';
+      document.getElementById('resultTitle').textContent='Request Submitted!';
+      document.getElementById('resultTitle').style.color='#065f46';
+      document.getElementById('resultMsg').textContent='Your '+selectedPlanName+' membership request has been submitted. The manager will approve it shortly. Come back to check in after approval!';
+      setTimeout(reset,20000);
       btn.disabled=false;btn.textContent='Pay Now →';
       return;
     }
