@@ -618,6 +618,40 @@ export default function InstitutionsTab() {
           </div>
         </div>
       )}
+      {/* Delete Institution Modal */}
+      {deleteTarget && (
+        <div style={{position:'fixed',inset:'0',background:'rgba(0,0,0,0.7)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center',backdropFilter:'blur(4px)'}}>
+          <div style={{background:'#fff',borderRadius:'20px',padding:'36px',width:'100%',maxWidth:'420px',boxShadow:'0 24px 80px rgba(0,0,0,0.3)'}}>
+            <div style={{textAlign:'center',marginBottom:'20px'}}>
+              <div style={{width:'64px',height:'64px',background:'#fee2e2',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px',fontSize:'28px'}}>{'⚠️'}</div>
+              <h2 style={{fontSize:'20px',fontWeight:700,color:'#0f172a',marginBottom:'8px'}}>Delete Institution?</h2>
+              <p style={{fontSize:'14px',color:'#64748b',lineHeight:'1.6'}}>You are about to permanently delete <strong style={{color:'#0f172a'}}>{deleteTarget.name}</strong>.</p>
+            </div>
+            <div style={{background:'#fff7ed',border:'1px solid #fed7aa',borderRadius:'12px',padding:'16px',marginBottom:'20px'}}>
+              <p style={{fontSize:'13px',color:'#9a3412',fontWeight:600,marginBottom:'8px'}}>{'⚠️'} This action will:</p>
+              <ul style={{fontSize:'13px',color:'#9a3412',paddingLeft:'16px',lineHeight:'2'}}>
+                <li>Unlink all members from this institution</li>
+                <li>Delete all billing records and invoices</li>
+                <li>Remove all HR admin accounts</li>
+                <li>This <strong>cannot be undone</strong></li>
+              </ul>
+            </div>
+            <p style={{fontSize:'13px',color:'#64748b',marginBottom:'8px'}}>Type <strong style={{color:'#ef4444'}}>{deleteTarget.name}</strong> to confirm:</p>
+            <input type="text" placeholder={`Type "${deleteTarget.name}" to confirm`}
+              value={deleteConfirmText} onChange={e => setDeleteConfirmText(e.target.value)}
+              style={{width:'100%',padding:'12px',border:'2px solid '+(deleteConfirmText===deleteTarget.name?'#ef4444':'#e5e7eb'),borderRadius:'10px',fontSize:'14px',outline:'none',marginBottom:'16px'}}
+            />
+            <button onClick={confirmDelete} disabled={deleteConfirmText !== deleteTarget.name || deleting}
+              style={{width:'100%',padding:'12px',background:deleteConfirmText===deleteTarget.name?'#ef4444':'#fca5a5',color:'#fff',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:600,cursor:deleteConfirmText===deleteTarget.name?'pointer':'not-allowed',marginBottom:'8px'}}>
+              {deleting ? 'Deleting...' : '🗑 Yes, Delete Institution'}
+            </button>
+            <button onClick={() => { setDeleteTarget(null); setDeleteConfirmText(''); }}
+              style={{width:'100%',padding:'12px',background:'#f8fafc',color:'#374151',border:'1px solid #e5e7eb',borderRadius:'10px',fontSize:'14px',fontWeight:600,cursor:'pointer'}}>
+              Cancel — Keep Institution
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
