@@ -468,9 +468,11 @@ async function loadIndividualPlans(){
     };
     grid.appendChild(btn);
   });
+  selectedPlanId=null;
+  selectedPlanName='';
+  selectedPlanPrice=0;
   document.getElementById('regName').value='';
   document.getElementById('regPhone').value='';
-  selectedPlanId=null;
   goTo('sPlans');
 }
 
@@ -483,6 +485,7 @@ async function submitRegistration(){
   if(selectedPlanPrice>0){
     // Show MoMo payment step first
     momoType='individual';
+    console.log('Plan price:', selectedPlanPrice, 'Plan:', selectedPlanName);
     document.getElementById('momoTitle').textContent='Pay for Membership';
     document.getElementById('momoDesc').textContent='Pay '+selectedPlanPrice.toLocaleString()+' RWF for '+selectedPlanName;
     document.getElementById('momoAmount').textContent=selectedPlanPrice.toLocaleString()+' RWF';
