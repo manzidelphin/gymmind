@@ -230,6 +230,16 @@ export default function InstitutionsTab() {
     } finally { setAddAdminLoading(false); }
   }
 
+  async function deleteInstitution(inst: Institution) {
+    if (!window.confirm(`Delete "${inst.name}"? This will unlink all members and remove all billing records. This cannot be undone.`)) return;
+    try {
+      await api.delete(`/institutions/${inst.id}`);
+      loadInstitutions();
+    } catch (e: any) {
+      alert(e.response?.data?.error ?? 'Failed to delete institution.');
+    }
+  }
+
   function openUpload(inst: Institution) {
     setUploadInst(inst); setUploadParsed([]);
     setUploadResult(null); setUploadError('');
