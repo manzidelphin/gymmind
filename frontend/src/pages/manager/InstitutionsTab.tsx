@@ -234,7 +234,7 @@ export default function InstitutionsTab() {
     if (!window.confirm(`Delete "${inst.name}"? This will unlink all members and remove all billing records. This cannot be undone.`)) return;
     try {
       await api.delete(`/institutions/${inst.id}`);
-      loadInstitutions();
+      fetchInstitutions();
     } catch (e: any) {
       alert(e.response?.data?.error ?? 'Failed to delete institution.');
     }
