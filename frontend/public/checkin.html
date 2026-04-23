@@ -567,7 +567,8 @@ async function initiateMomoPayment(){
         // We use a simple approach - just poll and then create membership request
       }catch(e){}
       // Submit membership request
-      const r2=await fetch('/api/membership-requests',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({planId:selectedPlanId,newMemberName:wname,newMemberPhone:wphone})});
+      const cleanPhone=wphone.replace(/\s/g,'').replace(/^\+250/,'0').replace(/^250/,'0');
+      const r2=await fetch('/api/membership-requests',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({planId:selectedPlanId,newMemberName:wname,newMemberPhone:cleanPhone})});
       const d2=await r2.json();
       if(!r2.ok){alert(d2.error||'Registration failed');btn.disabled=false;btn.textContent='Pay Now →';return;}
       goTo('sResult');
