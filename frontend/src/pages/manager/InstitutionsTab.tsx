@@ -342,6 +342,10 @@ export default function InstitutionsTab() {
                   <button type="button" className={s.uploadBtn} onClick={() => openUpload(inst)}>
                     ↑ Upload Members
                   </button>
+                  <button type="button" onClick={() => deleteInstitution(inst)}
+                    style={{marginTop:'6px',display:'block',width:'100%',padding:'6px 10px',background:'#fff',color:'#ef4444',border:'1px solid #fecaca',borderRadius:'8px',fontSize:'12px',fontWeight:600,cursor:'pointer'}}>
+                    🗑 Remove
+                  </button>
                 </td>
               </tr>
             ))}
