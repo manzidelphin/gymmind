@@ -230,14 +230,26 @@ export default function InstitutionsTab() {
     } finally { setAddAdminLoading(false); }
   }
 
+  const [deleteTarget, setDeleteTarget] = useState<Institution | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+
   async function deleteInstitution(inst: Institution) {
-    if (!window.confirm(`Delete "${inst.name}"? This will unlink all members and remove all billing records. This cannot be undone.`)) return;
+    setDeleteTarget(inst);
+    setDeleteConfirmText('');
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await api.delete(`/institutions/${inst.id}`);
+      await api.delete(`/institutions/${deleteTarget.id}`);
+      setDeleteTarget(null);
+      setDeleteConfirmText('');
       fetchInstitutions();
     } catch (e: any) {
       alert(e.response?.data?.error ?? 'Failed to delete institution.');
-    }
+    } finally { setDeleting(false); }
   }
 
   function openUpload(inst: Institution) {
