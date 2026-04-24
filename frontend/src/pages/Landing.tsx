@@ -94,8 +94,8 @@ export default function Landing() {
           ))}
         </div>
         <div style={{display:'flex',gap:'10px'}}>
-          <button className="btn-ghost" onClick={()=>navigate('/login')} style={{padding:'10px 20px',fontSize:'12px'}}>Login</button>
-          <button className="btn-primary" onClick={()=>navigate('/signup')} style={{padding:'10px 20px',fontSize:'12px'}}>Start Free →</button>
+          <button className="btn-ghost" onClick={()=>navigate('/login')} style={{padding:'10px 20px',fontSize:'12px',borderRadius:'100px'}}>Login</button>
+          <button className="btn-primary" onClick={()=>navigate('/signup')} style={{padding:'10px 20px',fontSize:'12px',borderRadius:'100px'}}>Start Free →</button>
         </div>
       </nav>
 
@@ -108,7 +108,7 @@ export default function Landing() {
             <div>
               <div className="hero-eye" style={{display:'inline-flex',alignItems:'center',gap:'10px',marginBottom:'32px'}}>
                 <div className='dot-pulse' style={{width:'8px',height:'8px',borderRadius:'50%',background:'linear-gradient(135deg,#0F6E56,#1a9b7a)',boxShadow:'0 0 12px #22c997'}} />
-                <span style={{fontSize:'11px',fontWeight:600,letterSpacing:'0.15em',textTransform:'uppercase',color:'rgba(245,240,232,0.5)',fontFamily:"'DM Mono',monospace"}}>Live in Rwanda · 2026</span>
+                <span style={{fontSize:'11px',fontWeight:600,letterSpacing:'0.15em',textTransform:'uppercase',color:'rgba(245,240,232,0.5)',fontFamily:"'DM Mono',monospace"}}>A product of &lt;DELLON/&gt; · Rwanda 2026</span>
               </div>
               <h1 className="hero-title" style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'clamp(72px,10vw,128px)',lineHeight:'0.92',letterSpacing:'0.01em',marginBottom:'32px'}}>
                 <span style={{display:'block',color:'#f5f0e8'}}>GYM</span>
@@ -261,7 +261,7 @@ export default function Landing() {
                 ))}
               </div>
               <div style={{display:'flex',gap:'12px',alignItems:'center',flexWrap:'wrap'}}>
-                <button className="btn-primary" onClick={()=>navigate('/signup')} style={{fontSize:'14px',padding:'16px 36px'}}>Get Started Free →</button>
+                <button className="btn-primary" onClick={()=>navigate('/signup')} style={{fontSize:'14px',padding:'16px 36px',borderRadius:'100px'}}>Get Started Free →</button>
                 <span style={{fontSize:'12px',color:'rgba(245,240,232,0.3)',fontFamily:"'DM Mono',monospace"}}>No credit card required</span>
               </div>
             </div>
@@ -281,8 +281,8 @@ export default function Landing() {
             Stop managing with WhatsApp and paper. GymMind gives you a real system — built for how Rwandan gyms actually work.
           </p>
           <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap'}}>
-            <button className="btn-primary" onClick={()=>navigate('/signup')} style={{fontSize:'14px',padding:'16px 40px'}}>Start Free Trial →</button>
-            <button className="btn-ghost" onClick={()=>navigate('/hr/login')} style={{fontSize:'14px',padding:'16px 40px'}}>HR Admin Login</button>
+            <button className="btn-primary" onClick={()=>navigate('/signup')} style={{fontSize:'14px',padding:'16px 40px',borderRadius:'100px'}}>Start Free Trial →</button>
+            <button className="btn-ghost" onClick={()=>navigate('/hr/login')} style={{fontSize:'14px',padding:'16px 40px',borderRadius:'100px'}}>HR Admin Login</button>
           </div>
         </div>
       </section>
@@ -298,7 +298,9 @@ export default function Landing() {
                 </div>
                 <span style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'20px',letterSpacing:'0.05em'}}>GymMind</span>
               </div>
-              <p style={{fontSize:'13px',color:'rgba(245,240,232,0.35)',lineHeight:1.6,maxWidth:'220px',fontWeight:300}}>Gym management software built for Rwanda. Simple, powerful, local.</p>
+              <p style={{fontSize:'13px',color:'rgba(245,240,232,0.35)',lineHeight:1.6,maxWidth:'220px',fontWeight:300}}>
+                Gym management software built for Rwanda. A product of <span style={{color:'#22c997'}}>&lt;DELLON/&gt;</span>
+              </p>
             </div>
             <div style={{display:'flex',gap:'64px',flexWrap:'wrap'}}>
               {[
@@ -321,7 +323,9 @@ export default function Landing() {
           </div>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingTop:'32px',borderTop:'1px solid rgba(245,240,232,0.06)',flexWrap:'wrap',gap:'12px'}}>
             <span style={{fontFamily:"'DM Mono',monospace",fontSize:'11px',color:'rgba(245,240,232,0.2)',letterSpacing:'0.05em'}}>© 2026 GYMMIND · KIGALI, RWANDA 🇷🇼</span>
-            <span style={{fontFamily:"'DM Mono',monospace",fontSize:'11px',color:'rgba(245,240,232,0.2)',letterSpacing:'0.05em'}}>BUILT FOR RWANDAN GYMS</span>
+            <span style={{fontFamily:"'DM Mono',monospace",fontSize:'11px',color:'rgba(245,240,232,0.2)',letterSpacing:'0.05em'}}>
+              A PRODUCT OF <span style={{color:'#22c997',fontWeight:600}}>&lt;DELLON/&gt;</span>
+            </span>
           </div>
         </div>
       </footer>
