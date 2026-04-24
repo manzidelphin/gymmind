@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 export default function Landing() {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
@@ -148,7 +147,7 @@ export default function Landing() {
             <p style={{color:'rgba(240,250,245,0.6)',fontSize:'16px',maxWidth:'500px',margin:'0 auto'}}>From member check-ins to corporate billing — GymMind handles it all.</p>
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'20px'}}>
-            {features.map((f,i) => (
+            {features.map((f) => (
               <div key={f.title} className="fade-up" style={{background:'var(--card)',border:'1px solid var(--border)',borderRadius:'20px',padding:'28px',transition:'all 0.3s',cursor:'default'}}
                 onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.borderColor='var(--g600)';(e.currentTarget as HTMLElement).style.transform='translateY(-4px)'}}
                 onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.borderColor='var(--border)';(e.currentTarget as HTMLElement).style.transform='translateY(0)'}}>
@@ -169,7 +168,7 @@ export default function Landing() {
             <h2 style={{fontFamily:'Playfair Display,serif',fontSize:'clamp(32px,4vw,52px)',fontWeight:700,letterSpacing:'-1px'}}>Up and Running in Minutes</h2>
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'32px'}}>
-            {steps.map((st,i) => (
+            {steps.map((st, i) => (
               <div key={st.n} className="fade-up" style={{position:'relative',textAlign:'center',padding:'32px 24px'}}>
                 {i < 2 && <div style={{position:'absolute',top:'40px',right:'-16px',width:'32px',height:'1px',background:'linear-gradient(90deg,var(--g600),transparent)'}} />}
                 <div style={{fontFamily:'Playfair Display,serif',fontSize:'56px',fontWeight:900,color:'rgba(15,110,86,0.3)',lineHeight:1,marginBottom:'16px'}}>{st.n}</div>
