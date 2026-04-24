@@ -163,6 +163,76 @@ MIEUX.',
   };
 
   const T = t[lang];
+  const [lang, setLang] = useState<'en'|'rw'|'sw'|'fr'>('en');
+
+  const translations = {
+    en: {
+      eyebrow:'A product of DELLON · Rwanda 2026',
+      h1a:'GYM',h1b:'MANAGE',h1c:'SMARTER.',
+      sub:'The all-in-one platform built for Rwandan gyms. Members, billing, attendance, corporate HR, and AI analytics.',
+      start:'Start Free Trial',login:'Manager Login',hr:'HR Portal',
+      s1:'{T.s1}',s2:'THREE STEPS TO LAUNCH',
+      t1:'{T.t1}',d1:'Sign up, add your gym details, set up services and plans. Takes under 5 minutes.',
+      t2:'{T.t2}',d2:'Import from Excel, add manually, or let members self-register at check-in.',
+      t3:'{T.t3}',d3:'Track attendance, collect payments, send invoices and get AI insights.',
+      pricing:'START FREE. NO EXCUSES.',
+      pdesc:'Full access, no credit card, no commitment. 3 months completely free.',
+      trial:'{T.trial}',nocard:'{T.nocard}',
+      cta:'YOUR GYM DESERVES BETTER.',
+      ctad:'Stop managing with WhatsApp and paper. GymMind gives you a real system.',
+      tagline:'Gym management software built for Rwanda.',
+    },
+    rw: {
+      eyebrow:'Igicuruzwa cya DELLON · Rwanda 2026',
+      h1a:'GUCUNGA',h1b:'INGABU',h1c:"N'UBUHANGA.",
+      sub:'Sisitemu yuzuye yo gucunga ingabu zawe. Abanyamuryango, kwishyura, kugenzura, HR — byose hamwe.',
+      start:'Tangira Ubuntu',login:"Injira nk'Umuyobozi",hr:'Injira HR',
+      s1:'Gutangira byoroshye',s2:'INTERA EBYIRI KU GUTANGIRA',
+      t1:'Fungura Ingabu Yawe',d1:'Iyandikishe, ongeramo ingabu zawe, shyiramo serivisi n'gahunda zo kwishyura.',
+      t2:'Ongeramo Abanyamuryango',d2:'Naka Excel, ongeramo mu buryo bwite, cyangwa abanyamuryango biyandikishe ubwabo.',
+      t3:'Gucunga no Gutera Imbere',d3:'Genzura ubutabizi, gusaba amafaranga, kohereza fagitire kandi ubone ibisobanuro.',
+      pricing:'TANGIRA UBUNTU.',
+      pdesc:'Ikaze ryuzuye, nta karita ya banki. Amezi 3 ubuntu.',
+      trial:'AMEZI 3 UBUNTU',nocard:'Nta karita ya banki isabwa',
+      cta:'INGABU YAWE IKWIRIYE NEZA.',
+      ctad:'Hagarika gucunga na WhatsApp. GymMind ikuha sisitemu nyayo.',
+      tagline:'Sisitemu yo gucunga ingabu yakozwe mu Rwanda.',
+    },
+    sw: {
+      eyebrow:'Bidhaa ya DELLON · Rwanda 2026',
+      h1a:'SIMAMIA',h1b:'GYM',h1c:'KWA AKILI.',
+      sub:'Jukwaa kamili lililojengwa kwa gym za Rwanda. Wanachama, malipo, mahudhurio, HR na AI — zote mahali pamoja.',
+      start:'Anza Bure',login:'Ingia kama Meneja',hr:'Mlango wa HR',
+      s1:'Uanzishaji rahisi',s2:'HATUA TATU KWA KUANZA',
+      t1:'Unda Gym Yako',d1:'Jisajili, ongeza maelezo ya gym yako, weka huduma na mipango ya uanachama.',
+      t2:'Ongeza Wanachama',d2:'Ingiza kutoka Excel, ongeza mwenyewe, au wanachama wajisajili wenyewe.',
+      t3:'Simamia na Kukua',d3:'Fuatilia mahudhurio, kusanya malipo, tuma ankara kwa kampuni.',
+      pricing:'ANZA BURE. HAPANA UDHURU.',
+      pdesc:'Ufikiaji kamili, bila kadi ya benki. Miezi 3 bure kabisa.',
+      trial:'MIEZI 3 BURE',nocard:'Hakuna kadi ya benki inayohitajika',
+      cta:'GYM YAKO INASTAHILI ZAIDI.',
+      ctad:'Acha kusimamia na WhatsApp. GymMind inakupa mfumo wa kweli.',
+      tagline:'Programu ya usimamizi wa gym iliyojengwa kwa Rwanda.',
+    },
+    fr: {
+      eyebrow:'Un produit de DELLON · Rwanda 2026',
+      h1a:'GÉREZ',h1b:'VOTRE SALLE',h1c:'MIEUX.',
+      sub:'La plateforme tout-en-un conçue pour les salles de sport rwandaises. Membres, facturation, présences, RH et IA.',
+      start:'Commencer Gratuitement',login:'Connexion Gestionnaire',hr:'Portail RH',
+      s1:'Configuration simple',s2:'TROIS ÉTAPES POUR DÉMARRER',
+      t1:'Créez Votre Salle',d1:"Inscrivez-vous, ajoutez les détails de votre salle, configurez vos services et plans d'adhésion.",
+      t2:'Ajoutez Vos Membres',d2:"Importez depuis Excel, ajoutez manuellement, ou laissez les membres s'inscrire eux-mêmes.",
+      t3:'Gérez et Grandissez',d3:"Suivez les présences, collectez les paiements, envoyez des factures aux entreprises.",
+      pricing:'COMMENCEZ GRATUITEMENT.',
+      pdesc:'Accès complet, sans carte bancaire. 3 mois entièrement gratuits.',
+      trial:'3 MOIS GRATUITS',nocard:'Aucune carte bancaire requise',
+      cta:'VOTRE SALLE MÉRITE MIEUX.',
+      ctad:'Arrêtez de gérer avec WhatsApp. GymMind vous donne un vrai système.',
+      tagline:'Logiciel de gestion de salle conçu pour le Rwanda.',
+    },
+  };
+
+  const T = translations[lang];
   const navScrolled = scrollY > 60;
 
   const features = [
@@ -239,6 +309,18 @@ MIEUX.',
               </button>
             ))}
           </div>
+          <div style={{display:'flex',background:'rgba(245,240,232,0.06)',borderRadius:'100px',padding:'3px',gap:'2px'}}>
+            {(['en','rw','sw','fr'] as const).map(l=>(
+              <button key={l} onClick={()=>setLang(l)}
+                style={{padding:'5px 10px',borderRadius:'100px',border:'none',cursor:'pointer',
+                  fontSize:'10px',fontWeight:700,fontFamily:'inherit',letterSpacing:'0.05em',
+                  textTransform:'uppercase',
+                  background:lang===l?'#0F6E56':'transparent',
+                  color:lang===l?'#fff':'rgba(245,240,232,0.4)',transition:'all 0.2s'}}>
+                {l.toUpperCase()}
+              </button>
+            ))}
+          </div>
           <button className="btn-ghost" onClick={()=>navigate('/login')} style={{padding:'10px 20px',fontSize:'12px',borderRadius:'100px'}}>Login</button>
           <button className="btn-primary" onClick={()=>navigate('/signup')} style={{padding:'10px 20px',fontSize:'12px',borderRadius:'100px'}}>Start Free →</button>
         </div>
@@ -261,7 +343,7 @@ MIEUX.',
                 <span style={{display:'block',color:'#f5f0e8'}}>{T.h1c}</span>
               </h1>
               <p className="hero-sub" style={{fontSize:'16px',lineHeight:'1.7',color:'rgba(245,240,232,0.55)',maxWidth:'480px',marginBottom:'40px',fontWeight:300}}>
-                The all-in-one platform built for Rwandan gyms. Members, billing, attendance, corporate HR, and AI analytics — all in one clean system.
+                {T.sub}
               </p>
               <div className="hero-btns" style={{display:'flex',gap:'12px',flexWrap:'wrap'}}>
                 <button className="btn-primary" onClick={()=>navigate('/signup')}>{T.btnStart}</button>
@@ -363,9 +445,9 @@ MIEUX.',
           </div>
           <div className="mob-col" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'48px'}}>
             {[
-              {n:'01',title:'Create Your Gym',desc:'Sign up, add your gym details, set up your services and membership plans. Takes under 5 minutes.'},
-              {n:'02',title:'Add Your Members',desc:'Import from Excel, add manually, or let members self-register at check-in with their phone.'},
-              {n:'03',title:'Manage & Grow',desc:'Track attendance, collect payments, send invoices to companies, and get AI insights on performance.'},
+              {n:'01',title:'Create Your Gym',desc:'{T.d1}'},
+              {n:'02',title:'Add Your Members',desc:'{T.d2}'},
+              {n:'03',title:'Manage & Grow',desc:'{T.d3}'},
             ].map(s=>(
               <div key={s.n} style={{position:'relative',paddingTop:'24px'}}>
                 <div className="step-num">{s.n}</div>
@@ -396,7 +478,7 @@ MIEUX.',
             </div>
             <div style={{padding:'40px',background:'rgba(245,240,232,0.02)'}}>
               <p style={{fontSize:'15px',color:'rgba(245,240,232,0.5)',marginBottom:'32px',fontWeight:300,lineHeight:1.6}}>
-                We are new and we want you to experience GymMind before paying anything. Full access, no credit card, no commitment.
+                {T.pdesc}
               </p>
               <div className="mob-2" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'40px'}}>
                 {['Unlimited member profiles','Smart QR check-in system','Corporate HR billing portal','AI business analytics','MTN MoMo payment collection','PDF & CSV report exports','SMS notifications','Multi-service management'].map(f=>(
@@ -423,10 +505,10 @@ MIEUX.',
             {T.ctaTitle.split('\n')[0]}<br/>{T.ctaTitle.split('\n')[1]}<br/><span style={{color:'#22c997'}}>BETTER.</span>
           </h2>
           <p style={{fontSize:'16px',color:'rgba(245,240,232,0.45)',marginBottom:'48px',fontWeight:300,lineHeight:1.7,maxWidth:'500px',margin:'0 auto 48px'}}>
-            Stop managing with WhatsApp and paper. GymMind gives you a real system — built for how Rwandan gyms actually work.
+            {T.ctad}
           </p>
           <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap'}}>
-            <button className="btn-primary" onClick={()=>navigate('/signup')} style={{fontSize:'14px',padding:'16px 40px',borderRadius:'100px'}}>Start Free Trial →</button>
+            <button className="btn-primary" onClick={()=>navigate('/signup')} style={{fontSize:'14px',padding:'16px 40px',borderRadius:'100px'}}>{T.start} →</button>
             <button className="btn-ghost" onClick={()=>navigate('/hr/login')} style={{fontSize:'14px',padding:'16px 40px',borderRadius:'100px'}}>{T.btnHR}</button>
           </div>
         </div>
