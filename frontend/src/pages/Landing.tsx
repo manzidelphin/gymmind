@@ -25,7 +25,7 @@ export default function Landing() {
     return () => obs.disconnect();
   }, []);
 
-  const [lang, setLang] = useState<'en'|'rw'|'sw'|'fr'>('en'); // eslint-disable-line
+  const [lang, setLang] = useState<'en'|'rw'|'sw'|'fr'>('en');
   const T = {
     en: {
       eye:'A product of DELLON · Rwanda 2026',
