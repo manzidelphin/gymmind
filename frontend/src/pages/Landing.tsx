@@ -51,7 +51,7 @@ export default function Landing() {
         .feat-card:hover::before{transform:scaleX(1)}
         .btn-primary{background:#22c997;color:#0a0a08;border:none;font-weight:700;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;padding:14px 28px;cursor:pointer;transition:all 0.2s;font-family:inherit}
         .btn-primary:hover{background:linear-gradient(135deg,#1a9b7a,#22c997);transform:translateY(-1px)}
-        .btn-ghost{background:transparent;color:rgba(245,240,232,0.6);border:1px solid rgba(245,240,232,0.15);font-weight:500;font-size:13px;padding:14px 28px;cursor:pointer;transition:all 0.2s;font-family:inherit}
+        .btn-ghost{background:transparent;color:rgba(245,240,232,0.6);border:1px solid rgba(245,240,232,0.15);font-weight:500;font-size:13px;padding:14px 32px;cursor:pointer;transition:all 0.2s;font-family:inherit;border-radius:100px}
         .btn-ghost:hover{color:#f5f0e8;border-color:rgba(245,240,232,0.4)}
         .ticker-inner{display:flex;gap:48px;animation:ticker 20s linear infinite}
         @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
