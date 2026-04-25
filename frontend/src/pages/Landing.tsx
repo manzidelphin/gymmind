@@ -41,7 +41,7 @@ export default function Landing() {
       trial:'{T.trial}',nocard:'{T.nocard}',
       cta1:'YOUR GYM',cta2:'DESERVES',cta3:'BETTER.',
       ctad:'Stop managing with WhatsApp and paper. GymMind gives you a real system.',
-      tag:'Gym management software built for Rwanda.',
+      tag:'{T.tag}',
     },
     rw: {
       eye:'Igicuruzwa cya DELLON · Rwanda 2026',
@@ -191,7 +191,7 @@ export default function Landing() {
                 <span style={{display:'block',color:'#f5f0e8'}}>{T.h1c}</span>
               </h1>
               <p className="hero-sub" style={{fontSize:'16px',lineHeight:'1.7',color:'rgba(245,240,232,0.55)',maxWidth:'480px',marginBottom:'40px',fontWeight:300}}>
-                The all-in-one platform built for Rwandan gyms. Members, billing, attendance, corporate HR, and AI analytics — all in one clean system.
+                {T.sub}
               </p>
               <div className="hero-btns" style={{display:'flex',gap:'12px',flexWrap:'wrap'}}>
                 <button className="btn-primary" onClick={()=>navigate('/signup')}>{T.start} →</button>
@@ -267,10 +267,10 @@ export default function Landing() {
         <div style={{maxWidth:'1200px',margin:'0 auto'}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginBottom:'64px',flexWrap:'wrap',gap:'24px'}}>
             <div>
-              <div style={{fontFamily:"'DM Mono',monospace",fontSize:'11px',color:'#22c997',letterSpacing:'0.12em',textTransform:'uppercase',marginBottom:'12px'}}>What's inside</div>
+              <div style={{fontFamily:"'DM Mono',monospace",fontSize:'11px',color:'#22c997',letterSpacing:'0.12em',textTransform:'uppercase',marginBottom:'12px'}}>{T.whatInside}</div>
               <h2 style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'clamp(40px,5vw,64px)',letterSpacing:'0.02em',lineHeight:0.95}}>BUILT FOR<br/>REAL GYMS.</h2>
             </div>
-            <p style={{fontSize:'15px',color:'rgba(245,240,232,0.45)',maxWidth:'380px',lineHeight:'1.7',fontWeight:300}}>Every feature was designed after talking to gym owners in Rwanda. Nothing unnecessary. Everything you need.</p>
+            <p style={{fontSize:'15px',color:'rgba(245,240,232,0.45)',maxWidth:'380px',lineHeight:'1.7',fontWeight:300}}>{T.featDesc}</p>
           </div>
           <div className="mob-col" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'1px',background:'rgba(245,240,232,0.06)'}}>
             {features.map(f=>(
@@ -288,7 +288,7 @@ export default function Landing() {
       <section id="how-it-works" style={{padding:'120px 48px',borderTop:'1px solid rgba(245,240,232,0.06)',background:'rgba(245,240,232,0.01)'}}>
         <div style={{maxWidth:'1200px',margin:'0 auto'}}>
           <div style={{marginBottom:'80px'}}>
-            <div style={{fontFamily:"'DM Mono',monospace",fontSize:'11px',color:'#22c997',letterSpacing:'0.12em',textTransform:'uppercase',marginBottom:'12px'}}>Simple setup</div>
+            <div style={{fontFamily:"'DM Mono',monospace",fontSize:'11px',color:'#22c997',letterSpacing:'0.12em',textTransform:'uppercase',marginBottom:'12px'}}>{T.s1}</div>
             <h2 style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'clamp(40px,5vw,64px)',letterSpacing:'0.02em',lineHeight:0.95}}>{T.s2a}<br/>{T.s2b}</h2>
           </div>
           <div className="mob-col" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'48px'}}>
