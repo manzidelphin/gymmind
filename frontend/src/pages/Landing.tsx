@@ -269,7 +269,8 @@ export default function Landing() {
       </section>
 
       {/* FEATURES */}
-      <section id="features" style={{padding:'120px 48px'}}>
+      <section id="features" style={{padding:'120px 48px',position:'relative'}}>
+        <div style={{position:'absolute',inset:0,backgroundImage:'url(/images/2i.jpg)',backgroundSize:'cover',backgroundPosition:'center',opacity:0.05,zIndex:0}} />
         <div style={{maxWidth:'1200px',margin:'0 auto'}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginBottom:'64px',flexWrap:'wrap',gap:'24px'}}>
             <div>
