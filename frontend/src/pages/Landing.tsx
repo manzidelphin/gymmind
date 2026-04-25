@@ -380,6 +380,7 @@ export default function Landing() {
 
       {/* CTA */}
       <section style={{padding:'120px 48px',borderTop:'1px solid rgba(245,240,232,0.06)',position:'relative',overflow:'hidden'}}>
+        <div style={{position:'absolute',inset:0,backgroundImage:'url(/images/3i.jpg)',backgroundSize:'cover',backgroundPosition:'center',opacity:0.12,zIndex:0}} />
         <div style={{position:'absolute',inset:0,background:'radial-gradient(ellipse 60% 80% at 50% 50%,rgba(34,201,151,0.05) 0%,transparent 70%)',pointerEvents:'none'}} />
         <div style={{maxWidth:'900px',margin:'0 auto',textAlign:'center',position:'relative'}}>
           <div style={{fontFamily:"'DM Mono',monospace",fontSize:'11px',color:'#22c997',letterSpacing:'0.12em',textTransform:'uppercase',marginBottom:'24px'}}>Ready?</div>
