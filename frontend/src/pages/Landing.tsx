@@ -41,7 +41,7 @@ export default function Landing() {
       trial:'{T.trial}',nocard:'{T.nocard}',
       cta1:'YOUR GYM',cta2:'DESERVES',cta3:'BETTER.',
       ctad:'Stop managing with WhatsApp and paper. GymMind gives you a real system.',
-      tag:'{T.tag}',
+      tag:'Gym management software built for Rwanda.',
     },
     rw: {
       eye:'Igicuruzwa cya DELLON · Rwanda 2026',
@@ -298,9 +298,9 @@ export default function Landing() {
           </div>
           <div className="mob-col" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'48px'}}>
             {[
-              {n:'01',title:'Create Your Gym',desc:'{T.d1}'},
-              {n:'02',title:'Add Your Members',desc:'{T.d2}'},
-              {n:'03',title:'{T.t3}',desc:'{T.d3}'},
+              {n:'01',title:T.t1,desc:T.d1},
+              {n:'02',title:T.t2,desc:T.d2},
+              {n:'03',title:T.t3,desc:T.d3},
             ].map(s=>(
               <div key={s.n} style={{position:'relative',paddingTop:'24px'}}>
                 <div className="step-num">{s.n}</div>
