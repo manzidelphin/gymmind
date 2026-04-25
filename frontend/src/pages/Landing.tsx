@@ -169,8 +169,8 @@ export default function Landing() {
               </button>
             ))}
           </div>
-          <button className="btn-ghost" onClick={()=>navigate('/login')} style={{padding:'10px 20px',fontSize:'12px'}}>Login</button>
-          <button className="btn-primary" onClick={()=>navigate('/signup')} style={{padding:'10px 20px',fontSize:'12px'}}>Start Free →</button>
+          <button className="btn-ghost" onClick={()=>navigate('/login')} style={{borderRadius:'100px',padding:'10px 20px',fontSize:'12px'}}>Login</button>
+          <button className="btn-primary" onClick={()=>navigate('/signup')} style={{borderRadius:'100px',padding:'10px 20px',fontSize:'12px'}}>Start Free →</button>
         </div>
       </nav>
 
@@ -196,7 +196,7 @@ export default function Landing() {
               <div className="hero-btns" style={{display:'flex',gap:'12px',flexWrap:'wrap'}}>
                 <button className="btn-primary" onClick={()=>navigate('/signup')}>{T.start} →</button>
                 <button className="btn-ghost" onClick={()=>navigate('/login')}>{T.mgr}</button>
-                <button className="btn-ghost" onClick={()=>navigate('/hr/login')} style={{borderColor:'rgba(34,201,151,0.2)',color:'rgba(34,201,151,0.7)'}}>{T.hr}</button>
+                <button className="btn-ghost" onClick={()=>navigate('/hr/login')} style={{borderRadius:'100px',borderColor:'rgba(34,201,151,0.2)',color:'rgba(34,201,151,0.7)'}}>{T.hr}</button>
               </div>
             </div>
             <div className="hide-mob hero-card" style={{background:'rgba(245,240,232,0.03)',border:'1px solid rgba(245,240,232,0.08)',padding:'32px',position:'relative'}}>
@@ -336,7 +336,7 @@ export default function Landing() {
                 ))}
               </div>
               <div style={{display:'flex',gap:'12px',alignItems:'center',flexWrap:'wrap'}}>
-                <button className="btn-primary" onClick={()=>navigate('/signup')} style={{fontSize:'14px',padding:'16px 36px'}}>{T.start} →</button>
+                <button className="btn-primary" onClick={()=>navigate('/signup')} style={{borderRadius:'100px',fontSize:'14px',padding:'16px 36px'}}>{T.start} →</button>
                 <span style={{fontSize:'12px',color:'rgba(245,240,232,0.3)',fontFamily:"'DM Mono',monospace"}}>No credit card required</span>
               </div>
             </div>
@@ -356,8 +356,8 @@ export default function Landing() {
             {T.ctad}
           </p>
           <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap'}}>
-            <button className="btn-primary" onClick={()=>navigate('/signup')} style={{fontSize:'14px',padding:'16px 40px'}}>{T.start} →</button>
-            <button className="btn-ghost" onClick={()=>navigate('/hr/login')} style={{fontSize:'14px',padding:'16px 40px'}}>{T.hr}</button>
+            <button className="btn-primary" onClick={()=>navigate('/signup')} style={{borderRadius:'100px',fontSize:'14px',padding:'16px 40px'}}>{T.start} →</button>
+            <button className="btn-ghost" onClick={()=>navigate('/hr/login')} style={{borderRadius:'100px',fontSize:'14px',padding:'16px 40px'}}>{T.hr}</button>
           </div>
         </div>
       </section>
