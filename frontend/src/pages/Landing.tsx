@@ -32,7 +32,7 @@ export default function Landing() {
       h1a:'GYM',h1b:'MANAGE',h1c:'SMARTER.',
       sub:'The all-in-one platform built for Rwandan gyms. Members, billing, attendance, corporate HR, and AI analytics.',
       start:'Start Free Trial',mgr:'Manager Login',hr:'HR Portal',
-      s1:'{T.s1}',s2a:'THREE STEPS',s2b:'TO LAUNCH.',
+      s1:'Simple setup',s2a:'THREE STEPS',s2b:'TO LAUNCH.',
       t1:'{T.t1}',d1:'Sign up, add your gym details, set up services and plans. Under 5 minutes.',
       t2:'{T.t2}',d2:'Import from Excel, add manually, or let members self-register at check-in.',
       t3:'Manage and Grow',d3:'Track attendance, collect payments, send invoices and get AI insights.',
@@ -186,9 +186,9 @@ export default function Landing() {
                 <span style={{fontSize:'11px',fontWeight:600,letterSpacing:'0.15em',textTransform:'uppercase',color:'rgba(245,240,232,0.5)',fontFamily:"'DM Mono',monospace"}}>{T.eye}</span>
               </div>
               <h1 className="hero-title" style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'clamp(72px,10vw,128px)',lineHeight:'0.92',letterSpacing:'0.01em',marginBottom:'32px'}}>
-                <span style={{display:'block',color:'#f5f0e8'}}>GYM</span>
-                <span style={{display:'block',color:'#22c997'}}>MANAGE</span>
-                <span style={{display:'block',color:'#f5f0e8'}}>SMARTER.</span>
+                <span style={{display:'block',color:'#f5f0e8'}}>{T.h1a}</span>
+                <span style={{display:'block',color:'#22c997'}}>{T.h1b}</span>
+                <span style={{display:'block',color:'#f5f0e8'}}>{T.h1c}</span>
               </h1>
               <p className="hero-sub" style={{fontSize:'16px',lineHeight:'1.7',color:'rgba(245,240,232,0.55)',maxWidth:'480px',marginBottom:'40px',fontWeight:300}}>
                 The all-in-one platform built for Rwandan gyms. Members, billing, attendance, corporate HR, and AI analytics — all in one clean system.
@@ -289,7 +289,7 @@ export default function Landing() {
         <div style={{maxWidth:'1200px',margin:'0 auto'}}>
           <div style={{marginBottom:'80px'}}>
             <div style={{fontFamily:"'DM Mono',monospace",fontSize:'11px',color:'#22c997',letterSpacing:'0.12em',textTransform:'uppercase',marginBottom:'12px'}}>Simple setup</div>
-            <h2 style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'clamp(40px,5vw,64px)',letterSpacing:'0.02em',lineHeight:0.95}}>THREE STEPS<br/>TO LAUNCH.</h2>
+            <h2 style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'clamp(40px,5vw,64px)',letterSpacing:'0.02em',lineHeight:0.95}}>{T.s2a}<br/>{T.s2b}</h2>
           </div>
           <div className="mob-col" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'48px'}}>
             {[
@@ -314,7 +314,7 @@ export default function Landing() {
         <div style={{maxWidth:'900px',margin:'0 auto'}}>
           <div style={{marginBottom:'64px'}}>
             <div style={{fontFamily:"'DM Mono',monospace",fontSize:'11px',color:'#22c997',letterSpacing:'0.12em',textTransform:'uppercase',marginBottom:'12px'}}>Pricing</div>
-            <h2 style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'clamp(40px,5vw,64px)',letterSpacing:'0.02em',lineHeight:0.95}}>START FREE.<br/>NO EXCUSES.</h2>
+            <h2 style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'clamp(40px,5vw,64px)',letterSpacing:'0.02em',lineHeight:0.95}}>{T.ptitle}<br/>{T.ptitle2}</h2>
           </div>
           <div style={{border:'1px solid rgba(245,240,232,0.1)',overflow:'hidden'}}>
             <div style={{background:'linear-gradient(135deg,#0F6E56,#1a9b7a)',padding:'20px 40px',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'12px'}}>
@@ -350,7 +350,7 @@ export default function Landing() {
         <div style={{maxWidth:'900px',margin:'0 auto',textAlign:'center',position:'relative'}}>
           <div style={{fontFamily:"'DM Mono',monospace",fontSize:'11px',color:'#22c997',letterSpacing:'0.12em',textTransform:'uppercase',marginBottom:'24px'}}>Ready?</div>
           <h2 style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'clamp(56px,8vw,96px)',lineHeight:'0.9',letterSpacing:'0.02em',marginBottom:'32px'}}>
-            YOUR GYM<br/>DESERVES<br/><span style={{color:'#22c997'}}>BETTER.</span>
+            {T.cta1}<br/>{T.cta2}<br/><span style={{color:'#22c997'}}>{T.cta3}</span>
           </h2>
           <p style={{fontSize:'16px',color:'rgba(245,240,232,0.45)',marginBottom:'48px',fontWeight:300,lineHeight:1.7,maxWidth:'500px',margin:'0 auto 48px'}}>
             {T.ctad}
