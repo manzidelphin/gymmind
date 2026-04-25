@@ -93,6 +93,10 @@ export default function Landing() {
     },
   }[lang];
 
+  const [stats, setStats] = useState({members:0,gyms:0,checkins:0,revenue:0});
+  useEffect(()=>{
+    fetch('/api/stats').then(r=>r.json()).then(d=>setStats(d)).catch(()=>{});
+  },[]);
   const navScrolled = scrollY > 60;
 
   const features = [
