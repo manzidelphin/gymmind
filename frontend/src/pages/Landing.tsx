@@ -213,9 +213,9 @@ export default function Landing() {
               <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',background:'linear-gradient(90deg,#22c997,transparent)'}} />
               <div style={{fontFamily:"'DM Mono',monospace",fontSize:'10px',color:'rgba(245,240,232,0.3)',letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'20px'}}>Live Dashboard</div>
               {[
-                {label:'Active Members',value:'247',change:'+12 this week',up:true},
-                {label:'Monthly Revenue',value:'2.4M RWF',change:'+18% vs last month',up:true},
-                {label:"Today's Check-ins",value:'34',change:'3 pending approval',up:false},
+                {label:'Active Members',value:String(stats.members),change:stats.gyms+' gyms on platform',up:true},
+                {label:'Monthly Revenue',value:Math.round(stats.revenue/1000)+'K RWF',change:'This month',up:true},
+                {label:"Today's Check-ins",value:String(stats.checkins),change:'Verified via OTP',up:true},
               ].map(stat=>(
                 <div key={stat.label} style={{marginBottom:'20px',paddingBottom:'20px',borderBottom:'1px solid rgba(245,240,232,0.06)'}}>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
