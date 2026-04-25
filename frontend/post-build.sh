@@ -144,3 +144,10 @@ print('All patches done!')
 PYEOF
 
 echo "Post-build patches complete!"
+
+# Copy gym images to dist
+if [ -d "public/images" ]; then
+  mkdir -p dist/images
+  cp public/images/*.jpg dist/images/ 2>/dev/null || true
+  echo "Copied gym images to dist!"
+fi

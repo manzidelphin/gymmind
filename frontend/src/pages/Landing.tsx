@@ -182,6 +182,7 @@ export default function Landing() {
       {/* HERO */}
       <section style={{minHeight:'100vh',padding:'140px 48px 80px',position:'relative',display:'flex',alignItems:'center'}}>
         <div style={{position:'absolute',inset:0,backgroundImage:'linear-gradient(rgba(245,240,232,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(245,240,232,0.03) 1px,transparent 1px)',backgroundSize:'80px 80px',zIndex:0}} />
+        <div style={{position:'absolute',inset:0,backgroundImage:'url(/images/1i.jpg)',backgroundSize:'cover',backgroundPosition:'center',opacity:0.08,zIndex:0}} />
         <div style={{position:'absolute',top:'15%',right:'5%',width:'480px',height:'480px',background:'radial-gradient(circle,rgba(34,201,151,0.08) 0%,transparent 70%)',pointerEvents:'none',zIndex:0}} />
         <div style={{maxWidth:'1200px',margin:'0 auto',width:'100%',position:'relative',zIndex:1}}>
           <div className="mob-col" style={{display:'grid',gridTemplateColumns:'1fr 400px',gap:'80px',alignItems:'center'}}>
@@ -285,6 +286,33 @@ export default function Landing() {
                 <div style={{fontSize:'13px',color:'rgba(245,240,232,0.45)',lineHeight:'1.65',fontWeight:300}}>{f.desc}</div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* GALLERY */}
+      <section style={{padding:'0 0 0 0',borderTop:'1px solid rgba(245,240,232,0.06)',position:'relative',overflow:'hidden'}}>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',height:'420px'}}>
+          <div style={{backgroundImage:'url(/images/1i.jpg)',backgroundSize:'cover',backgroundPosition:'center',position:'relative'}}>
+            <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(10,10,8,0.7),transparent)'}} />
+            <div style={{position:'absolute',bottom:'24px',left:'24px'}}>
+              <div style={{fontFamily:"'DM Mono',monospace",fontSize:'10px',color:'#22c997',letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'4px'}}>Members</div>
+              <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'22px',color:'#f5f0e8'}}>Real People,<br/>Real Results</div>
+            </div>
+          </div>
+          <div style={{backgroundImage:'url(/images/2i.jpg)',backgroundSize:'cover',backgroundPosition:'center',position:'relative'}}>
+            <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(10,10,8,0.7),transparent)'}} />
+            <div style={{position:'absolute',bottom:'24px',left:'24px'}}>
+              <div style={{fontFamily:"'DM Mono',monospace",fontSize:'10px',color:'#22c997',letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'4px'}}>Training</div>
+              <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'22px',color:'#f5f0e8'}}>World Class<br/>Facilities</div>
+            </div>
+          </div>
+          <div style={{backgroundImage:'url(/images/3i.jpg)',backgroundSize:'cover',backgroundPosition:'center',position:'relative'}}>
+            <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(10,10,8,0.7),transparent)'}} />
+            <div style={{position:'absolute',bottom:'24px',left:'24px'}}>
+              <div style={{fontFamily:"'DM Mono',monospace",fontSize:'10px',color:'#22c997',letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'4px'}}>Community</div>
+              <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'22px',color:'#f5f0e8'}}>Built for<br/>Rwanda</div>
+            </div>
           </div>
         </div>
       </section>
