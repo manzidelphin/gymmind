@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: process.env.SMTP_HOST || 'smtp.zoho.com',
   auth: {
     user:  process.env.GMAIL_USER,
     pass:  process.env.GMAIL_APP_PASSWORD,
@@ -21,7 +21,7 @@ export async function sendWelcomeEmail(params: {
   }
 
   await transporter.sendMail({
-    from:    '"GymMind" <noreply@gymmind.rw>',
+    from:    '"GymMind" <dellon@gymmind.rw>',
     to:      params.to,
     subject: `Welcome to GymMind — ${params.gymName} is live!`,
     html: `
@@ -91,7 +91,7 @@ export async function sendMonthlyReport(params: {
   }
 
   await transporter.sendMail({
-    from:    '"GymMind" <noreply@gymmind.rw>',
+    from:    '"GymMind" <dellon@gymmind.rw>',
     to:      params.to,
     subject: `${params.gymName} — Monthly Report for ${params.month}`,
     html: `
