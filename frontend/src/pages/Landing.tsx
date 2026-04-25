@@ -162,12 +162,17 @@ export default function Landing() {
           ))}
         </div>
         <div style={{display:'flex',gap:'10px'}}>
-          <div style={{display:'flex',background:'rgba(245,240,232,0.06)',borderRadius:'100px',padding:'3px',gap:'2px'}}>
-            {(['en','rw','sw','fr'] as const).map(l=>(
-              <button key={l} onClick={()=>setLang(l)} style={{padding:'5px 10px',borderRadius:'100px',border:'none',cursor:'pointer',fontSize:'10px',fontWeight:700,fontFamily:'inherit',letterSpacing:'0.05em',textTransform:'uppercase',background:lang===l?'#0F6E56':'transparent',color:lang===l?'#fff':'rgba(245,240,232,0.4)',transition:'all 0.2s'}}>
-                {l.toUpperCase()}
-              </button>
-            ))}
+          <div style={{position:'relative'}}>
+            <select
+              value={lang}
+              onChange={e=>setLang(e.target.value as 'en'|'rw'|'sw'|'fr')}
+              style={{appearance:'none',WebkitAppearance:'none',background:'rgba(245,240,232,0.06)',border:'1px solid rgba(245,240,232,0.12)',borderRadius:'100px',padding:'8px 36px 8px 16px',fontSize:'12px',fontWeight:600,color:'rgba(245,240,232,0.8)',cursor:'pointer',fontFamily:'inherit',outline:'none',transition:'all 0.2s'}}>
+              <option value="en" style={{background:'#0a0a08'}}>🌐 English</option>
+              <option value="rw" style={{background:'#0a0a08'}}>🇷🇼 Kinyarwanda</option>
+              <option value="sw" style={{background:'#0a0a08'}}>🌍 Swahili</option>
+              <option value="fr" style={{background:'#0a0a08'}}>🇫🇷 Français</option>
+            </select>
+            <span style={{position:'absolute',right:'14px',top:'50%',transform:'translateY(-50%)',color:'rgba(245,240,232,0.5)',fontSize:'10px',pointerEvents:'none'}}>▾</span>
           </div>
           <button className="btn-ghost" onClick={()=>navigate('/login')} style={{borderRadius:'100px',padding:'10px 20px',fontSize:'12px'}}>Login</button>
           <button className="btn-primary" onClick={()=>navigate('/signup')} style={{borderRadius:'100px',padding:'10px 20px',fontSize:'12px'}}>Start Free →</button>
