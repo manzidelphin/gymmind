@@ -162,6 +162,13 @@ export default function Landing() {
           ))}
         </div>
         <div style={{display:'flex',gap:'10px'}}>
+          <div style={{display:'flex',background:'rgba(245,240,232,0.06)',borderRadius:'100px',padding:'3px',gap:'2px'}}>
+            {(['en','rw','sw','fr'] as const).map(l=>(
+              <button key={l} onClick={()=>setLang(l)} style={{padding:'5px 10px',borderRadius:'100px',border:'none',cursor:'pointer',fontSize:'10px',fontWeight:700,fontFamily:'inherit',letterSpacing:'0.05em',textTransform:'uppercase',background:lang===l?'#0F6E56':'transparent',color:lang===l?'#fff':'rgba(245,240,232,0.4)',transition:'all 0.2s'}}>
+                {l.toUpperCase()}
+              </button>
+            ))}
+          </div>
           <button className="btn-ghost" onClick={()=>navigate('/login')} style={{padding:'10px 20px',fontSize:'12px'}}>Login</button>
           <button className="btn-primary" onClick={()=>navigate('/signup')} style={{padding:'10px 20px',fontSize:'12px'}}>Start Free →</button>
         </div>
