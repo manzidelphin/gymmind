@@ -194,8 +194,8 @@ export default function Landing() {
                 {T.sub}
               </p>
               <div className="hero-btns" style={{display:'flex',gap:'12px',flexWrap:'wrap'}}>
-                <button className="btn-primary" onClick={()=>navigate('/signup')}>{T.start} →</button>
-                <button className="btn-ghost" onClick={()=>navigate('/login')}>{T.mgr}</button>
+                <button className="btn-primary" onClick={()=>navigate('/signup')} style={{borderRadius:'100px'}}>{T.start} →</button>
+                <button className="btn-ghost" onClick={()=>navigate('/login')} style={{borderRadius:'100px'}}>{T.mgr}</button>
                 <button className="btn-ghost" onClick={()=>navigate('/hr/login')} style={{borderRadius:'100px',borderColor:'rgba(34,201,151,0.2)',color:'rgba(34,201,151,0.7)'}}>{T.hr}</button>
               </div>
             </div>
