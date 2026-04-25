@@ -149,11 +149,28 @@ export default function Landing() {
         .btn-primary:hover{animation:borderGlow 1s infinite}
         .dot-pulse{animation:pulse 2s infinite}
         .hero-num{animation:float 4s ease-in-out infinite}
-        @media(max-width:768px){.hide-mob{display:none!important}.mob-col{grid-template-columns:1fr!important}.mob-2{grid-template-columns:1fr 1fr!important}}
+        @media(max-width:768px){
+          .hide-mob{display:none!important}
+          .mob-col{grid-template-columns:1fr!important}
+          .mob-2{grid-template-columns:1fr 1fr!important}
+          .mob-full{grid-template-columns:1fr!important}
+          .mob-pad{padding:64px 20px!important}
+          .mob-hero{padding:100px 20px 60px!important}
+          .mob-nav{padding:16px 20px!important}
+          .mob-small{font-size:clamp(48px,12vw,72px)!important}
+          .mob-text{font-size:14px!important}
+          .mob-center{text-align:center!important}
+          .mob-stack{flex-direction:column!important;align-items:stretch!important}
+          .mob-hide{display:none!important}
+          .mob-gallery{grid-template-columns:1fr!important;height:auto!important}
+          .mob-gallery>div{height:200px!important}
+          .mob-footer{flex-direction:column!important;gap:24px!important}
+          .mob-footer-links{grid-template-columns:1fr 1fr!important;gap:24px!important}
+        }
       `}</style>
 
       {/* NAV */}
-      <nav style={{position:'fixed',top:0,left:0,right:0,zIndex:100,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'20px 48px',background:navScrolled?'rgba(10,10,8,0.92)':'transparent',backdropFilter:navScrolled?'blur(16px)':'none',borderBottom:navScrolled?'1px solid rgba(245,240,232,0.06)':'none',transition:'all 0.4s'}}>
+      <nav className='mob-nav' style={{position:'fixed',top:0,left:0,right:0,zIndex:100,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'20px 48px',background:navScrolled?'rgba(10,10,8,0.92)':'transparent',backdropFilter:navScrolled?'blur(16px)':'none',borderBottom:navScrolled?'1px solid rgba(245,240,232,0.06)':'none',transition:'all 0.4s'}}>
         <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
           <div style={{width:'32px',height:'32px',background:'linear-gradient(135deg,#0F6E56,#1a9b7a)',borderRadius:'4px',display:'flex',alignItems:'center',justifyContent:'center'}}>
             <svg width="18" height="18" viewBox="0 0 64 64" fill="none"><line x1="18" y1="32" x2="46" y2="32" stroke="#0a0a08" strokeWidth="5" strokeLinecap="round"/><rect x="12" y="24" width="7" height="16" rx="2" fill="#0a0a08"/><rect x="45" y="24" width="7" height="16" rx="2" fill="#0a0a08"/></svg>
@@ -184,7 +201,7 @@ export default function Landing() {
       </nav>
 
       {/* HERO */}
-      <section style={{minHeight:'100vh',padding:'140px 48px 80px',position:'relative',display:'flex',alignItems:'center'}}>
+      <section className='mob-hero' style={{minHeight:'100vh',padding:'140px 48px 80px',position:'relative',display:'flex',alignItems:'center'}}>
         <div style={{position:'absolute',inset:0,backgroundImage:'linear-gradient(rgba(245,240,232,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(245,240,232,0.03) 1px,transparent 1px)',backgroundSize:'80px 80px',zIndex:0}} />
         <div style={{position:'absolute',inset:0,backgroundImage:'url(/images/1i.jpg)',backgroundSize:'cover',backgroundPosition:'center',opacity:0.08,zIndex:0}} />
         <div style={{position:'absolute',top:'15%',right:'5%',width:'480px',height:'480px',background:'radial-gradient(circle,rgba(34,201,151,0.08) 0%,transparent 70%)',pointerEvents:'none',zIndex:0}} />
@@ -195,7 +212,7 @@ export default function Landing() {
                 <div className='dot-pulse' style={{width:'8px',height:'8px',borderRadius:'50%',background:'linear-gradient(135deg,#0F6E56,#1a9b7a)',boxShadow:'0 0 12px #22c997'}} />
                 <span style={{fontSize:'11px',fontWeight:600,letterSpacing:'0.15em',textTransform:'uppercase',color:'rgba(245,240,232,0.5)',fontFamily:"'DM Mono',monospace"}}>{T.eye}</span>
               </div>
-              <h1 className="hero-title" style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'clamp(72px,10vw,128px)',lineHeight:'0.92',letterSpacing:'0.01em',marginBottom:'32px'}}>
+              <h1 className="hero-title mob-small" style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:'clamp(72px,10vw,128px)',lineHeight:'0.92',letterSpacing:'0.01em',marginBottom:'32px'}}>
                 <span style={{display:'block',color:'#f5f0e8'}}>{T.h1a}</span>
                 <span style={{display:'block',color:'#22c997'}}>{T.h1b}</span>
                 <span style={{display:'block',color:'#f5f0e8'}}>{T.h1c}</span>
@@ -203,7 +220,7 @@ export default function Landing() {
               <p className="hero-sub" style={{fontSize:'16px',lineHeight:'1.7',color:'rgba(245,240,232,0.55)',maxWidth:'480px',marginBottom:'40px',fontWeight:300}}>
                 {T.sub}
               </p>
-              <div className="hero-btns" style={{display:'flex',gap:'12px',flexWrap:'wrap'}}>
+              <div className="hero-btns mob-stack" style={{display:'flex',gap:'12px',flexWrap:'wrap'}}>
                 <button className="btn-primary" onClick={()=>navigate('/signup')} style={{borderRadius:'100px'}}>{T.start} →</button>
                 <button className="btn-ghost" onClick={()=>navigate('/login')} style={{borderRadius:'100px'}}>{T.mgr}</button>
                 <button className="btn-ghost" onClick={()=>navigate('/hr/login')} style={{borderRadius:'100px',borderColor:'rgba(34,201,151,0.2)',color:'rgba(34,201,151,0.7)'}}>{T.hr}</button>
@@ -297,7 +314,7 @@ export default function Landing() {
 
       {/* GALLERY */}
       <section style={{padding:'0 0 0 0',borderTop:'1px solid rgba(245,240,232,0.06)',position:'relative',overflow:'hidden'}}>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',height:'420px'}}>
+        <div className='mob-gallery' style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',height:'420px'}}>
           <div style={{backgroundImage:'url(/images/1i.jpg)',backgroundSize:'cover',backgroundPosition:'center',position:'relative'}}>
             <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(10,10,8,0.7),transparent)'}} />
             <div style={{position:'absolute',bottom:'24px',left:'24px'}}>
@@ -394,7 +411,7 @@ export default function Landing() {
           <p style={{fontSize:'16px',color:'rgba(245,240,232,0.45)',marginBottom:'48px',fontWeight:300,lineHeight:1.7,maxWidth:'500px',margin:'0 auto 48px'}}>
             {T.ctad}
           </p>
-          <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap'}}>
+          <div className='mob-stack' style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap'}}>
             <button className="btn-primary" onClick={()=>navigate('/signup')} style={{borderRadius:'100px',fontSize:'14px',padding:'16px 40px'}}>{T.start} →</button>
             <button className="btn-ghost" onClick={()=>navigate('/hr/login')} style={{borderRadius:'100px',fontSize:'14px',padding:'16px 40px'}}>{T.hr}</button>
           </div>
@@ -404,7 +421,7 @@ export default function Landing() {
       {/* FOOTER */}
       <footer id="contact" style={{borderTop:'1px solid rgba(245,240,232,0.06)',padding:'48px',background:'rgba(245,240,232,0.01)'}}>
         <div style={{maxWidth:'1200px',margin:'0 auto'}}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:'40px',marginBottom:'48px'}}>
+          <div className='mob-footer' style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:'40px',marginBottom:'48px'}}>
             <div>
               <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}>
                 <div style={{width:'28px',height:'28px',background:'linear-gradient(135deg,#0F6E56,#1a9b7a)',borderRadius:'3px',display:'flex',alignItems:'center',justifyContent:'center'}}>
@@ -414,7 +431,7 @@ export default function Landing() {
               </div>
               <p style={{fontSize:'13px',color:'rgba(245,240,232,0.35)',lineHeight:1.6,maxWidth:'220px',fontWeight:300}}>{T.tag}</p>
             </div>
-            <div style={{display:'flex',gap:'64px',flexWrap:'wrap'}}>
+            <div className='mob-footer-links' style={{display:'flex',gap:'64px',flexWrap:'wrap'}}>
               {[
                 {title:'Product',links:[{l:'Features',h:'#features'},{l:'Pricing',h:'#pricing'},{l:'Sign Up',h:'/signup'},{l:'Login',h:'/login'}]},
                 {title:'Portals',links:[{l:'Manager Login',h:'/login'},{l:'HR Portal',h:'/hr/login'}]},
