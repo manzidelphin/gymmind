@@ -421,7 +421,7 @@ export default function HRDashboard() {
   const [addError,   setAddError]   = useState('');
 
   // Excel upload
-  interface UploadRow { name: string; phone: string; valid: boolean }
+  interface UploadRow { name: string; phone: string; parent_name: string; valid: boolean }
   const [uploadPreview, setUploadPreview] = useState<UploadRow[]>([]);
   const [uploadLoading, setUploadLoading] = useState(false);
   const [uploadResult,  setUploadResult]  = useState<{ created: number; skipped: number } | null>(null);
@@ -582,9 +582,10 @@ export default function HRDashboard() {
         const ws   = wb.Sheets[wb.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: '' });
         const preview: UploadRow[] = rows.map((r) => {
-          const name  = String(r['Name']  || r['name']  || r['NAME']  || '').trim();
-          const phone = String(r['Phone'] || r['phone'] || r['PHONE'] || '').trim();
-          return { name, phone, valid: name.length > 0 };
+          const name        = String(r['Name']        || r['name']        || r['NAME']        || '').trim();
+          const phone       = String(r['Phone']       || r['phone']       || r['PHONE']       || '').trim();
+          const parent_name = String(r['Parent Name'] || r['parent_name'] || r['Parent']      || '').trim();
+          return { name, phone, parent_name, valid: name.length > 0 };
         }).filter(r => r.name || r.phone);
         setUploadPreview(preview);
         setUploadResult(null);
@@ -616,7 +617,7 @@ export default function HRDashboard() {
     try {
       const { data } = await hrApi.post<{ created: number; skipped: number }>(
         `/hr/${e.institutionId}/employees/bulk`,
-        { employees: valid.map(r => ({ name: r.name, phone: r.phone || undefined })) },
+        { employees: valid.map(r => ({ name: r.name, phone: r.phone || undefined, parent_name: r.parent_name || undefined })) },
       );
       setUploadResult(data);
       setUploadPreview([]);

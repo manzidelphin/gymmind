@@ -898,8 +898,9 @@ router.post('/:token/employees', async (req: Request, res: Response) => {
 // ---------------------------------------------------------------
 const bulkSchema = z.object({
   employees: z.array(z.object({
-    name:  z.string().min(1).max(255),
-    phone: z.string().optional(),
+    name:        z.string().min(1).max(255),
+    phone:       z.string().optional(),
+    parent_name: z.string().optional(),
   })).min(1).max(500),
 });
 
@@ -951,10 +952,19 @@ router.post('/:token/employees/bulk', async (req: Request, res: Response) => {
           continue;
         }
 
+        // Resolve parent_id if parent_name provided
+        let parentId: number | null = null;
+        if (emp.parent_name?.trim()) {
+          const [parentRows] = await pool.query<any[]>(
+            'SELECT id FROM users WHERE gym_id = ? AND institution_id = ? AND LOWER(name) = LOWER(?) LIMIT 1',
+            [inst.gymId, inst.institutionId, emp.parent_name.trim()]
+          );
+          parentId = parentRows[0]?.id ?? null;
+        }
         await pool.query(
-          `INSERT INTO users (gym_id, name, phone, role, institution_id, status)
-           VALUES (?, ?, ?, 'member', ?, ?)`,
-          [inst.gymId, emp.name.trim(), phone, inst.institutionId, phone ? 'active' : 'unclaimed'],
+          `INSERT INTO users (gym_id, name, phone, role, institution_id, parent_id, status)
+           VALUES (?, ?, ?, 'member', ?, ?, ?)`,
+          [inst.gymId, emp.name.trim(), phone, inst.institutionId, parentId, phone ? 'active' : 'unclaimed'],
         );
         created++;
       } catch {
