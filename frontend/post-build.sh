@@ -132,12 +132,7 @@ cb = cb.replace(", currency,", ",").replace(", 'RWF',", ",")
 cb = re.sub(r'total_visits\s*=\s*VALUES\(total_visits\)', 'total_checkins = VALUES(total_checkins)', cb)
 cb = re.sub(r'\(gym_id, institution_id, month, total_visits,', '(gym_id, institution_id, month, total_checkins,', cb)
 
-# Add try/catch to send-to-hr if missing
-if "try {\n    const gymId = req.gym.id;\n    const parsed = sendToHrSchema" not in cb:
-    cb = cb.replace(
-        "router.post('/send-to-hr', async (req, res) => {\n    const gymId = req.gym.id;",
-        "router.post('/send-to-hr', async (req, res) => {\n    try {\n    const gymId = req.gym.id;"
-    )
+# send-to-hr try/catch is already in the compiled JS - no patch needed
 
 open('/var/www/gymmind/backend/dist/routes/institutionalBilling.js','w').write(cb)
 print('All patches done!')
