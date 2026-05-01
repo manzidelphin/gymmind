@@ -1,39 +1,29 @@
 import re
 
-# Fix 1: literal newlines in AI chat prompt
 with open('/var/www/gymmind/backend/dist/routes/hr.js') as f:
     c = f.read()
 
+# Fix 1: literal newlines in AI chat prompt
 c = c.replace(
     "(systemPrompt||'')+'\n\n'+(messages||[]).map(m=>m.role+': '+m.content).join('\n')",
     "(systemPrompt||'')+'\\n\\n'+(messages||[]).map(m=>m.role+': '+m.content).join('\\n')"
 )
+print('Fixed prompt newlines!')
 
-# Fix 2: billing-report missing service_names and gym_name
-old_sql = 'GROUP BY u.id ORDER BY u.name\','
-new_sql = 'GROUP BY u.id,g.name ORDER BY u.name\','
+# Fix 2: amount_due shows 0 for members with no visits
+c = c.replace(
+    'amount_due:Number(r.total_amount||0)',
+    'amount_due:Number(r.visit_count)>0?Number(r.total_amount||0):0'
+)
+print('Fixed amount_due!')
 
-old_join = 'LEFT JOIN services s ON s.id=c.service_id WHERE u.gym_id=? AND u.institution_id=? AND u.role="member"'
-new_join = 'LEFT JOIN services s ON s.id=c.service_id LEFT JOIN gyms g ON g.id=u.gym_id WHERE u.gym_id=? AND u.institution_id=? AND u.role="member"'
-
-old_select = 'visit_dates FROM users u'
-new_select = 'visit_dates,GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") AS service_names,g.name AS gym_name FROM users u'
-
-old_map = 'visit_dates:r.visit_dates?r.visit_dates.split(\',\'):[]}))'
-new_map = 'visit_dates:r.visit_dates?r.visit_dates.split(\',\'):[],service_names:r.service_names?r.service_names.split(', '):null,gym_name:r.gym_name??null}))'
-
-for old, new in [(old_join, new_join), (old_select, new_select), (old_map, new_map)]:
-    if old in c:
-        c = c.replace(old, new)
-        print(f'Fixed: {old[:40]}...')
-    else:
-        print(f'Not found: {old[:40]}...')
+# Fix 3: service_names split string to array
+c = c.replace(
+    'service_names:r.service_names??null',
+    'service_names:r.service_names?r.service_names.split(\', \'):null'
+)
+print('Fixed service_names!')
 
 with open('/var/www/gymmind/backend/dist/routes/hr.js', 'w') as f:
     f.write(c)
-# Fix amount_due to show 0 for members with no visits
-c2 = open('/var/www/gymmind/backend/dist/routes/hr.js').read()
-c2 = c2.replace('amount_due:Number(r.total_amount||0)', 'amount_due:Number(r.visit_count)>0?Number(r.total_amount||0):0')
-open('/var/www/gymmind/backend/dist/routes/hr.js', 'w').write(c2)
-print('Fixed amount_due!')
 print('Done!')
