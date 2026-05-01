@@ -527,7 +527,13 @@ router.post('/claim-account', async (req: Request, res: Response) => {
     phone:  user.phone,
   });
 
-  res.json({ user, token });
+  // Generate checkin token for immediate checkin after claiming
+  const checkinOtp = Math.floor(100000 + Math.random() * 900000).toString();
+  await pool.query(
+    `INSERT INTO otps (gym_id, phone, code, expires_at) VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))`,
+    [gymId, phone, checkinOtp]
+  );
+  res.json({ user, token, checkinToken: checkinOtp });
 });
 
 export default router;

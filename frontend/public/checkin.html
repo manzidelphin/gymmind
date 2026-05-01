@@ -406,13 +406,10 @@ async function doClaimAccount(){
     const r=await fetch('/api/auth/claim-account',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({userId:claimUserId,phone:cp,code})});
     const d=await r.json();
     if(!r.ok){alert(d.error||'Failed to claim account');return;}
-    // Account claimed! Now check in with new phone
+    // Account claimed! Now check in directly using the token from claim
     phone=cp;
-    const r2=await fetch('/api/auth/send-otp',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone})});
-    const d2=await r2.json();
-    otp=d2.devCode||'';
-    if(d2.devCode){document.getElementById('devCode').textContent='Dev: '+d2.devCode;document.getElementById('devCode').style.display='block';}
-    // Show service selection
+    otp=d.checkinToken||'';
+    // Show service selection — checkin will use token directly
     showServiceSelection(d.user?.name||'member');
   }catch(e){alert('Network error');}
 }
