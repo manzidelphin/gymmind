@@ -50,8 +50,8 @@ router.get('/:token/checkins', async (req, res) => {
     if(String(search).trim()){sql+=" AND (u.name LIKE ? OR u.phone LIKE ?)";params.push('%'+search+'%','%'+search+'%');}
     sql+=" ORDER BY c.checked_in_at DESC LIMIT 500";
     const [rows]=await db_1.pool.query(sql,params);
-    const unique=new Set(rows.map(r=>r.employee_name)).size;
-    const ma=rows.reduce((a,r)=>{a[r.employee_name]=(a[r.employee_name]||0)+1;return a;},{});
+    const unique=new Set(rows.map(r=>r.employee_id)).size;
+    const ma=rows.reduce((a,r)=>{a[r.employee_id]=(a[r.employee_id]||0)+1;return a;},{});
     res.json({records:rows,attendance:rows,total:rows.length,uniqueEmployees:unique,mostActive:Object.entries(ma).sort((a,b)=>b[1]-a[1])[0]?.[0]||null,lastCheckin:rows[0]?rows[0].checked_in_at:null});
     }catch(e){res.status(500).json({error:'Failed'});}
 });
