@@ -772,9 +772,10 @@ router.get('/:token/checkins', async (req: Request, res: Response) => {
     }));
 
     const uniqueEmployees = new Set(rows.map((r: any) => r.employee_id)).size;
-    const nameCounts: Record<string, number> = {};
-    for (const r of rows) nameCounts[r.employee_id] = (nameCounts[r.employee_id] ?? 0) + 1;
-    const mostActive = Object.entries(nameCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+    const idCounts: Record<string, number> = {};
+    for (const r of rows) idCounts[r.employee_id] = (idCounts[r.employee_id] ?? 0) + 1;
+    const mostActiveId = Object.entries(idCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+    const mostActive = mostActiveId ? (rows.find((r: any) => String(r.employee_id) === String(mostActiveId))?.employee_name ?? null) : null;
     const lastCheckin = rows[0]?.checked_in_at ?? null;
 
     res.json({ records, total: records.length, uniqueEmployees, mostActive, lastCheckin });
@@ -926,7 +927,8 @@ router.post('/:token/employees/bulk', async (req: Request, res: Response) => {
             if (!validatePhone(phone)) phone = null;
           } catch { phone = null; }
 
-          if (phone) {
+          // Check duplicate by phone
+        if (phone) {
             const [dup] = await pool.query<any[]>(
               'SELECT id FROM users WHERE gym_id = ? AND phone = ?',
               [inst.gymId, phone],
@@ -937,6 +939,16 @@ router.post('/:token/employees/bulk', async (req: Request, res: Response) => {
               continue;
             }
           }
+        // Check duplicate by name within same institution
+        const [nameDup] = await pool.query<any[]>(
+          'SELECT id FROM users WHERE gym_id = ? AND institution_id = ? AND name = ?',
+          [inst.gymId, inst.institutionId, emp.name.trim()],
+        );
+        if (nameDup[0]) {
+          skipped++;
+          errors.push(`${emp.name}: already exists in this institution`);
+          continue;
+        }
         }
 
         await pool.query(
