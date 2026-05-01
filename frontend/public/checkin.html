@@ -49,6 +49,7 @@ input:focus{border-color:#0F6E56}
 .badge-dep{background:#fef3c7;color:#92400e}
 .section-label{font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px}
 .section-sub{color:#64748b;font-size:12px;margin-bottom:14px}
+  .inline-error{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:10px 14px;border-radius:8px;font-size:13px;margin-top:8px;display:none;text-align:center}
 </style>
 </head>
 <body>
@@ -68,6 +69,7 @@ input:focus{border-color:#0F6E56}
     <label>Member Phone Number</label>
     <input type="tel" id="phoneInput" placeholder="07XX XXX XXX" inputmode="numeric" autofocus>
     <button class="btn" id="sendBtn" onclick="sendOTP()">Send Code →</button>
+    <div class="inline-error" id="phoneError"></div>
     <p class="hint">A 6-digit code will be sent to verify identity</p>
   </div>
 
@@ -243,15 +245,19 @@ function goTo(id){
 }
 
 // ── Step 1: Send OTP ───────────────────────────────────────────
+function showPhoneError(msg){
+  const el=document.getElementById('phoneError');
+  if(el){el.textContent=msg;el.style.display='block';setTimeout(()=>{el.style.display='none';},4000);}
+}
 async function sendOTP(){
   const raw=document.getElementById('phoneInput').value.replace(/\s/g,'');
-  if(!raw){alert('Please enter a phone number');return;}
+  if(!raw){showPhoneError('Please enter your phone number: 07XX XXX XXX');return;}
   phone=raw;
   const btn=document.getElementById('sendBtn');btn.disabled=true;btn.textContent='Sending...';
   try{
     const r=await fetch('/api/auth/send-otp',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone})});
     const d=await r.json();
-    if(!r.ok){alert(d.error||'Failed to send code');btn.disabled=false;btn.textContent='Send Code →';return;}
+    if(!r.ok){showPhoneError(d.error||'Invalid phone number. Use format: 07XX XXX XXX or +250 7XX XXX XXX');btn.disabled=false;btn.textContent='Send Code →';return;}
     if(d.devCode){const dc=document.getElementById('devCode');dc.textContent='Dev: '+d.devCode;dc.style.display='block';}
     document.getElementById('sentTo').textContent=phone;
     goTo('s2');document.getElementById('otpGrid').children[0].focus();
