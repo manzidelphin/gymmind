@@ -661,7 +661,7 @@ export default function HRDashboard() {
     [attendance, attMonth],
   );
   const topEmployees = useMemo(
-    () => [...(detail?.employees ?? [])].sort((a, b) => b.days_attended - a.days_attended).slice(0, 5),
+    () => [...(detail?.employees ?? [])].filter(e => e.days_attended > 0).sort((a, b) => b.days_attended - a.days_attended).slice(0, 5),
     [detail],
   );
   const recentCheckins = useMemo(

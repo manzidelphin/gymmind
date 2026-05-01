@@ -45,7 +45,7 @@ async function resolveInstitution(token: string): Promise<ResolvedInst | null> {
   const [instRows] = await pool.query<any[]>(
     `SELECT i.id, i.name, i.rate_per_session, i.gym_id, g.name AS gym_name
      FROM institutions i JOIN gyms g ON g.id = i.gym_id
-     WHERE i.slug = ? LIMIT 1`,
+     WHERE i.id = ? LIMIT 1`,
     [token],
   );
   if (instRows[0]) {
@@ -501,7 +501,7 @@ router.get('/:token/invoice.pdf', async (req: Request, res: Response) => {
       const [instRows] = await pool.query<any[]>(
         `SELECT i.id, i.name, i.rate_per_session, i.gym_id, g.name AS gym_name
          FROM institutions i JOIN gyms g ON g.id = i.gym_id
-         WHERE i.slug = ? LIMIT 1`,
+         WHERE i.id = ? LIMIT 1`,
         [token],
       );
       let instRow: any = instRows[0] ?? null;
@@ -650,7 +650,7 @@ router.get('/:token', async (req: Request, res: Response) => {
     const [instRows] = await pool.query<any[]>(
       `SELECT i.id, i.name, i.rate_per_session, i.gym_id, g.name AS gym_name
        FROM institutions i JOIN gyms g ON g.id = i.gym_id
-       WHERE i.slug = ? LIMIT 1`,
+       WHERE i.id = ? LIMIT 1`,
       [token],
     );
 

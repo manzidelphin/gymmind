@@ -139,6 +139,7 @@ print('All patches done!')
 PYEOF
 
 # Verify compiled JS files are valid before restarting
+python3 /var/www/gymmind/frontend/fix-hr-prompt.py
 echo "Verifying compiled JS..."
 node --check /var/www/gymmind/backend/dist/routes/hr.js && echo "✅ hr.js OK" || (echo "❌ hr.js has syntax error!" && exit 1)
 node --check /var/www/gymmind/backend/dist/routes/institutionalBilling.js && echo "✅ institutionalBilling.js OK" || (echo "❌ institutionalBilling.js has syntax error!" && exit 1)
