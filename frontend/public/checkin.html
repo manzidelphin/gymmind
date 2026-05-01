@@ -268,9 +268,9 @@ async function verifyAndContinue(){
     const r=await fetch('/api/checkin/peek',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone,otp})});
     const d=await r.json();
     if(r.status===401){alert('Invalid or expired code. Please try again.');return;}
-    // User not found — show Institution/Individual/Walkin choice
-    if(d.userFound===false){goTo('sType');return;}
-    // User exists — get fresh OTP and show service selection
+    // User not found OR no membership — show Institution/Individual/Walkin choice
+    if(d.userFound===false || d.hasMembership===false){goTo('sType');return;}
+    // User exists with membership — show service selection
     const r2=await fetch('/api/auth/send-otp',{method:'POST',headers:{'Content-Type':'application/json','X-Gym-Slug':slug},body:JSON.stringify({phone})});
     const d2=await r2.json();
     if(d2.devCode){otp=d2.devCode;}
