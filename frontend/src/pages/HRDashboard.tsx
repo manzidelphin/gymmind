@@ -890,7 +890,7 @@ export default function HRDashboard() {
                 {uploadResult && (
                   <div className={s.uploadSuccess}>
                     ✓ Upload complete — <strong>{uploadResult.created}</strong> added
-                    {uploadResult.skipped > 0 && `, ${uploadResult.skipped} skipped (duplicates)`}
+                    {uploadResult.skipped > 0 && `, ${uploadResult.skipped} already registered in this gym`}
                   </div>
                 )}
 
