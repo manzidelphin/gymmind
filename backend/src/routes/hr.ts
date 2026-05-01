@@ -928,7 +928,7 @@ router.post('/:token/employees/bulk', async (req: Request, res: Response) => {
           } catch { phone = null; }
 
           // Check duplicate by phone
-        if (phone) {
+          if (phone) {
             const [dup] = await pool.query<any[]>(
               'SELECT id FROM users WHERE gym_id = ? AND phone = ?',
               [inst.gymId, phone],
@@ -939,16 +939,16 @@ router.post('/:token/employees/bulk', async (req: Request, res: Response) => {
               continue;
             }
           }
-        // Check duplicate by name within same institution
+        }
+        // Check duplicate by name within same institution (always runs)
         const [nameDup] = await pool.query<any[]>(
-          'SELECT id FROM users WHERE gym_id = ? AND institution_id = ? AND name = ?',
+          'SELECT id FROM users WHERE gym_id = ? AND institution_id = ? AND LOWER(name) = LOWER(?)',
           [inst.gymId, inst.institutionId, emp.name.trim()],
         );
         if (nameDup[0]) {
           skipped++;
           errors.push(`${emp.name}: already exists in this institution`);
           continue;
-        }
         }
 
         await pool.query(
