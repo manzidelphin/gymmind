@@ -20,7 +20,7 @@ old_select = 'visit_dates FROM users u'
 new_select = 'visit_dates,GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") AS service_names,g.name AS gym_name FROM users u'
 
 old_map = 'visit_dates:r.visit_dates?r.visit_dates.split(\',\'):[]}))'
-new_map = 'visit_dates:r.visit_dates?r.visit_dates.split(\',\'):[],service_names:r.service_names??null,gym_name:r.gym_name??null}))'
+new_map = 'visit_dates:r.visit_dates?r.visit_dates.split(\',\'):[],service_names:r.service_names?r.service_names.split(', '):null,gym_name:r.gym_name??null}))'
 
 for old, new in [(old_join, new_join), (old_select, new_select), (old_map, new_map)]:
     if old in c:
