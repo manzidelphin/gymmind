@@ -31,4 +31,9 @@ for old, new in [(old_join, new_join), (old_select, new_select), (old_map, new_m
 
 with open('/var/www/gymmind/backend/dist/routes/hr.js', 'w') as f:
     f.write(c)
+# Fix amount_due to show 0 for members with no visits
+c2 = open('/var/www/gymmind/backend/dist/routes/hr.js').read()
+c2 = c2.replace('amount_due:Number(r.total_amount||0)', 'amount_due:Number(r.visit_count)>0?Number(r.total_amount||0):0')
+open('/var/www/gymmind/backend/dist/routes/hr.js', 'w').write(c2)
+print('Fixed amount_due!')
 print('Done!')
