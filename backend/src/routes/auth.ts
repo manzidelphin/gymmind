@@ -436,13 +436,13 @@ router.get('/claim-search', async (req: Request, res: Response) => {
 
   const gymId = req.gym.id;
   const [rows] = await pool.query<any[]>(
-    `SELECT u.id, u.name,
+    `SELECT u.id, u.name, u.parent_id, u.institution_id,
             p.name AS parent_name,
-            i.name AS institution_name
+            COALESCE(i.name, ip.name) AS institution_name
      FROM users u
-     LEFT JOIN users i_parent ON i_parent.id = u.parent_id AND i_parent.gym_id = u.gym_id
      LEFT JOIN users p ON p.id = u.parent_id AND p.gym_id = u.gym_id
-     LEFT JOIN institutions i ON i.id = COALESCE(u.institution_id, i_parent.institution_id) AND i.gym_id = u.gym_id
+     LEFT JOIN institutions i ON i.id = u.institution_id AND i.gym_id = u.gym_id
+     LEFT JOIN institutions ip ON ip.id = p.institution_id AND ip.gym_id = u.gym_id
      WHERE u.gym_id = ? AND u.status = 'unclaimed' AND u.name LIKE ?
      ORDER BY u.name LIMIT 15`,
     [gymId, `%${name}%`]
