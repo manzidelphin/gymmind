@@ -1017,7 +1017,7 @@ export default function HRDashboard() {
               }
               <div className={s.partnerCta}>
                 <span>Want to add another gym location?</span>
-                <a href="mailto:hello@gymmind.app" className={s.btnSecondary}>Request Partnership →</a>
+                <a href="mailto:info@gymmind.rw" className={s.btnSecondary}>Request Partnership →</a>
               </div>
             </>
           )}
@@ -1277,7 +1277,7 @@ export default function HRDashboard() {
                 <SettingsRow label="Rate Per Visit" value={fmtRwf(entry.ratePerSession)} />
                 <div className={s.settingsNote}>
                   To update company details, contact{' '}
-                  <a href="mailto:hello@gymmind.app">hello@gymmind.app</a>
+                  <a href="mailto:info@gymmind.rw">info@gymmind.rw</a>
                 </div>
               </div>
               <div className={s.panel}>
@@ -1288,7 +1288,7 @@ export default function HRDashboard() {
                 <SettingsRow label="Total This Month" value={fmtRwf(entry.invoiceAmount)} />
                 <div className={s.settingsNote}>
                   For billing queries, email{' '}
-                  <a href="mailto:billing@gymmind.app">billing@gymmind.app</a>
+                  <a href="mailto:support@gymmind.rw">support@gymmind.rw</a>
                 </div>
               </div>
             </div>
