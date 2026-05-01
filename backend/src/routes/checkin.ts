@@ -99,14 +99,17 @@ router.post('/peek', async (req: Request, res: Response) => {
   );
 
   const user = userRows[0];
-  if (!user || user.status !== 'active') {
+  if (!user) {
     res.json({ hasMembership: false });
     return;
   }
-
-  // Institutional employee → always has access
-  if (user.institution_id !== null) {
+  // Institutional employee → always has access (even if unclaimed)
+  if (user.institution_id !== null && user.status !== 'suspended') {
     res.json({ hasMembership: true });
+    return;
+  }
+  if (user.status !== 'active') {
+    res.json({ hasMembership: false });
     return;
   }
 

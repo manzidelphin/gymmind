@@ -75,12 +75,8 @@ export async function validateCheckin(
     return { allowed: false, reason: 'pending_approval', pendingPlan: pendingReq?.plan_name, user };
   }
 
-  if (user.status !== 'active') {
-    return { allowed: false, reason: 'user_suspended', user };
-  }
-
-  // ── STEP 2: Institutional employee ─────────────────────────────────────
   if (user.institution_id !== null) {
+    if (user.status === 'suspended') { return { allowed: false, reason: 'user_suspended', user }; }
     if (serviceId !== undefined) {
       const denied = await checkInstitutionServiceAccess(
         user.institution_id,
@@ -120,6 +116,10 @@ export async function validateCheckin(
     // Parent has no institution — fall through to individual check
   }
 
+  // Check status for non-institutional members
+  if (user.status !== 'active') {
+    return { allowed: false, reason: 'user_suspended', user };
+  }
   // ── STEP 3.5: Check for a pending membership request ────────────────────
   const [[pendingReq]] = await pool.query<any[]>(
     `SELECT mr.id, mp.name AS plan_name
