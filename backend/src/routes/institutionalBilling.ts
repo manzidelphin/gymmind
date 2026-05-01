@@ -187,7 +187,7 @@ router.get('/summary', async (req: Request, res: Response) => {
          ip.payment_reference
        FROM institutions i
        LEFT JOIN users u
-         ON u.institution_id = i.id AND u.gym_id = i.gym_id
+         ON u.institution_id = i.id AND u.gym_id = i.gym_id AND u.parent_id IS NULL
        LEFT JOIN checkins c
          ON c.user_id = u.id AND c.gym_id = i.gym_id
          AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
@@ -257,7 +257,7 @@ router.get('/institutions', async (req: Request, res: Response) => {
        ip.payment_reference
      FROM institutions i
      LEFT JOIN users u
-       ON u.institution_id = i.id AND u.gym_id = i.gym_id
+       ON u.institution_id = i.id AND u.gym_id = i.gym_id AND u.parent_id IS NULL
      LEFT JOIN checkins c
        ON c.user_id = u.id AND c.gym_id = i.gym_id
        AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
@@ -456,12 +456,31 @@ router.patch('/institutions/:id/status', async (req: Request, res: Response) => 
     return;
   }
 
+  // Calculate real visits/amount so we never insert zeros
+  const [visitRows] = await pool.query<any[]>(
+    `SELECT COUNT(c.id) AS total_visits,
+            COUNT(c.id) * i.rate_per_session AS total_amount
+     FROM institutions i
+     LEFT JOIN users u
+       ON u.institution_id = i.id AND u.gym_id = i.gym_id AND u.parent_id IS NULL
+     LEFT JOIN checkins c
+       ON c.user_id = u.id AND c.gym_id = i.gym_id
+       AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
+     WHERE i.id = ? AND i.gym_id = ?`,
+    [month, institutionId, gymId],
+  );
+  const totalVisits = Number((visitRows as any[])[0]?.total_visits ?? 0);
+  const totalAmount = Number((visitRows as any[])[0]?.total_amount ?? 0);
+
   await pool.query(
     `INSERT INTO institutional_payments
        (gym_id, institution_id, month, total_visits, total_amount, status)
-     VALUES (?, ?, ?, 0, 0, ?)
-     ON DUPLICATE KEY UPDATE status = VALUES(status)`,
-    [gymId, institutionId, month, status],
+     VALUES (?, ?, ?, ?, ?, ?)
+     ON DUPLICATE KEY UPDATE
+       status       = VALUES(status),
+       total_visits = IF(total_visits = 0, VALUES(total_visits), total_visits),
+       total_amount = IF(total_amount = 0, VALUES(total_amount), total_amount)`,
+    [gymId, institutionId, month, totalVisits, totalAmount, status],
   );
 
   res.json({ message: 'Status updated' });

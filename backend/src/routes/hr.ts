@@ -347,7 +347,7 @@ router.get('/dashboard', hrAuth, async (req: Request, res: Response) => {
        LEFT JOIN checkins c
          ON c.user_id = u.id AND c.gym_id = u.gym_id
          AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
-       WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member'
+       WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member' AND u.parent_id IS NULL
        GROUP BY u.id`,
       [month, gymId, institutionId],
     );
@@ -771,9 +771,9 @@ router.get('/:token/checkins', async (req: Request, res: Response) => {
       type:          r.checkin_type  ?? 'institutional',
     }));
 
-    const uniqueEmployees = new Set(rows.map((r: any) => r.employee_name)).size;
+    const uniqueEmployees = new Set(rows.map((r: any) => r.employee_id)).size;
     const nameCounts: Record<string, number> = {};
-    for (const r of rows) nameCounts[r.employee_name] = (nameCounts[r.employee_name] ?? 0) + 1;
+    for (const r of rows) nameCounts[r.employee_id] = (nameCounts[r.employee_id] ?? 0) + 1;
     const mostActive = Object.entries(nameCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
     const lastCheckin = rows[0]?.checked_in_at ?? null;
 
@@ -811,7 +811,7 @@ router.get('/:token/attendance', async (req: Request, res: Response) => {
        LEFT JOIN checkins c
          ON c.user_id = u.id AND c.gym_id = u.gym_id
          AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
-       WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member'
+       WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member' AND u.parent_id IS NULL
        GROUP BY u.id, u.name
        ORDER BY u.name ASC`,
       [monthParam, inst.gymId, inst.institutionId],
