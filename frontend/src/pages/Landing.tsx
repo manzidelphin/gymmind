@@ -436,6 +436,7 @@ export default function Landing() {
                 {title:'Product',links:[{l:'Features',h:'#features'},{l:'Pricing',h:'#pricing'},{l:'Sign Up',h:'/signup'},{l:'Login',h:'/login'}]},
                 {title:'Portals',links:[{l:'Manager Login',h:'/login'},{l:'HR Portal',h:'/hr/login'}]},
                 {title:'Contact',links:[{l:'info@gymmind.rw',h:'mailto:info@gymmind.rw'},{l:'support@gymmind.rw',h:'mailto:support@gymmind.rw'}]},
+                {title:'Legal',links:[{l:'Terms of Service',h:'/terms.html'},{l:'Privacy Policy',h:'/privacy.html'},{l:'Institutional Agreement',h:'/institutional-agreement.html'},{l:'Data Processing',h:'/data-processing.html'}]},
               ].map(col=>(
                 <div key={col.title}>
                   <div style={{fontFamily:"'DM Mono',monospace",fontSize:'10px',letterSpacing:'0.1em',color:'rgba(245,240,232,0.3)',textTransform:'uppercase',marginBottom:'16px'}}>{col.title}</div>
