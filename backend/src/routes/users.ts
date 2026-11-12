@@ -32,7 +32,7 @@ router.get('/', async (req: Request, res: Response) => {
   const params: unknown[]    = [gymId];
 
   if (search) {
-    conditions.push('(u.name LIKE ? OR u.phone LIKE ?)');
+    conditions.push('(u.name ILIKE ? OR u.phone ILIKE ?)');
     params.push(`%${search}%`, `%${search}%`);
   }
   if (institutionId) {

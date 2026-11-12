@@ -30,7 +30,7 @@ These describe the project's focus and supporting technology; individual workflo
 | Data visualization | Recharts |
 | HTTP requests | Axios |
 | Backend | Node.js, Express, TypeScript |
-| Database | MySQL (mysql2) |
+| Database | PostgreSQL on Supabase (pg) |
 | Authentication utilities | JSON Web Tokens |
 | Validation | Zod |
 | Notifications | Africa's Talking, Nodemailer |
@@ -54,7 +54,7 @@ gymmind/
 
 ## Run locally
 
-**Requirements:** Node.js, npm, and a MySQL database compatible with the backend configuration.
+**Requirements:** Node.js, npm, and a PostgreSQL database (Supabase). Copy `backend/.env.example` to `backend/.env` and fill it in.
 
 Clone the repository:
 
@@ -78,7 +78,7 @@ The backend provides these commands:
 | `npm run dev` | Run the development server |
 | `npm run build` | Compile TypeScript |
 | `npm start` | Start the compiled server |
-| `npm run migrate` | Run the project's migration script |
+| `npm run migrate` | Apply `sql/schema.sql` to an empty database (`-- --seed` adds demo data) |
 
 Configure your own database connection, authentication secrets, and integration credentials before running the server. Review the backend source and SQL files for the current required variables and migration sequence. **Do not run migrations against a production database without a backup and review.**
 
@@ -126,3 +126,14 @@ The repository includes local Claude tooling settings. Such settings should be r
 **Manzi Delphin** · Software Engineering · Rwanda 🇷🇼
 
 GymMind is being developed to support the digital transformation of gym management in Rwanda and the wider East African market.
+
+## Deployment
+
+GymMind runs on Vercel as two projects from this repository, with the database on Supabase:
+
+| Project | Root directory | Notes |
+| --- | --- | --- |
+| Frontend | `frontend` | Vite build. Set `VITE_API_BASE_URL=/api`. |
+| Backend | `backend` | Express API. Set the variables listed in `backend/.env.example`. |
+
+The backend's daily jobs (membership expiry warnings, attendance reminders, monthly summaries) are triggered by Vercel Cron through `/api/cron/daily`, protected by `CRON_SECRET`.

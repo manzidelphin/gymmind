@@ -102,7 +102,7 @@ router.post('/institutions/:id/request-payment', async (req: Request, res: Respo
         `SELECT COUNT(DISTINCT c.id) AS visits
          FROM checkins c JOIN users u ON u.id = c.user_id
          WHERE c.gym_id = ? AND u.institution_id = ?
-           AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?`,
+           AND to_char(c.checked_in_at, 'YYYY-MM') = ?`,
         [inst.gym_id, institutionId, month],
       );
       amount = Number(visitRow?.visits ?? 0) * Number(inst.rate_per_session);
@@ -126,7 +126,7 @@ router.post('/institutions/:id/request-payment', async (req: Request, res: Respo
     if (existing) {
       await pool.query(
         `UPDATE institutional_payments
-         SET momo_reference_id = ?, status = IF(status = 'paid', 'paid', 'sent'), sent_at = NOW()
+         SET momo_reference_id = ?, status = CASE WHEN status = 'paid' THEN 'paid' ELSE 'sent' END, sent_at = NOW()
          WHERE id = ?`,
         [referenceId, existing.id],
       );
@@ -190,7 +190,7 @@ router.get('/summary', async (req: Request, res: Response) => {
          ON u.institution_id = i.id AND u.gym_id = i.gym_id AND u.parent_id IS NULL
        LEFT JOIN checkins c
          ON c.user_id = u.id AND c.gym_id = i.gym_id
-         AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
+         AND to_char(c.checked_in_at, 'YYYY-MM') = ?
        LEFT JOIN institutional_payments ip
          ON ip.institution_id = i.id AND ip.gym_id = i.gym_id AND ip.month = ?
        WHERE i.gym_id = ?
@@ -260,7 +260,7 @@ router.get('/institutions', async (req: Request, res: Response) => {
        ON u.institution_id = i.id AND u.gym_id = i.gym_id AND u.parent_id IS NULL
      LEFT JOIN checkins c
        ON c.user_id = u.id AND c.gym_id = i.gym_id
-       AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
+       AND to_char(c.checked_in_at, 'YYYY-MM') = ?
      LEFT JOIN institutional_payments ip
        ON ip.institution_id = i.id AND ip.gym_id = i.gym_id AND ip.month = ?
      WHERE i.gym_id = ?
@@ -334,7 +334,7 @@ router.get('/institutions/:id/breakdown', async (req: Request, res: Response) =>
      LEFT JOIN users parent ON u.parent_id = parent.id AND parent.gym_id = u.gym_id
      LEFT JOIN checkins c
        ON c.user_id = u.id AND c.gym_id = u.gym_id
-       AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
+       AND to_char(c.checked_in_at, 'YYYY-MM') = ?
      LEFT JOIN services s ON c.service_id = s.id
      WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member'
      GROUP BY u.id, u.name, u.parent_id, parent.name, s.id, s.name, i.rate_per_session
@@ -400,22 +400,22 @@ router.post('/institutions/:id/mark-paid', async (req: Request, res: Response) =
      FROM checkins c
      JOIN users u ON c.user_id = u.id AND u.gym_id = c.gym_id
      WHERE c.gym_id = ? AND u.institution_id = ?
-       AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?`,
+       AND to_char(c.checked_in_at, 'YYYY-MM') = ?`,
     [gymId, institutionId, month],
   );
   const totalVisits = Number(visitRow.total_visits);
 
   await pool.query(
-    `INSERT INTO institutional_payments
+    `INSERT INTO institutional_payments AS ip
        (gym_id, institution_id, month, total_visits, total_amount, currency, status, paid_at, payment_reference, notes)
      VALUES (?, ?, ?, ?, ?, 'RWF', 'paid', NOW(), ?, ?)
-     ON DUPLICATE KEY UPDATE
+     ON CONFLICT (institution_id, month, gym_id) DO UPDATE SET
        status            = 'paid',
-       total_visits      = VALUES(total_visits),
-       total_amount      = VALUES(total_amount),
+       total_visits      = EXCLUDED.total_visits,
+       total_amount      = EXCLUDED.total_amount,
        paid_at           = NOW(),
-       payment_reference = VALUES(payment_reference),
-       notes             = VALUES(notes)`,
+       payment_reference = EXCLUDED.payment_reference,
+       notes             = EXCLUDED.notes`,
     [gymId, institutionId, month, totalVisits, totalAmount, paymentReference ?? null, notes ?? null],
   );
 
@@ -465,21 +465,22 @@ router.patch('/institutions/:id/status', async (req: Request, res: Response) => 
        ON u.institution_id = i.id AND u.gym_id = i.gym_id AND u.parent_id IS NULL
      LEFT JOIN checkins c
        ON c.user_id = u.id AND c.gym_id = i.gym_id
-       AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
-     WHERE i.id = ? AND i.gym_id = ?`,
+       AND to_char(c.checked_in_at, 'YYYY-MM') = ?
+     WHERE i.id = ? AND i.gym_id = ?
+     GROUP BY i.id, i.rate_per_session`,
     [month, institutionId, gymId],
   );
   const totalVisits = Number((visitRows as any[])[0]?.total_visits ?? 0);
   const totalAmount = Number((visitRows as any[])[0]?.total_amount ?? 0);
 
   await pool.query(
-    `INSERT INTO institutional_payments
+    `INSERT INTO institutional_payments AS ip
        (gym_id, institution_id, month, total_visits, total_amount, status)
      VALUES (?, ?, ?, ?, ?, ?)
-     ON DUPLICATE KEY UPDATE
-       status       = VALUES(status),
-       total_visits = IF(total_visits = 0, VALUES(total_visits), total_visits),
-       total_amount = IF(total_amount = 0, VALUES(total_amount), total_amount)`,
+     ON CONFLICT (institution_id, month, gym_id) DO UPDATE SET
+       status       = EXCLUDED.status,
+       total_visits = CASE WHEN ip.total_visits = 0 THEN EXCLUDED.total_visits ELSE ip.total_visits END,
+       total_amount = CASE WHEN ip.total_amount = 0 THEN EXCLUDED.total_amount ELSE ip.total_amount END`,
     [gymId, institutionId, month, totalVisits, totalAmount, status],
   );
 
@@ -527,7 +528,7 @@ router.post('/generate', async (req: Request, res: Response) => {
      FROM users u
      LEFT JOIN checkins c
        ON c.user_id = u.id AND c.gym_id = u.gym_id
-       AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
+       AND to_char(c.checked_in_at, 'YYYY-MM') = ?
      WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member'
      GROUP BY u.id`,
     [monthStr, gymId, institutionId],
@@ -539,14 +540,14 @@ router.post('/generate', async (req: Request, res: Response) => {
   const accessToken = randomBytes(32).toString('hex');
 
   await pool.query(
-    `INSERT INTO institutional_payments
+    `INSERT INTO institutional_payments AS ip
        (gym_id, institution_id, month, total_visits, total_amount, currency, status, access_token)
      VALUES (?, ?, ?, ?, ?, 'RWF', 'pending', ?)
-     ON DUPLICATE KEY UPDATE
-       total_visits  = VALUES(total_visits),
-       total_amount  = VALUES(total_amount),
-       access_token  = VALUES(access_token),
-       status        = IF(status = 'paid', 'paid', 'pending')`,
+     ON CONFLICT (institution_id, month, gym_id) DO UPDATE SET
+       total_visits  = EXCLUDED.total_visits,
+       total_amount  = EXCLUDED.total_amount,
+       access_token  = EXCLUDED.access_token,
+       status        = CASE WHEN ip.status = 'paid' THEN 'paid' ELSE 'pending' END`,
     [gymId, institutionId, monthStr, totalVisits, totalAmount, accessToken],
   );
 
@@ -617,7 +618,7 @@ router.post('/send-to-hr', async (req: Request, res: Response) => {
      FROM users u
      LEFT JOIN checkins c
        ON c.user_id = u.id AND c.gym_id = u.gym_id
-       AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
+       AND to_char(c.checked_in_at, 'YYYY-MM') = ?
      WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member'
      GROUP BY u.id`,
     [month, gymId, institutionId],
@@ -627,15 +628,15 @@ router.post('/send-to-hr', async (req: Request, res: Response) => {
   const accessToken = randomBytes(32).toString('hex');
 
   await pool.query(
-    `INSERT INTO institutional_payments
+    `INSERT INTO institutional_payments AS ip
        (gym_id, institution_id, month, total_visits, total_amount, currency, status, access_token, sent_at)
      VALUES (?, ?, ?, ?, ?, 'RWF', 'sent', ?, NOW())
-     ON DUPLICATE KEY UPDATE
-       total_visits  = VALUES(total_visits),
-       total_amount  = VALUES(total_amount),
-       access_token  = COALESCE(access_token, VALUES(access_token)),
-       status        = IF(status = 'paid', 'paid', 'sent'),
-       sent_at       = IF(status = 'paid', sent_at, NOW())`,
+     ON CONFLICT (institution_id, month, gym_id) DO UPDATE SET
+       total_visits  = EXCLUDED.total_visits,
+       total_amount  = EXCLUDED.total_amount,
+       access_token  = COALESCE(ip.access_token, EXCLUDED.access_token),
+       status        = CASE WHEN ip.status = 'paid' THEN 'paid' ELSE 'sent' END,
+       sent_at       = CASE WHEN ip.status = 'paid' THEN ip.sent_at ELSE NOW() END`,
     [gymId, institutionId, month, totalVisits, totalAmount, accessToken],
   );
 

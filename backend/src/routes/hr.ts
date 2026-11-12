@@ -6,6 +6,7 @@ import { generateOTP, saveOTP, sendOTP, verifyOTP } from '../services/otp.servic
 import { signToken, verifyToken } from '../services/jwt.service';
 import { env } from '../config/env';
 import { generateInvoicePdf } from '../services/invoice.service';
+import axios from 'axios';
 
 const router = Router();
 
@@ -272,7 +273,7 @@ router.get('/attendance', hrAuth, async (req: Request, res: Response) => {
       params.push(employeeId);
     }
     if (search) {
-      extraWhere += ' AND (u.name LIKE ? OR u.phone LIKE ?)';
+      extraWhere += ' AND (u.name ILIKE ? OR u.phone ILIKE ?)';
       params.push(`%${search}%`, `%${search}%`);
     }
 
@@ -294,7 +295,7 @@ router.get('/attendance', hrAuth, async (req: Request, res: Response) => {
        LEFT JOIN user_memberships um ON um.id = c.membership_id
        LEFT JOIN membership_plans mp ON mp.id = um.plan_id
        LEFT JOIN institutions i      ON i.id  = u.institution_id
-       WHERE u.institution_id IN (?)
+       WHERE u.institution_id = ANY(?::int[])
          AND c.gym_id = u.gym_id
          AND c.checked_in_at BETWEEN ? AND ?
          ${extraWhere}
@@ -346,7 +347,7 @@ router.get('/dashboard', hrAuth, async (req: Request, res: Response) => {
        FROM users u
        LEFT JOIN checkins c
          ON c.user_id = u.id AND c.gym_id = u.gym_id
-         AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
+         AND to_char(c.checked_in_at, 'YYYY-MM') = ?
        WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member' AND u.parent_id IS NULL
        GROUP BY u.id`,
       [month, gymId, institutionId],
@@ -425,7 +426,7 @@ router.get('/gym/:gymSlug/institution/:institutionId', hrAuth, async (req: Reque
      FROM users u
      LEFT JOIN checkins c
        ON c.user_id = u.id AND c.gym_id = u.gym_id
-       AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
+       AND to_char(c.checked_in_at, 'YYYY-MM') = ?
      WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member' AND u.parent_id IS NULL
      GROUP BY u.id, u.name, u.phone, u.status
      ORDER BY u.name ASC`,
@@ -540,7 +541,7 @@ router.get('/:token/invoice.pdf', async (req: Request, res: Response) => {
        FROM users u
        LEFT JOIN checkins c
          ON c.user_id = u.id AND c.gym_id = u.gym_id
-         AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
+         AND to_char(c.checked_in_at, 'YYYY-MM') = ?
        WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member' AND u.parent_id IS NULL
        GROUP BY u.id, u.name
        ORDER BY u.name ASC`,
@@ -612,7 +613,7 @@ router.get('/:token', async (req: Request, res: Response) => {
          FROM users u
          LEFT JOIN checkins c
            ON c.user_id = u.id AND c.gym_id = u.gym_id
-           AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
+           AND to_char(c.checked_in_at, 'YYYY-MM') = ?
          WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member' AND u.parent_id IS NULL
          GROUP BY u.id, u.name, u.phone, u.status
          ORDER BY u.name ASC`,
@@ -685,7 +686,7 @@ router.get('/:token', async (req: Request, res: Response) => {
        FROM users u
        LEFT JOIN checkins c
          ON c.user_id = u.id AND c.gym_id = u.gym_id
-         AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
+         AND to_char(c.checked_in_at, 'YYYY-MM') = ?
        WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member' AND u.parent_id IS NULL
        GROUP BY u.id, u.name, u.phone, u.status
        ORDER BY u.name ASC`,
@@ -741,7 +742,7 @@ router.get('/:token/checkins', async (req: Request, res: Response) => {
     if (from) { conditions.push('DATE(c.checked_in_at) >= ?'); params.push(from); }
     if (to)   { conditions.push('DATE(c.checked_in_at) <= ?'); params.push(to);   }
     if (search) {
-      conditions.push('(u.name LIKE ? OR u.phone LIKE ?)');
+      conditions.push('(u.name ILIKE ? OR u.phone ILIKE ?)');
       params.push(`%${search}%`, `%${search}%`);
     }
 
@@ -806,12 +807,12 @@ router.get('/:token/attendance', async (req: Request, res: Response) => {
 
     const [rows] = await pool.query<any[]>(
       `SELECT u.id AS user_id, u.name,
-              GROUP_CONCAT(DISTINCT DAY(c.checked_in_at) ORDER BY c.checked_in_at) AS days_raw,
+              array_to_string(array_agg(DISTINCT EXTRACT(DAY FROM c.checked_in_at)::int ORDER BY EXTRACT(DAY FROM c.checked_in_at)::int), ',') AS days_raw,
               COUNT(DISTINCT DATE(c.checked_in_at)) AS total_days
        FROM users u
        LEFT JOIN checkins c
          ON c.user_id = u.id AND c.gym_id = u.gym_id
-         AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?
+         AND to_char(c.checked_in_at, 'YYYY-MM') = ?
        WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member' AND u.parent_id IS NULL
        GROUP BY u.id, u.name
        ORDER BY u.name ASC`,
@@ -1063,7 +1064,7 @@ router.post('/:token/pay', async (req: Request, res: Response) => {
            FROM checkins c
            JOIN users u ON u.id = c.user_id
            WHERE c.gym_id = ? AND u.institution_id = ?
-             AND DATE_FORMAT(c.checked_in_at, '%Y-%m') = ?`,
+             AND to_char(c.checked_in_at, 'YYYY-MM') = ?`,
           [inst.gymId, inst.institutionId, month],
         );
         const visits = Number(visitRow?.visits ?? 0);
@@ -1096,6 +1097,93 @@ router.post('/:token/pay', async (req: Request, res: Response) => {
   } catch (err) {
     console.error('HR pay error:', err);
     res.status(500).json({ error: 'Failed to initiate payment' });
+  }
+});
+
+// ---------------------------------------------------------------
+// GET /api/hr/:token/billing-report?from=YYYY-MM-DD&to=YYYY-MM-DD
+// Per-member visit counts and amounts due for the period.
+// ---------------------------------------------------------------
+router.get('/:token/billing-report', async (req: Request, res: Response) => {
+  const token = req.params.token;
+  const today = new Date().toISOString().slice(0, 10);
+  const from  = (req.query.from as string) || new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+  const to    = (req.query.to   as string) || today;
+
+  try {
+    const inst = await resolveInstitution(token);
+    if (!inst) { res.status(404).json({ error: 'Portal not found' }); return; }
+
+    const rate = inst.ratePerSession;
+    const [rows] = await pool.query<any[]>(
+      `SELECT u.id, u.name, u.parent_id, p.name AS parent_name,
+              COUNT(c.id) AS visit_count,
+              COALESCE(SUM(COALESCE(s.walkin_price, ?)) FILTER (WHERE c.id IS NOT NULL), 0) AS total_amount,
+              string_agg(to_char(c.checked_in_at, 'YYYY-MM-DD HH24:MI'), ',' ORDER BY c.checked_in_at) AS visit_dates
+       FROM users u
+       LEFT JOIN users p ON p.id = u.parent_id AND p.gym_id = u.gym_id
+       LEFT JOIN checkins c
+         ON c.user_id = u.id AND c.gym_id = u.gym_id
+         AND DATE(c.checked_in_at) BETWEEN ? AND ?
+       LEFT JOIN services s ON s.id = c.service_id
+       WHERE u.gym_id = ? AND u.institution_id = ? AND u.role = 'member'
+       GROUP BY u.id, p.name
+       ORDER BY u.name`,
+      [rate, from, to, inst.gymId, inst.institutionId],
+    );
+
+    res.json({
+      institution: { id: inst.institutionId, name: inst.institutionName, rate_per_session: rate },
+      from,
+      to,
+      members: rows.map((r: any) => ({
+        id:          r.id,
+        name:        r.name,
+        parent_name: r.parent_name ?? null,
+        visit_count: Number(r.visit_count),
+        amount_due:  Number(r.total_amount),
+        visit_dates: r.visit_dates ? r.visit_dates.split(',') : [],
+      })),
+      total_visits: rows.reduce((sum: number, r: any) => sum + Number(r.visit_count), 0),
+      total_amount: rows.reduce((sum: number, r: any) => sum + Number(r.total_amount), 0),
+    });
+  } catch (err) {
+    console.error('[HR billing-report]', err);
+    res.status(500).json({ error: 'Failed to load billing report' });
+  }
+});
+
+// ---------------------------------------------------------------
+// POST /api/hr/ai-chat
+// Proxies the dashboard assistant to Gemini so the key stays server-side.
+// ---------------------------------------------------------------
+router.post('/ai-chat', async (req: Request, res: Response) => {
+  const header = req.headers.authorization;
+  if (!header?.startsWith('Bearer ')) { res.status(401).json({ error: 'Not authenticated' }); return; }
+  try {
+    verifyToken(header.slice(7));
+  } catch {
+    res.status(401).json({ error: 'Not authenticated' });
+    return;
+  }
+  if (!env.GEMINI_API_KEY) { res.status(503).json({ error: 'AI assistant is not configured' }); return; }
+
+  const { messages, systemPrompt } = req.body ?? {};
+  const prompt = `${systemPrompt || ''}\n\n${(Array.isArray(messages) ? messages : [])
+    .map((m: any) => `${m.role}: ${m.content}`)
+    .join('\n')}`;
+
+  try {
+    const { data } = await axios.post(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemma-3-4b-it:generateContent',
+      { contents: [{ parts: [{ text: prompt }] }] },
+      { headers: { 'x-goog-api-key': env.GEMINI_API_KEY }, timeout: 30_000 },
+    );
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    res.json({ content: [{ text }] });
+  } catch (err: any) {
+    console.error('[HR ai-chat]', err?.response?.status ?? err?.message);
+    res.status(502).json({ error: 'AI assistant is unavailable' });
   }
 });
 

@@ -208,8 +208,8 @@ router.post('/', async (req: Request, res: Response) => {
   const [recentRows] = await pool.query<any[]>(
     `SELECT id FROM checkins
      WHERE gym_id = ? AND user_id = ?
-       AND (service_id = ? OR (service_id IS NULL AND ? IS NULL))
-       AND checked_in_at > DATE_SUB(NOW(), INTERVAL 10 HOUR)
+       AND (service_id = ? OR (service_id IS NULL AND ?::int IS NULL))
+       AND checked_in_at > (NOW() - INTERVAL '10 HOUR')
      LIMIT 1`,
     [gymId, userId, serviceId, serviceId]
   );

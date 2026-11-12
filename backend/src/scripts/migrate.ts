@@ -1,78 +1,49 @@
 /**
  * migrate.ts
  *
- * Drops and recreates the gymmind database, then runs schema.sql + seed.sql.
+ * Applies sql/schema.sql to the database in DATABASE_URL.
+ * Pass --seed to also load the demo data in sql/seed.sql.
  *
  * Usage:
- *   npx ts-node src/scripts/migrate.ts
+ *   npm run migrate
+ *   npm run migrate -- --seed
  *
- * WARNING: This destroys all existing data. Development use only.
+ * Run this against an empty database only: the schema uses plain CREATE TABLE.
  */
 
-import mysql from 'mysql2/promise';
+import { Client } from 'pg';
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const DB_HOST     = process.env.DB_HOST     ?? 'localhost';
-const DB_PORT     = Number(process.env.DB_PORT ?? 3306);
-const DB_USER     = process.env.DB_USER     ?? 'root';
-const DB_PASSWORD = process.env.DB_PASSWORD ?? '';
-const DB_NAME     = process.env.DB_NAME     ?? 'gymmind';
-
-async function runSqlFile(connection: mysql.Connection, filePath: string): Promise<void> {
-  const sql = fs.readFileSync(filePath, 'utf-8');
-
-  // Strip single-line comments, then split on semicolons
-  const stripped = sql.replace(/--[^\n]*/g, '');
-  const statements = stripped
-    .split(';')
-    .map(s => s.trim())
-    .filter(s => s.length > 0);
-
-  for (const statement of statements) {
-    await connection.query(statement);
-  }
-}
-
 async function migrate(): Promise<void> {
-  // Connect without selecting a database so we can (re)create it
-  const connection = await mysql.createConnection({
-    host: DB_HOST,
-    port: DB_PORT,
-    user: DB_USER,
-    password: DB_PASSWORD,
-    multipleStatements: false,
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error('DATABASE_URL is not set');
+
+  const isLocal = /localhost|127\.0\.0\.1/.test(url);
+  const client = new Client({
+    connectionString: url,
+    ssl: isLocal ? undefined : { rejectUnauthorized: false },
   });
+  await client.connect();
+
+  const sqlDir = path.resolve(__dirname, '../../sql');
+  const files = ['schema.sql', ...(process.argv.includes('--seed') ? ['seed.sql'] : [])];
 
   try {
-    console.log(`Dropping database '${DB_NAME}' if it exists…`);
-    await connection.query(`DROP DATABASE IF EXISTS \`${DB_NAME}\``);
-
-    console.log(`Creating database '${DB_NAME}'…`);
-    await connection.query(
-      `CREATE DATABASE \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
-    );
-
-    await connection.query(`USE \`${DB_NAME}\``);
-
-    const sqlDir = path.join(__dirname, '../../sql');
-
-    console.log('Running schema.sql…');
-    await runSqlFile(connection, path.join(sqlDir, 'schema.sql'));
-
-    console.log('Running seed.sql…');
-    await runSqlFile(connection, path.join(sqlDir, 'seed.sql'));
-
-    console.log('✅  Migration complete.');
+    for (const file of files) {
+      console.log(`Running ${file}…`);
+      await client.query(fs.readFileSync(path.join(sqlDir, file), 'utf-8'));
+    }
+    console.log('Migration complete.');
   } finally {
-    await connection.end();
+    await client.end();
   }
 }
 
-migrate().catch(err => {
-  console.error('❌  Migration failed:', err.message);
+migrate().catch((err) => {
+  console.error('Migration failed:', err.message);
   process.exit(1);
 });

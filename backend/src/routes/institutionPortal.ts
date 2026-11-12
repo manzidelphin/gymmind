@@ -63,7 +63,7 @@ router.get('/members', async (req: Request, res: Response) => {
        AND c.gym_id = ?
      WHERE u.institution_id = ?
        AND u.gym_id = ?
-     GROUP BY u.id
+     GROUP BY u.id, parent.name
      ORDER BY u.name ASC`,
     [gymId, gymId, institutionId, gymId]
   );
@@ -98,21 +98,17 @@ router.get('/attendance', async (req: Request, res: Response) => {
        u.parent_id,
        u.status,
        COUNT(c.id) AS visit_count,
-       GROUP_CONCAT(
-         DATE_FORMAT(c.checked_in_at, '%d %b %Y %H:%i')
-         ORDER BY c.checked_in_at DESC
-         SEPARATOR '|'
-       ) AS visit_dates
+       string_agg(to_char(c.checked_in_at, 'DD Mon YYYY HH24:MI'), '|' ORDER BY c.checked_in_at DESC) AS visit_dates
      FROM users u
      LEFT JOIN users parent ON u.parent_id = parent.id
        AND parent.gym_id = ?
      LEFT JOIN checkins c ON c.user_id = u.id
        AND c.gym_id = ?
-       AND YEAR(c.checked_in_at) = ?
-       AND MONTH(c.checked_in_at) = ?
+       AND EXTRACT(YEAR FROM c.checked_in_at) = ?
+       AND EXTRACT(MONTH FROM c.checked_in_at) = ?
      WHERE u.institution_id = ?
        AND u.gym_id = ?
-     GROUP BY u.id
+     GROUP BY u.id, parent.name
      ORDER BY visit_count DESC`,
     [gymId, gymId, year, mon, institutionId, gymId]
   );
@@ -123,12 +119,12 @@ router.get('/attendance', async (req: Request, res: Response) => {
      FROM checkins c
      LEFT JOIN services s ON c.service_id = s.id AND s.gym_id = c.gym_id
      WHERE c.gym_id = ?
-       AND YEAR(c.checked_in_at) = ?
-       AND MONTH(c.checked_in_at) = ?
+       AND EXTRACT(YEAR FROM c.checked_in_at) = ?
+       AND EXTRACT(MONTH FROM c.checked_in_at) = ?
        AND c.user_id IN (
          SELECT id FROM users WHERE institution_id = ? AND gym_id = ?
        )
-     GROUP BY c.user_id, c.service_id`,
+     GROUP BY c.user_id, c.service_id, s.name`,
     [gymId, year, mon, institutionId, gymId]
   );
 

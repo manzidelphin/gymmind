@@ -95,7 +95,7 @@ router.post('/', requireRole('gym_owner', 'gym_manager'), async (req: Request, r
       );
       if (svcRows[0]) {
         await pool.query(
-          'INSERT IGNORE INTO plan_services (plan_id, service_id, gym_id) VALUES (?, ?, ?)',
+          'INSERT INTO plan_services (plan_id, service_id, gym_id) VALUES (?, ?, ?) ON CONFLICT DO NOTHING',
           [planId, serviceId, gymId]
         );
       }
@@ -217,7 +217,7 @@ router.patch('/:id/services', requireRole('gym_owner', 'gym_manager'), async (re
     );
     if (svcRows[0]) {
       await pool.query(
-        'INSERT IGNORE INTO plan_services (plan_id, service_id, gym_id) VALUES (?, ?, ?)',
+        'INSERT INTO plan_services (plan_id, service_id, gym_id) VALUES (?, ?, ?) ON CONFLICT DO NOTHING',
         [planId, serviceId, gymId]
       );
     }

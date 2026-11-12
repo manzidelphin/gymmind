@@ -38,9 +38,9 @@ router.get('/attendance', async (req: Request, res: Response) => {
     `SELECT
        DATE(c.checked_in_at)                                      AS date,
        COUNT(*)                                                    AS total,
-       SUM(c.checkin_type = 'institutional')                      AS institutional,
-       SUM(c.checkin_type = 'individual')                         AS individual,
-       SUM(c.checkin_type = 'dependent')                          AS dependent
+       COUNT(*) FILTER (WHERE c.checkin_type = 'institutional') AS institutional,
+       COUNT(*) FILTER (WHERE c.checkin_type = 'individual') AS individual,
+       COUNT(*) FILTER (WHERE c.checkin_type = 'dependent') AS dependent
      FROM checkins c
      ${institutionJoin}
      WHERE c.gym_id = ?
@@ -63,7 +63,7 @@ router.get('/attendance', async (req: Request, res: Response) => {
      WHERE c.gym_id = ?
        AND DATE(c.checked_in_at) BETWEEN ? AND ?
        ${institutionWhere}
-     GROUP BY DATE(c.checked_in_at), c.service_id
+     GROUP BY DATE(c.checked_in_at), s.id, s.name
      ORDER BY date ASC`,
     serviceParams
   );
@@ -103,7 +103,7 @@ router.get('/memberships', async (req: Request, res: Response) => {
      WHERE um.gym_id = ?
        AND um.status = 'active'
        AND mp.type = 'time_based'
-       AND um.end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)`,
+       AND um.end_date BETWEEN CURRENT_DATE AND (CURRENT_DATE + INTERVAL '7 DAY')`,
     [gymId]
   );
 
@@ -163,11 +163,7 @@ router.get('/institution-billing', async (req: Request, res: Response) => {
        u.parent_id,
        p.name AS parent_name,
        COUNT(c.id) AS visit_count,
-       GROUP_CONCAT(
-         DATE_FORMAT(c.checked_in_at, '%Y-%m-%d %H:%i')
-         ORDER BY c.checked_in_at ASC
-         SEPARATOR ','
-       ) AS visit_dates
+       string_agg(to_char(c.checked_in_at, 'YYYY-MM-DD HH24:MI'), ',' ORDER BY c.checked_in_at ASC) AS visit_dates
      FROM users u
      LEFT JOIN users p ON p.id = u.parent_id AND p.gym_id = u.gym_id
      LEFT JOIN checkins c
@@ -175,7 +171,7 @@ router.get('/institution-billing', async (req: Request, res: Response) => {
        AND DATE(c.checked_in_at) BETWEEN ? AND ?
      WHERE u.gym_id = ?
        AND (u.institution_id = ? OR (u.parent_id IS NOT NULL AND p.institution_id = ?))
-     GROUP BY u.id
+     GROUP BY u.id, p.name
      ORDER BY COALESCE(p.name, u.name), (u.parent_id IS NULL) DESC`,
     [from, to, gymId, institutionId, institutionId]
   );
@@ -239,8 +235,8 @@ router.get('/institutions', async (req: Request, res: Response) => {
        JOIN users u ON c.user_id = u.id
        WHERE c.gym_id = ?
          AND u.institution_id = ?
-         AND YEAR(c.checked_in_at) = ?
-         AND MONTH(c.checked_in_at) = ?
+         AND EXTRACT(YEAR FROM c.checked_in_at) = ?
+         AND EXTRACT(MONTH FROM c.checked_in_at) = ?
        GROUP BY u.id, u.name
        ORDER BY visits DESC`,
       [gymId, inst.id, year, month]
@@ -335,7 +331,7 @@ router.get('/today-checkins', async (req: Request, res: Response) => {
      LEFT JOIN institutions i ON u.institution_id    = i.id        AND i.gym_id      = ?
      LEFT JOIN users parent   ON u.parent_id         = parent.id   AND parent.gym_id = ?
      WHERE c.gym_id = ?
-       AND DATE(c.checked_in_at) = CURDATE()
+       AND DATE(c.checked_in_at) = CURRENT_DATE
      ORDER BY c.checked_in_at DESC
      LIMIT 100`,
     [gymId, gymId, gymId, gymId],
@@ -388,7 +384,7 @@ router.get('/recent-activity', async (req: Request, res: Response) => {
        wp.created_at      AS timestamp,
        'Walk-in'          AS member_name,
        wp.payer_phone     AS member_phone,
-       (SELECT GROUP_CONCAT(s.name ORDER BY s.name SEPARATOR ', ')
+       (SELECT string_agg(s.name, ', ' ORDER BY s.name)
         FROM walkin_payment_services wps2
         JOIN services s ON s.id = wps2.service_id
         WHERE wps2.walkin_payment_id = wp.id

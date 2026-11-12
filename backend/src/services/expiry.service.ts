@@ -32,16 +32,15 @@ export async function sendAttendanceReminders(): Promise<void> {
     JOIN institutions i ON u.institution_id = i.id
     JOIN gyms g ON u.gym_id = g.id
     LEFT JOIN checkins c ON c.gym_id = u.gym_id
-      AND c.checked_in_at >= DATE_FORMAT(NOW(), '%Y-%m-01')
-      AND c.checked_in_at < DATE_FORMAT(
-        DATE_ADD(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')
+      AND c.checked_in_at >= date_trunc('month', NOW())
+      AND c.checked_in_at <  date_trunc('month', NOW()) + INTERVAL '1 month'
     LEFT JOIN users member ON c.user_id = member.id
       AND member.institution_id = u.institution_id
     WHERE u.role = 'institution_admin'
       AND u.status = 'active'
       AND u.phone IS NOT NULL
       AND i.slug IS NOT NULL
-    GROUP BY u.id
+    GROUP BY u.id, i.name, i.slug, g.name
   `);
 
   for (const admin of admins) {
@@ -84,7 +83,7 @@ export async function checkExpiringMemberships(): Promise<void> {
     JOIN membership_plans mp ON um.plan_id  = mp.id AND mp.gym_id = um.gym_id
     JOIN gyms            g  ON um.gym_id   = g.id
     WHERE um.status = 'active'
-      AND DATE(um.end_date) = DATE(DATE_ADD(NOW(), INTERVAL 3 DAY))
+      AND DATE(um.end_date) = DATE((NOW() + INTERVAL '3 DAY'))
       AND u.phone IS NOT NULL
   `);
 
@@ -115,7 +114,7 @@ export async function checkExpiringMemberships(): Promise<void> {
     JOIN membership_plans mp ON um.plan_id  = mp.id AND mp.gym_id = um.gym_id
     JOIN gyms            g  ON um.gym_id   = g.id
     WHERE um.status = 'active'
-      AND DATE(um.end_date) = DATE(DATE_ADD(NOW(), INTERVAL 1 DAY))
+      AND DATE(um.end_date) = DATE((NOW() + INTERVAL '1 DAY'))
       AND u.phone IS NOT NULL
   `);
 
@@ -165,9 +164,9 @@ export async function sendMonthlyGymSummaries(): Promise<void> {
       ON um.gym_id = g.id
     LEFT JOIN payments p
       ON p.gym_id = g.id
-      AND p.paid_at >= ?
-      AND p.paid_at <  ?
-      AND p.status = 'completed'
+      AND p.created_at >= ?
+      AND p.created_at <  ?
+      AND p.status = 'successful'
     WHERE g.email IS NOT NULL
     GROUP BY g.id
   `, [lastMonthStart, thisMonthStart, lastMonthStart, thisMonthStart]);

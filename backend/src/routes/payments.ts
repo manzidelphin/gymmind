@@ -618,7 +618,7 @@ router.get('/', authenticate, requireRole('gym_owner', 'gym_manager'), async (re
          COALESCE(u.name, mr.new_member_name) AS member_name,
          mp.name                               AS plan_name,
          COALESCE(
-           (SELECT GROUP_CONCAT(s.name ORDER BY s.name SEPARATOR ', ')
+           (SELECT string_agg(s.name, ', ' ORDER BY s.name)
             FROM plan_services ps
             JOIN services s ON s.id = ps.service_id
             WHERE ps.plan_id = mr.plan_id AND ps.gym_id = p.gym_id
@@ -644,7 +644,7 @@ router.get('/', authenticate, requireRole('gym_owner', 'gym_manager'), async (re
          wp.created_at,
          COALESCE(u2.name, 'Walk-in')          AS member_name,
          NULL                                  AS plan_name,
-         (SELECT GROUP_CONCAT(s.name ORDER BY s.name SEPARATOR ', ')
+         (SELECT string_agg(s.name, ', ' ORDER BY s.name)
           FROM walkin_payment_services wps
           JOIN services s ON s.id = wps.service_id
           WHERE wps.walkin_payment_id = wp.id AND wps.gym_id = wp.gym_id

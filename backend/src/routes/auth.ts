@@ -443,7 +443,7 @@ router.get('/claim-search', async (req: Request, res: Response) => {
      LEFT JOIN users p ON p.id = u.parent_id AND p.gym_id = u.gym_id
      LEFT JOIN institutions i ON i.id = u.institution_id AND i.gym_id = u.gym_id
      LEFT JOIN institutions ip ON ip.id = p.institution_id AND ip.gym_id = u.gym_id
-     WHERE u.gym_id = ? AND u.status = 'unclaimed' AND u.name LIKE ?
+     WHERE u.gym_id = ? AND u.status = 'unclaimed' AND u.name ILIKE ?
      ORDER BY u.name LIMIT 15`,
     [gymId, `%${name}%`]
   );
@@ -530,7 +530,7 @@ router.post('/claim-account', async (req: Request, res: Response) => {
   // Generate checkin token for immediate checkin after claiming
   const checkinOtp = Math.floor(100000 + Math.random() * 900000).toString();
   await pool.query(
-    `INSERT INTO otps (gym_id, phone, code, expires_at) VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))`,
+    `INSERT INTO otps (gym_id, phone, code, expires_at) VALUES (?, ?, ?, (NOW() + INTERVAL '5 MINUTE'))`,
     [gymId, phone, checkinOtp]
   );
   res.json({ user, token, checkinToken: checkinOtp });

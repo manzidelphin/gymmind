@@ -191,7 +191,7 @@ router.get('/stats', async (_req: Request, res: Response) => {
   const [[{ checkins_today }]] = await pool.query<any[]>(
     `SELECT COUNT(*) AS checkins_today
      FROM checkins
-     WHERE DATE(checked_in_at) = CURDATE()`
+     WHERE DATE(checked_in_at) = CURRENT_DATE`
   );
 
   res.json({

@@ -1,6 +1,6 @@
 -- BodyMax membership plans seed
 -- gym_id = 3 (BODYMAX)
--- Run: mysql -u root -p gymmind < backend/sql/seed-bodymax.sql
+-- Run: psql "$DATABASE_URL" -f backend/sql/seed-bodymax.sql
 
 -- Update existing monthly plan to correct price
 UPDATE membership_plans

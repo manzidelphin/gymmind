@@ -8,7 +8,7 @@ export function generateOTP(): string {
 export async function saveOTP(gymId: number | null, phone: string, code: string): Promise<void> {
   await pool.query(
     `INSERT INTO otps (gym_id, phone, code, expires_at)
-     VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))`,
+     VALUES (?, ?, ?, (NOW() + INTERVAL '5 MINUTE'))`,
     [gymId, phone, code]
   );
 }
@@ -46,7 +46,7 @@ export async function sendSms(phone: string, message: string): Promise<void> {
 export async function saveRegistrationOTP(phone: string, code: string): Promise<void> {
   await pool.query(
     `INSERT INTO otps (gym_id, phone, code, expires_at)
-     VALUES (NULL, ?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))`,
+     VALUES (NULL, ?, ?, (NOW() + INTERVAL '10 MINUTE'))`,
     [phone, code]
   );
 }

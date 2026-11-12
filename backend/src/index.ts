@@ -76,31 +76,43 @@ app.get('/health', (_req, res) => {
 });
 
 // ---------------------------------------------------------------
+// Daily jobs: membership expiry warnings, attendance reminders, monthly summaries
+// ---------------------------------------------------------------
+async function runDailyJobs(): Promise<void> {
+  await Promise.all([
+    checkExpiringMemberships().catch(console.error),
+    sendAttendanceReminders().catch(console.error),
+    sendMonthlyGymSummaries().catch(console.error),
+  ]);
+}
+
+// GET /api/cron/daily — called once a day by Vercel Cron (see vercel.json).
+app.get('/api/cron/daily', async (req, res) => {
+  if (!env.CRON_SECRET || req.headers.authorization !== `Bearer ${env.CRON_SECRET}`) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+  await runDailyJobs();
+  res.json({ ok: true });
+});
+
+// ---------------------------------------------------------------
 // Global error handler (must be last)
 // ---------------------------------------------------------------
 app.use(errorHandler);
 
 // ---------------------------------------------------------------
 // Start
+// On Vercel the platform invokes the exported app and Cron triggers the
+// daily jobs. Anywhere else, listen on a port and schedule them in-process.
 // ---------------------------------------------------------------
-app.listen(env.PORT, () => {
-  console.log(`GymMind backend running on http://localhost:${env.PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(env.PORT, () => {
+    console.log(`GymMind backend running on http://localhost:${env.PORT}`);
+  });
 
-// Run immediately on startup to catch any missed warnings
-checkExpiringMemberships().catch(console.error);
-sendAttendanceReminders().catch(console.error);
-sendMonthlyGymSummaries().catch(console.error);
-
-// Then run every 24 hours
-setInterval(() => {
-  checkExpiringMemberships().catch(console.error);
-  sendAttendanceReminders().catch(console.error);
-  sendMonthlyGymSummaries().catch(console.error);
-}, 24 * 60 * 60 * 1000);
-
-console.log('[Expiry] Daily membership expiry check scheduled');
-console.log('[Reminder] Monthly attendance reminder scheduled');
-console.log('[Monthly] Monthly gym summary email scheduled');
+  runDailyJobs();
+  setInterval(runDailyJobs, 24 * 60 * 60 * 1000);
+}
 
 export default app;

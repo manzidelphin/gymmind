@@ -98,25 +98,32 @@ INSERT INTO membership_plans (id, gym_id, name, type, duration_days, sessions, p
 -- ============================================================
 INSERT INTO user_memberships (id, gym_id, user_id, plan_id, start_date, end_date, remaining_sessions, status, assigned_by) VALUES
 -- Gym 1
-(1, 1, 6,  1, DATE(NOW()), DATE(DATE_ADD(NOW(), INTERVAL 30 DAY)),  NULL, 'active', 3),
-(2, 1, 7,  4, DATE(NOW()), NULL,                                     7,    'active', 3),
+(1, 1, 6,  1, CURRENT_DATE, CURRENT_DATE + 30,  NULL, 'active', 3),
+(2, 1, 7,  4, CURRENT_DATE, NULL,                                     7,    'active', 3),
 -- Gym 2
-(3, 2, 10, 5, DATE(NOW()), DATE(DATE_ADD(NOW(), INTERVAL 30 DAY)),  NULL, 'active', 5),
-(4, 2, 11, 8, DATE(NOW()), NULL,                                     7,    'active', 5);
+(3, 2, 10, 5, CURRENT_DATE, CURRENT_DATE + 30,  NULL, 'active', 5),
+(4, 2, 11, 8, CURRENT_DATE, NULL,                                     7,    'active', 5);
 
 -- ============================================================
 -- CHECK-INS — last 7 days, 3–5 per gym
 -- ============================================================
 INSERT INTO checkins (gym_id, user_id, membership_id, checkin_type, checked_in_at) VALUES
 -- Gym 1
-(1, 6,  1,    'individual',    DATE_SUB(NOW(), INTERVAL 6 DAY)),
-(1, 7,  2,    'individual',    DATE_SUB(NOW(), INTERVAL 5 DAY)),
-(1, 8,  NULL, 'institutional', DATE_SUB(NOW(), INTERVAL 4 DAY)),
-(1, 9,  NULL, 'dependent',     DATE_SUB(NOW(), INTERVAL 3 DAY)),
-(1, 6,  1,    'individual',    DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(1, 6,  1,    'individual',    NOW() - INTERVAL '6 day'),
+(1, 7,  2,    'individual',    NOW() - INTERVAL '5 day'),
+(1, 8,  NULL, 'institutional', NOW() - INTERVAL '4 day'),
+(1, 9,  NULL, 'dependent',     NOW() - INTERVAL '3 day'),
+(1, 6,  1,    'individual',    NOW() - INTERVAL '1 day'),
 -- Gym 2
-(2, 10, 3,    'individual',    DATE_SUB(NOW(), INTERVAL 6 DAY)),
-(2, 11, 4,    'individual',    DATE_SUB(NOW(), INTERVAL 4 DAY)),
-(2, 12, NULL, 'institutional', DATE_SUB(NOW(), INTERVAL 3 DAY)),
-(2, 10, 3,    'individual',    DATE_SUB(NOW(), INTERVAL 2 DAY)),
-(2, 11, 4,    'individual',    DATE_SUB(NOW(), INTERVAL 1 DAY));
+(2, 10, 3,    'individual',    NOW() - INTERVAL '6 day'),
+(2, 11, 4,    'individual',    NOW() - INTERVAL '4 day'),
+(2, 12, NULL, 'institutional', NOW() - INTERVAL '3 day'),
+(2, 10, 3,    'individual',    NOW() - INTERVAL '2 day'),
+(2, 11, 4,    'individual',    NOW() - INTERVAL '1 day');
+
+-- Rows above use explicit ids, so move each identity sequence past them.
+SELECT setval(pg_get_serial_sequence('gyms', 'id'),             (SELECT MAX(id) FROM gyms));
+SELECT setval(pg_get_serial_sequence('users', 'id'),            (SELECT MAX(id) FROM users));
+SELECT setval(pg_get_serial_sequence('institutions', 'id'),     (SELECT MAX(id) FROM institutions));
+SELECT setval(pg_get_serial_sequence('membership_plans', 'id'), (SELECT MAX(id) FROM membership_plans));
+SELECT setval(pg_get_serial_sequence('user_memberships', 'id'), (SELECT MAX(id) FROM user_memberships));

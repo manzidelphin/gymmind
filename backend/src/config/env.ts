@@ -6,12 +6,10 @@ dotenv.config();
 const envSchema = z.object({
   PORT: z.coerce.number().default(3001),
 
-  // Database
-  DB_HOST:     z.string().default('localhost'),
-  DB_PORT:     z.coerce.number().default(3306),
-  DB_USER:     z.string().default('root'),
-  DB_PASSWORD: z.string().default(''),
-  DB_NAME:     z.string().default('gymmind'),
+  // Database (Supabase Postgres connection string)
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+  // Optional PEM CA certificate used to verify the database server
+  DATABASE_CA_CERT: z.string().default(''),
 
   // Auth
   JWT_SECRET: z.string().min(16, 'JWT_SECRET must be at least 16 characters'),
@@ -24,6 +22,10 @@ const envSchema = z.object({
   // Email / Gmail SMTP
   GMAIL_USER:         z.string().default(''),
   GMAIL_APP_PASSWORD: z.string().default(''),
+
+  // Gemini key for the HR assistant, and the secret Vercel Cron sends
+  GEMINI_API_KEY: z.string().default(''),
+  CRON_SECRET:    z.string().default(''),
 
   // Frontend URL (used in SMS links)
   FRONTEND_URL: z.string().default('gymmind.rw'),
